@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/main.dir/src/main/main.cpp.o -o /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/bin/main  -Wl,-rpath,/home/zhangjinrui/AppDisk/anaconda3/envs/PNC/lib /home/zhangjinrui/AppDisk/anaconda3/envs/PNC/lib/libpython3.10.so 
