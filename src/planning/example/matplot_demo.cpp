@@ -69,7 +69,8 @@ int main() {
     };
     plt::scatter(scatter_x, scatter_y, 50.0, scatter_kwargs);
     
-    plt::legend(); // 图例需要在绘制后调用
+        // 确保图例可见
+    plt::legend({{"loc", "upper right"}});
 
     // 文本位置和内容
     double center_x = 0.5;

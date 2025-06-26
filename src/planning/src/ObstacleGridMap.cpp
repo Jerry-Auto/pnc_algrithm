@@ -242,47 +242,35 @@ void ObstacleGridMap::convertCoords(CoordType coord_type, double& x, double& y) 
     // For world coordinates, no conversion needed
 }
 
-void ObstacleGridMap::convertPath(CoordType coord_type,
-                                std::vector<std::pair<double, double>>& path) const {
-    if (coord_type == CoordType::GRID_COORDS) {
-        for (auto& p : path) {
-            double wx, wy;
-            gridToWorld(static_cast<int>(p.first), static_cast<int>(p.second), wx, wy);
-            p.first = wx;
-            p.second = wy;
-        }
-    }
-    // For world coordinates, no conversion needed
-}
 
  void ObstacleGridMap::plotWorldMap() const {
-    // 创建图形
+
+
+            // 创建图形
     plt::figure_size(1000, 800);
     plt::title("Obstacle Grid Map (World Coordinates)");
-    
-    // 设置坐标轴范围
-    plt::xlim(-3.0, world_width_+5);
-    plt::ylim(-3.0, world_height_+5);
+    // 设置坐标轴范围（添加一些边距）
+    plt::xlim(-resolution_*2, world_width_ + 2*resolution_);
+    plt::ylim(-resolution_*2, world_height_ + 2*resolution_);
     plt::xlabel("World X (m)");
     plt::ylabel("World Y (m)");
     plt::grid(true);
-    
     // 绘制地图边界
-    std::vector<double> boundary_x = {0.0, world_width_, world_width_, 0.0, 0.0};
-    std::vector<double> boundary_y = {0.0, 0.0, world_height_, world_height_, 0.0};
+    std::vector<double> boundary_x = {0.0, resolution_*grid_width_, resolution_*grid_width_, 0.0, 0.0};
+    std::vector<double> boundary_y = {0.0, 0.0, resolution_*grid_height_, resolution_*grid_height_, 0.0};
     plt::plot(boundary_x, boundary_y, "k-"); // 使用黑色线条绘制边界
-    
-    // 准备数据
+
+    // 准备数据 - 绘制栅格点
     std::vector<double> obstacle_x, obstacle_y;
     std::vector<double> free_space_x, free_space_y;
     std::vector<double> unknown_x, unknown_y;
     
-    // 绘制内部点
+    // 绘制栅格中心点
     for (int gy = 0; gy < grid_height_; ++gy) {
         for (int gx = 0; gx < grid_width_; ++gx) {
             float prob = grid_[coordToIndex(gx, gy)];
             double wx, wy;
-            gridToWorld(gx, gy, wx, wy);
+            gridToWorld(gx, gy, wx, wy); // 这已经返回栅格中心点
             
             // 根据概率决定颜色
             if (prob > 0.65f) { // 障碍物
@@ -298,131 +286,93 @@ void ObstacleGridMap::convertPath(CoordType coord_type,
         }
     }
     
-    // 绘制障碍物点
+    
+    // 绘制障碍物点（使用较大的点显示）
+        std::map<std::string, std::string> obstacle_kwargs = {
+        {"c", "r"},       // 颜色为红色
+        {"marker", "x"},  // 标记为圆点
+        {"label", "obstacle"}
+    };
+            std::map<std::string, std::string> free_space_kwargs = {
+        {"c", "g"},       // 颜色为绿色
+        {"marker", "o"},  // 标记为圆点
+        {"label", "free_space"}
+    };
+            std::map<std::string, std::string> unknown_kwargs = {
+        {"c", "gray"},       // 颜色为蓝色
+        {"marker", "o"},  // 标记为圆点
+         {"label", "Unknown"}
+    };
     if (!obstacle_x.empty() && !obstacle_y.empty()) {
-        plt::scatter(obstacle_x, obstacle_y, 10, {{"color", "red"}});
+        plt::scatter(obstacle_x, obstacle_y,point_size,obstacle_kwargs);
     }
     
     // 绘制自由空间点
     if (!free_space_x.empty() && !free_space_y.empty()) {
-        plt::scatter(free_space_x, free_space_y, 10, {{"color", "green"}});
+        plt::scatter(free_space_x, free_space_y,point_size, free_space_kwargs);
     }
     
     // 绘制未知区域点
     if (!unknown_x.empty() && !unknown_y.empty()) {
-        plt::scatter(unknown_x, unknown_y, 10, {{"color", "gray"}});
+        plt::scatter(unknown_x, unknown_y,point_size,unknown_kwargs);
     }
-    
-    // 添加图例项
-    std::vector<double> dummy_x = {0, 1};
-    std::vector<double> dummy_y = {0, 0};
-    
-    std::map<std::string, std::string> obstacle_kwargs = {
-        {"label", "Obstacle"},
-        {"color", "red"}
-    };
-    plt::scatter(dummy_x, dummy_y, 10, obstacle_kwargs);
-    
-    std::map<std::string, std::string> free_space_kwargs = {
-        {"label", "Free Space"},
-        {"color", "green"}
-    };
-    plt::scatter(dummy_x, dummy_y, 10, free_space_kwargs);
-    
-    std::map<std::string, std::string> unknown_kwargs = {
-        {"label", "Unknown"},
-        {"color", "gray"}
-    };
-    plt::scatter(dummy_x, dummy_y, 10, unknown_kwargs);
-    
-    // 确保图例可见
-    plt::legend({{"loc", "upper right"}});
+
+    plt::legend({{"loc", "upper left"}});
     
     // 显示图形
-    plt::show();
+    if (show_plot_) {
+        plt::show();
+    }
 }
 
-void ObstacleGridMap::plotGridMap() const {
-    // 创建图形
-    plt::figure_size(1000, 800);
-    plt::title("Obstacle Grid Map (Grid Coordinates)");
-    
-    // 设置坐标轴范围
-    plt::xlim(-3.0, static_cast<double>(grid_width_+5));
-    plt::ylim(-3.0, static_cast<double>(grid_height_+5));
-    plt::xlabel("Grid X");
-    plt::ylabel("Grid Y");
-    plt::grid(true);
-    
-    // 绘制地图边界
-    std::vector<double> boundary_x = {0.0, static_cast<double>(grid_width_), static_cast<double>(grid_width_), 0.0, 0.0};
-    std::vector<double> boundary_y = {0.0, 0.0, static_cast<double>(grid_height_), static_cast<double>(grid_height_), 0.0};
-    plt::plot(boundary_x, boundary_y, "k-"); // 使用黑色线条绘制边界
-    
-    // 准备数据
-    std::vector<double> obstacle_x, obstacle_y;
-    std::vector<double> free_space_x, free_space_y;
-    std::vector<double> unknown_x, unknown_y;
-    
-    // 绘制内部点
-    for (int gy = 0; gy < grid_height_; ++gy) {
-        for (int gx = 0; gx < grid_width_; ++gx) {
-            float prob = grid_[coordToIndex(gx, gy)];
-            
-            // 根据概率决定颜色
-            if (prob > 0.65f) { // 障碍物
-                obstacle_x.push_back(gx);
-                obstacle_y.push_back(gy);
-            } else if (prob < 0.35f) { // 自由空间
-                free_space_x.push_back(gx);
-                free_space_y.push_back(gy);
-            } else { // 未知区域
-                unknown_x.push_back(gx);
-                unknown_y.push_back(gy);
-            }
-        }
+void ObstacleGridMap::plotpath(std::pair<std::vector<double>, std::vector<double>> path_data) {
+    show_plot_=false;
+    if(!(this->point_plot))
+    {
+        plotWorldMap();
     }
-    
-    // 绘制障碍物点
-    if (!obstacle_x.empty() && !obstacle_y.empty()) {
-        plt::scatter(obstacle_x, obstacle_y, 10, {{"color", "red"}});
+    std::vector<double> x_coords;
+    std::vector<double> y_coords;
+    // 对 x 坐标进行缩放和偏移
+    for (double x : path_data.first) {
+        x_coords.push_back(x * resolution_ - 0.5 * resolution_);
     }
-    
-    // 绘制自由空间点
-    if (!free_space_x.empty() && !free_space_y.empty()) {
-        plt::scatter(free_space_x, free_space_y, 10, {{"color", "green"}});
+    // 对 y 坐标进行缩放和偏移
+    for (double y : path_data.second) {
+        y_coords.push_back(y * resolution_ - 0.5 * resolution_);
     }
-    
-    // 绘制未知区域点
-    if (!unknown_x.empty() && !unknown_y.empty()) {
-        plt::scatter(unknown_x, unknown_y, 10, {{"color", "gray"}});
-    }
-    
-    // 添加图例项
-    std::vector<double> dummy_x = {0, 1};
-    std::vector<double> dummy_y = {0, 0};
-    
-    std::map<std::string, std::string> obstacle_kwargs = {
-        {"label", "Obstacle"},
-        {"color", "red"}
-    };
-    plt::scatter(dummy_x, dummy_y, 10, obstacle_kwargs);
-    
-    std::map<std::string, std::string> free_space_kwargs = {
-        {"label", "Free Space"},
-        {"color", "green"}
-    };
-    plt::scatter(dummy_x, dummy_y, 10, free_space_kwargs);
-    
-    std::map<std::string, std::string> unknown_kwargs = {
-        {"label", "Unknown"},
-        {"color", "gray"}
-    };
-    plt::scatter(dummy_x, dummy_y, 10, unknown_kwargs);
-    
-    // 确保图例可见
-    plt::legend({{"loc", "upper right"}});
-    
-    // 显示图形
+    // 绘制路径
+    plt::plot(x_coords, y_coords, "-r");
+    plt::pause(1);
     plt::show();
+    show_plot_=true;
+    this->point_plot=false;
+}
+
+void ObstacleGridMap::plotpoint(double x_index, double y_index) {
+    show_plot_ = false; // 防止 plotWorldMap() 内部调用 plt::show()   
+    if(!(this->point_plot))
+    {
+        plotWorldMap();
+    }
+    this->point_plot=true;
+    std::vector<double> x_coords;
+    std::vector<double> y_coords;
+    // 对 x 坐标进行缩放和偏移
+    x_coords.push_back((x_index-0.5)* resolution_);
+    // 对 y 坐标进行缩放和偏移
+    y_coords.push_back((y_index -0.5)* resolution_);
+
+    std::map<std::string, std::string> obstacle_kwargs = {
+        {"c", "blue"},       // 颜色为蓝色
+        {"marker", "x"},     // 标记为 x
+    };
+
+    // 绘制点
+    if (!x_coords.empty() && !y_coords.empty()) {
+        plt::scatter(x_coords, y_coords, this->point_size, obstacle_kwargs);
+    }
+
+    plt::pause(1);
+    show_plot_ = true;
 }

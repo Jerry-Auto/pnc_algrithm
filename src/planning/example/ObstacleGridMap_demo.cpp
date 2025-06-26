@@ -41,10 +41,36 @@ int main() {
     // 测试世界坐标下的地图绘制
     std::cout << "Plotting world coordinates map..." << std::endl;
     grid_map.plotWorldMap();
+    
+        // 准备路径数据
+    std::vector<double> x_coords = {10.0, 20.0, 30.0, 50.0}; // x 坐标
+    std::vector<double> y_coords = {10.0, 20.0, 30.0, 40.0}; // y 坐标
+    std::pair<std::vector<double>, std::vector<double>> path_data(x_coords, y_coords);
+ 
+    // 绘制路径
+    grid_map.plotpath(path_data);
 
-    // 测试栅格坐标下的地图绘制
-    std::cout << "Plotting grid coordinates map..." << std::endl;
-    grid_map.plotGridMap();
+    //绘制点
+    std::vector<double> x_coord;
+    std::vector<double> y_coord;
+
+    for(int i=2;i<5;i++)
+    {
+        x_coord.push_back(i);
+        y_coord.push_back(i+10);
+    }
+    
+    for(std::vector<double>::size_type i=0;i<x_coord.size();i++)
+    {
+        grid_map.plotpoint(x_coord[i],y_coord[i]);
+    }
+
+    // 先画点再绘制路径
+    grid_map.plotpath(path_data);
+
+
+    grid_map.plotWorldMap();
+
 
     return 0;
 }

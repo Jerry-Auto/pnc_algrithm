@@ -1,8 +1,7 @@
 file(REMOVE_RECURSE
-  "/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/bin/planning/example/ObstacleGridMap_demo"
-  "/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/bin/planning/example/ObstacleGridMap_demo.pdb"
+  "../../../bin/planning/example/ObstacleGridMap_demo"
+  "../../../bin/planning/example/ObstacleGridMap_demo.pdb"
   "CMakeFiles/ObstacleGridMap_demo.dir/example/ObstacleGridMap_demo.cpp.o"
-  "CMakeFiles/ObstacleGridMap_demo.dir/example/ObstacleGridMap_demo.cpp.o.d"
 )
 
 # Per-language clean rules from dependency scanning.

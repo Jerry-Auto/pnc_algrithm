@@ -22,8 +22,6 @@ public:
         GRID_COORDS     // 栅格坐标
     };
 
-
-
     /**
      * 创建障碍物地图
      * @param world_width 实际世界宽度（米）
@@ -108,8 +106,10 @@ public:
     // 声明 plotWorldMap 函数
     void plotWorldMap() const;
 
-    // 声明 plotGridMap 函数
-    void plotGridMap() const;
+    void plotpath(std::pair<std::vector<double>, std::vector<double>> path_data);
+
+    void plotpoint(double x_index, double y_index);
+
 
 private:
     double world_width_;     // 世界宽度（米）
@@ -119,13 +119,15 @@ private:
     int grid_height_;        // 栅格地图高度（栅格数）
     std::vector<float> grid_;// 栅格数据 (行优先存储)
 
+    double point_size=resolution_*5;//栅格点尺寸
     // 内部辅助函数
     int coordToIndex(int gx, int gy) const;
     void initializeGrid();
-  
+
+    bool show_plot_=true; // 标志变量，控制是否在 plotWorldMap() 中调用 plt::show()
+    bool point_plot=false;// 标志变量，控制是否在 plotWorldMap() 中新建图纸
     // 坐标转换辅助函数
     void convertCoords(CoordType coord_type, double& x, double& y) const;
-    void convertPath(CoordType coord_type,std::vector<std::pair<double, double>>& path) const;
 
 };
 
