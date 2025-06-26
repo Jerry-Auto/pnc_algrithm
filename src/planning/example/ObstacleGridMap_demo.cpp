@@ -1,27 +1,50 @@
-#include "ObstacleGridMap.h"
+#include <iostream>
+#include "ObstacleGridMap.h"  // 假设 ObstacleGridMap 类的头文件是 ObstacleGridMap.h
 
 int main() {
-    // 创建地图 (10米×10米，分辨率0.1米/格)
-    ObstacleGridMap map(10.0, 10.0, 0.1);
+    // 使用正确的构造函数初始化 ObstacleGridMap 对象
+    double world_width = 135.78;
+    double world_height = 120.66;
+    double resolution = 3.5;
 
-    // 添加障碍物
-    map.setRectangleObstacle(2.0, 2.0, 3.0, 2.0);  // 矩形障碍
-    map.setCircleObstacle(7.0, 7.0, 1.5);          // 圆形障碍
+    // 创建 ObstacleGridMap 对象
+    ObstacleGridMap grid_map(world_width, world_height, resolution);
 
-    // 模拟路径 (栅格坐标)
-    std::vector<std::pair<double, double>> path = {
-        {1,1}, {2,2}, {3,3}, {4,4}, {5,5}, {6,6}, {7,7}, {8,8}
-    };
+    // 获取栅格地图的宽度和高度
+    int grid_width = grid_map.getGridWidth();
+    int grid_height = grid_map.getGridHeight();
 
-    // 绘制地图
-    map.plotMapAdvanced(
-        ObstacleGridMap::PlotConfig(),  // 使用默认配置
-        &path,                          // 路径
-        1, 1,                           // 起点(栅格坐标)
-        8, 8,                           // 终点(栅格坐标)
-        nullptr,                        // 无额外点
-        "Path Planning Result"          // 标题
-    );
-    
+    // 初始化网格的概率数据
+    for (int gy = 0; gy < grid_height; ++gy) {
+        for (int gx = 0; gx < grid_width; ++gx) {
+            float prob = 0.5f; // 设置为未知区域
+            grid_map.setCellProbability(gx, gy, prob); // 使用 setCellProbability 而不是 setGridProbability
+        }
+    }
+
+    // 设置障碍物区域
+    // 假设我们想在 (2, 2) 到 (4, 4) 的区域设置障碍物
+    for (int gy = 2; gy <= 4; ++gy) {
+        for (int gx = 2; gx <= 4; ++gx) {
+            grid_map.setCellProbability(gx, gy, 0.9f); // 高概率表示障碍物
+        }
+    }
+
+    // 设置自由空间区域
+    // 假设我们想在 (6, 6) 到 (8, 8) 的区域设置自由空间
+    for (int gy = 6; gy <= 8; ++gy) {
+        for (int gx = 6; gx <= 8; ++gx) {
+            grid_map.setCellProbability(gx, gy, 0.1f); // 低概率表示自由空间
+        }
+    }
+
+    // 测试世界坐标下的地图绘制
+    std::cout << "Plotting world coordinates map..." << std::endl;
+    grid_map.plotWorldMap();
+
+    // 测试栅格坐标下的地图绘制
+    std::cout << "Plotting grid coordinates map..." << std::endl;
+    grid_map.plotGridMap();
+
     return 0;
 }

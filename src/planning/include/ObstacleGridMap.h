@@ -22,37 +22,7 @@ public:
         GRID_COORDS     // 栅格坐标
     };
 
-    // 绘图颜色配置结构体
-    struct PlotConfig {
-        float occupied_color[3];       // 占据区域颜色 (RGB)
-        float free_color[3];           // 空闲区域颜色 (RGB)
-        float unknown_color[3];        // 未知区域颜色 (RGB)
-        float grid_color[3];           // 网格线颜色 (RGB)
-        float path_color[3];           // 路径颜色 (RGB)
-        float start_color[3];          // 起点颜色 (RGB)
-        float goal_color[3];           // 终点颜色 (RGB)
-        float point_color[3];          // 普通点颜色 (RGB)
-        bool show_grid;                // 是否显示网格
-        bool show_values;              // 是否显示概率值
-        float grid_line_width;         // 网格线宽
-        float cell_margin;             // 单元格边距
-        CoordType coord_type;          // 坐标类型
 
-        PlotConfig() :
-            occupied_color{0, 0, 0},
-            free_color{1, 1, 1},
-            unknown_color{0.7f, 0.7f, 0.7f},
-            grid_color{0.8f, 0.8f, 0.8f},
-            path_color{0, 0.5f, 1},
-            start_color{0, 1, 0},
-            goal_color{1, 0, 0},
-            point_color{1, 0, 1},
-            show_grid(true),
-            show_values(false),
-            grid_line_width(0.5f),
-            cell_margin(0.05f),
-            coord_type(CoordType::WORLD_COORDS) {}
-    };
 
     /**
      * 创建障碍物地图
@@ -134,24 +104,12 @@ public:
     // 直接访问栅格数据 (用于路径规划算法)
     const std::vector<float>& getGridData() const { return grid_; }
 
-    // 绘制地图
-    void plotMap(const std::string& title = "Obstacle Grid Map") const;
-    
-    // 绘制地图并添加路径 (世界坐标)
-    void plotMapWithPath(const std::vector<std::pair<double, double>>& path,
-                        double start_x, double start_y,
-                        double goal_x, double goal_y,
-                        const std::string& title = "Path Planning") const;
-    
-    // 高级绘图方法（使用自定义配置）
-    void plotMapAdvanced(
-        const PlotConfig& config = PlotConfig(),
-        const std::vector<std::pair<double, double>>* path = nullptr,
-        double start_x = -1, double start_y = -1,
-        double goal_x = -1, double goal_y = -1,
-        const std::vector<std::pair<double, double>>* points = nullptr,
-        const std::string& title = "Obstacle Grid Map"
-    ) const;
+
+    // 声明 plotWorldMap 函数
+    void plotWorldMap() const;
+
+    // 声明 plotGridMap 函数
+    void plotGridMap() const;
 
 private:
     double world_width_;     // 世界宽度（米）
@@ -164,15 +122,11 @@ private:
     // 内部辅助函数
     int coordToIndex(int gx, int gy) const;
     void initializeGrid();
-    
-    // 绘图辅助函数
-    void drawCell(int gx, int gy, const PlotConfig& config) const;
-    
+  
     // 坐标转换辅助函数
-    void convertCoords(CoordType coord_type, 
-                      double& x, double& y) const;
-    void convertPath(CoordType coord_type,
-                    std::vector<std::pair<double, double>>& path) const;
+    void convertCoords(CoordType coord_type, double& x, double& y) const;
+    void convertPath(CoordType coord_type,std::vector<std::pair<double, double>>& path) const;
+
 };
 
 #endif // OBSTACLE_GRID_MAP_H
