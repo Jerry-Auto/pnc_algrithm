@@ -57,18 +57,18 @@ RM = /usr/local/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project
+CMAKE_SOURCE_DIR = /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build
+CMAKE_BINARY_DIR = /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/local/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/local/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -132,9 +132,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build/CMakeFiles /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build/CMakeFiles /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -226,6 +226,19 @@ ObstacleGridMap_demo/fast:
 	$(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap_demo.dir/build.make src/planning/CMakeFiles/ObstacleGridMap_demo.dir/build
 .PHONY : ObstacleGridMap_demo/fast
 
+#=============================================================================
+# Target rules for targets named matplot_demo
+
+# Build rule for target.
+matplot_demo: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 matplot_demo
+.PHONY : matplot_demo
+
+# fast build rule for target.
+matplot_demo/fast:
+	$(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/matplot_demo.dir/build.make src/planning/CMakeFiles/matplot_demo.dir/build
+.PHONY : matplot_demo/fast
+
 src/main/main.o: src/main/main.cpp.o
 .PHONY : src/main/main.o
 
@@ -267,6 +280,7 @@ help:
 	@echo "... graph"
 	@echo "... graph_demo"
 	@echo "... main"
+	@echo "... matplot_demo"
 	@echo "... src/main/main.o"
 	@echo "... src/main/main.i"
 	@echo "... src/main/main.s"

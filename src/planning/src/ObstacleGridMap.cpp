@@ -223,18 +223,6 @@ void ObstacleGridMap::loadFromFile(const std::string& filename) {
     }
 }
 
-void ObstacleGridMap::plotMap(const std::string& title) const {
-    PlotConfig config;
-    plotMapAdvanced(config, nullptr, -1, -1, -1, -1, nullptr, title);
-}
-
-void ObstacleGridMap::plotMapWithPath(const std::vector<std::pair<double, double>>& path,
-                                     double start_x, double start_y,
-                                     double goal_x, double goal_y,
-                                     const std::string& title) const {
-    PlotConfig config;
-    plotMapAdvanced(config, &path, start_x, start_y, goal_x, goal_y, nullptr, title);
-}
 
 int ObstacleGridMap::coordToIndex(int gx, int gy) const {
     return gy * grid_width_ + gx;
@@ -267,203 +255,174 @@ void ObstacleGridMap::convertPath(CoordType coord_type,
     // For world coordinates, no conversion needed
 }
 
-void ObstacleGridMap::plotMapAdvanced(
-    const PlotConfig& config,
-    const std::vector<std::pair<double, double>>* path,
-    double start_x, double start_y,
-    double goal_x, double goal_y,
-    const std::vector<std::pair<double, double>>* points,
-    const std::string& title) const {
+ void ObstacleGridMap::plotWorldMap() const {
+    // 创建图形
+    plt::figure_size(1000, 800);
+    plt::title("Obstacle Grid Map (World Coordinates)");
     
-    // Create figure
-    plt::figure_size(1000, static_cast<int>(1000 * (world_height_ / world_width_)));
-    plt::title(title);
-    plt::xlim(0.0, world_width_);
-    plt::ylim(0.0, world_height_);
+    // 设置坐标轴范围
+    plt::xlim(-3.0, world_width_+5);
+    plt::ylim(-3.0, world_height_+5);
+    plt::xlabel("World X (m)");
+    plt::ylabel("World Y (m)");
+    plt::grid(true);
     
-    // Draw all cells
+    // 绘制地图边界
+    std::vector<double> boundary_x = {0.0, world_width_, world_width_, 0.0, 0.0};
+    std::vector<double> boundary_y = {0.0, 0.0, world_height_, world_height_, 0.0};
+    plt::plot(boundary_x, boundary_y, "k-"); // 使用黑色线条绘制边界
+    
+    // 准备数据
+    std::vector<double> obstacle_x, obstacle_y;
+    std::vector<double> free_space_x, free_space_y;
+    std::vector<double> unknown_x, unknown_y;
+    
+    // 绘制内部点
     for (int gy = 0; gy < grid_height_; ++gy) {
         for (int gx = 0; gx < grid_width_; ++gx) {
-            drawCell(gx, gy, config);
+            float prob = grid_[coordToIndex(gx, gy)];
+            double wx, wy;
+            gridToWorld(gx, gy, wx, wy);
+            
+            // 根据概率决定颜色
+            if (prob > 0.65f) { // 障碍物
+                obstacle_x.push_back(wx);
+                obstacle_y.push_back(wy);
+            } else if (prob < 0.35f) { // 自由空间
+                free_space_x.push_back(wx);
+                free_space_y.push_back(wy);
+            } else { // 未知区域
+                unknown_x.push_back(wx);
+                unknown_y.push_back(wy);
+            }
         }
     }
     
-    // Draw grid lines
-    if (config.show_grid) {
-        // Vertical lines
-        for (int x = 0; x <= grid_width_; x++) {
-            double wx = x * resolution_;
-            std::vector<double> xs = {wx, wx};
-            std::vector<double> ys = {0, world_height_};
-            plt::plot(xs, ys, {{"color", std::to_string(config.grid_color[0]) + "," + 
-                               std::to_string(config.grid_color[1]) + "," + 
-                               std::to_string(config.grid_color[2])},
-                              {"linewidth", std::to_string(config.grid_line_width)}});
-        }
-        
-        // Horizontal lines
-        for (int y = 0; y <= grid_height_; y++) {
-            double wy = y * resolution_;
-            std::vector<double> xs = {0, world_width_};
-            std::vector<double> ys = {wy, wy};
-            plt::plot(xs, ys, {{"color", std::to_string(config.grid_color[0]) + "," + 
-                               std::to_string(config.grid_color[1]) + "," + 
-                               std::to_string(config.grid_color[2])},
-                              {"linewidth", std::to_string(config.grid_line_width)}});
-        }
+    // 绘制障碍物点
+    if (!obstacle_x.empty() && !obstacle_y.empty()) {
+        plt::scatter(obstacle_x, obstacle_y, 10, {{"color", "red"}});
     }
     
-    // Convert path coordinates if needed
-    std::vector<std::pair<double, double>> converted_path;
-    if (path) {
-        converted_path = *path;
-        convertPath(config.coord_type, converted_path);
+    // 绘制自由空间点
+    if (!free_space_x.empty() && !free_space_y.empty()) {
+        plt::scatter(free_space_x, free_space_y, 10, {{"color", "green"}});
     }
     
-    // Draw path
-    if (!converted_path.empty()) {
-        std::vector<double> path_x, path_y;
-        for (const auto& point : converted_path) {
-            path_x.push_back(point.first);
-            path_y.push_back(point.second);
-        }
-        
-        // Path line
-        std::map<std::string, std::string> line_keywords;
-        line_keywords["color"] = std::to_string(config.path_color[0]) + "," + 
-                                std::to_string(config.path_color[1]) + "," + 
-                                std::to_string(config.path_color[2]);
-        line_keywords["linewidth"] = "2";
-        line_keywords["linestyle"] = "-";
-        plt::plot(path_x, path_y, line_keywords);
-        
-        // Path points
-        std::map<std::string, std::string> point_keywords;
-        point_keywords["color"] = std::to_string(config.path_color[0]) + "," + 
-                                 std::to_string(config.path_color[1]) + "," + 
-                                 std::to_string(config.path_color[2]);
-        point_keywords["marker"] = "o";
-        point_keywords["markersize"] = "4";
-        point_keywords["linestyle"] = "none";
-        plt::plot(path_x, path_y, point_keywords);
+    // 绘制未知区域点
+    if (!unknown_x.empty() && !unknown_y.empty()) {
+        plt::scatter(unknown_x, unknown_y, 10, {{"color", "gray"}});
     }
     
-    // Convert start and goal coordinates if needed
-    double start_x_draw = start_x;
-    double start_y_draw = start_y;
-    double goal_x_draw = goal_x;
-    double goal_y_draw = goal_y;
+    // 添加图例项
+    std::vector<double> dummy_x = {0, 1};
+    std::vector<double> dummy_y = {0, 0};
     
-    if (start_x >= 0 && start_y >= 0) {
-        convertCoords(config.coord_type, start_x_draw, start_y_draw);
-        std::vector<double> start_x_vec = {start_x_draw};
-        std::vector<double> start_y_vec = {start_y_draw};
-        
-        std::map<std::string, std::string> start_keywords;
-        start_keywords["color"] = std::to_string(config.start_color[0]) + "," + 
-                                 std::to_string(config.start_color[1]) + "," + 
-                                 std::to_string(config.start_color[2]);
-        start_keywords["marker"] = "o";
-        start_keywords["markersize"] = "10";
-        start_keywords["linestyle"] = "none";
-        plt::plot(start_x_vec, start_y_vec, start_keywords);
-        plt::text(start_x_draw, start_y_draw, "Start");
-    }
+    std::map<std::string, std::string> obstacle_kwargs = {
+        {"label", "Obstacle"},
+        {"color", "red"}
+    };
+    plt::scatter(dummy_x, dummy_y, 10, obstacle_kwargs);
     
-    if (goal_x >= 0 && goal_y >= 0) {
-        convertCoords(config.coord_type, goal_x_draw, goal_y_draw);
-        std::vector<double> goal_x_vec = {goal_x_draw};
-        std::vector<double> goal_y_vec = {goal_y_draw};
-        
-        std::map<std::string, std::string> goal_keywords;
-        goal_keywords["color"] = std::to_string(config.goal_color[0]) + "," + 
-                                std::to_string(config.goal_color[1]) + "," + 
-                                std::to_string(config.goal_color[2]);
-        goal_keywords["marker"] = "x";
-        goal_keywords["markersize"] = "10";
-        goal_keywords["linewidth"] = "3";
-        goal_keywords["linestyle"] = "none";
-        plt::plot(goal_x_vec, goal_y_vec, goal_keywords);
-        plt::text(goal_x_draw, goal_y_draw, "Goal");
-    }
+    std::map<std::string, std::string> free_space_kwargs = {
+        {"label", "Free Space"},
+        {"color", "green"}
+    };
+    plt::scatter(dummy_x, dummy_y, 10, free_space_kwargs);
     
-    // Draw additional points
-    if (points && !points->empty()) {
-        std::vector<double> points_x, points_y;
-        for (const auto& p : *points) {
-            double x = p.first;
-            double y = p.second;
-            convertCoords(config.coord_type, x, y);
-            points_x.push_back(x);
-            points_y.push_back(y);
-        }
-        
-        std::map<std::string, std::string> points_keywords;
-        points_keywords["color"] = std::to_string(config.point_color[0]) + "," + 
-                                  std::to_string(config.point_color[1]) + "," + 
-                                  std::to_string(config.point_color[2]);
-        points_keywords["marker"] = "o";
-        points_keywords["markersize"] = "6";
-        points_keywords["linestyle"] = "none";
-        plt::plot(points_x, points_y, points_keywords);
-    }
+    std::map<std::string, std::string> unknown_kwargs = {
+        {"label", "Unknown"},
+        {"color", "gray"}
+    };
+    plt::scatter(dummy_x, dummy_y, 10, unknown_kwargs);
     
-    // Add axis labels
-    plt::xlabel("X (meters)");
-    plt::ylabel("Y (meters)");
+    // 确保图例可见
+    plt::legend({{"loc", "upper right"}});
     
-    // Show the plot
+    // 显示图形
     plt::show();
 }
 
-void ObstacleGridMap::drawCell(int gx, int gy, const PlotConfig& config) const {
-    // Get world coordinates of cell boundaries
-    double left = gx * resolution_;
-    double right = left + resolution_;
-    double bottom = gy * resolution_;
-    double top = bottom + resolution_;
+void ObstacleGridMap::plotGridMap() const {
+    // 创建图形
+    plt::figure_size(1000, 800);
+    plt::title("Obstacle Grid Map (Grid Coordinates)");
     
-    // Add margin
-    double margin = config.cell_margin * resolution_;
-    left += margin;
-    right -= margin;
-    bottom += margin;
-    top -= margin;
+    // 设置坐标轴范围
+    plt::xlim(-3.0, static_cast<double>(grid_width_+5));
+    plt::ylim(-3.0, static_cast<double>(grid_height_+5));
+    plt::xlabel("Grid X");
+    plt::ylabel("Grid Y");
+    plt::grid(true);
     
-    // Determine color
-    float color[3];
-    float prob = getCellProbability(gx, gy);
+    // 绘制地图边界
+    std::vector<double> boundary_x = {0.0, static_cast<double>(grid_width_), static_cast<double>(grid_width_), 0.0, 0.0};
+    std::vector<double> boundary_y = {0.0, 0.0, static_cast<double>(grid_height_), static_cast<double>(grid_height_), 0.0};
+    plt::plot(boundary_x, boundary_y, "k-"); // 使用黑色线条绘制边界
     
-    if (isOccupied(gx, gy)) {
-        color[0] = config.occupied_color[0];
-        color[1] = config.occupied_color[1];
-        color[2] = config.occupied_color[2];
-    } else if (isFree(gx, gy)) {
-        color[0] = config.free_color[0];
-        color[1] = config.free_color[1];
-        color[2] = config.free_color[2];
-    } else {
-        color[0] = config.unknown_color[0];
-        color[1] = config.unknown_color[1];
-        color[2] = config.unknown_color[2];
+    // 准备数据
+    std::vector<double> obstacle_x, obstacle_y;
+    std::vector<double> free_space_x, free_space_y;
+    std::vector<double> unknown_x, unknown_y;
+    
+    // 绘制内部点
+    for (int gy = 0; gy < grid_height_; ++gy) {
+        for (int gx = 0; gx < grid_width_; ++gx) {
+            float prob = grid_[coordToIndex(gx, gy)];
+            
+            // 根据概率决定颜色
+            if (prob > 0.65f) { // 障碍物
+                obstacle_x.push_back(gx);
+                obstacle_y.push_back(gy);
+            } else if (prob < 0.35f) { // 自由空间
+                free_space_x.push_back(gx);
+                free_space_y.push_back(gy);
+            } else { // 未知区域
+                unknown_x.push_back(gx);
+                unknown_y.push_back(gy);
+            }
+        }
     }
     
-    // Draw rectangle
-    std::vector<double> x = {left, right, right, left, left};
-    std::vector<double> y = {bottom, bottom, top, top, bottom};
-    
-    std::map<std::string, std::string> fill_keywords;
-    fill_keywords["color"] = std::to_string(color[0]) + "," + 
-                            std::to_string(color[1]) + "," + 
-                            std::to_string(color[2]);
-    plt::fill(x, y, fill_keywords);
-    
-    // Show probability value
-    if (config.show_values) {
-        double center_x = (left + right) / 2;
-        double center_y = (bottom + top) / 2;
-        std::stringstream ss;
-        ss << std::fixed << std::setprecision(2) << prob;
-        plt::text(center_x, center_y, ss.str());
+    // 绘制障碍物点
+    if (!obstacle_x.empty() && !obstacle_y.empty()) {
+        plt::scatter(obstacle_x, obstacle_y, 10, {{"color", "red"}});
     }
-}    
+    
+    // 绘制自由空间点
+    if (!free_space_x.empty() && !free_space_y.empty()) {
+        plt::scatter(free_space_x, free_space_y, 10, {{"color", "green"}});
+    }
+    
+    // 绘制未知区域点
+    if (!unknown_x.empty() && !unknown_y.empty()) {
+        plt::scatter(unknown_x, unknown_y, 10, {{"color", "gray"}});
+    }
+    
+    // 添加图例项
+    std::vector<double> dummy_x = {0, 1};
+    std::vector<double> dummy_y = {0, 0};
+    
+    std::map<std::string, std::string> obstacle_kwargs = {
+        {"label", "Obstacle"},
+        {"color", "red"}
+    };
+    plt::scatter(dummy_x, dummy_y, 10, obstacle_kwargs);
+    
+    std::map<std::string, std::string> free_space_kwargs = {
+        {"label", "Free Space"},
+        {"color", "green"}
+    };
+    plt::scatter(dummy_x, dummy_y, 10, free_space_kwargs);
+    
+    std::map<std::string, std::string> unknown_kwargs = {
+        {"label", "Unknown"},
+        {"color", "gray"}
+    };
+    plt::scatter(dummy_x, dummy_y, 10, unknown_kwargs);
+    
+    // 确保图例可见
+    plt::legend({{"loc", "upper right"}});
+    
+    // 显示图形
+    plt::show();
+}

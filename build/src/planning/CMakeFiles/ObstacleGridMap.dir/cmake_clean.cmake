@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "/home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/src/libs/planning/libObstacleGridMap.pdb"
-  "/home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/src/libs/planning/libObstacleGridMap.so"
+  "/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/src/libs/planning/libObstacleGridMap.pdb"
+  "/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/src/libs/planning/libObstacleGridMap.so"
   "CMakeFiles/ObstacleGridMap.dir/src/ObstacleGridMap.cpp.o"
   "CMakeFiles/ObstacleGridMap.dir/src/ObstacleGridMap.cpp.o.d"
 )

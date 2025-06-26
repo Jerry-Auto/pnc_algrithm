@@ -1,4 +1,4 @@
-# Install script for directory: /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/src/planning
+# Install script for directory: /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/src/planning
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
