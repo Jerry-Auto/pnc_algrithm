@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "/home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/bin/planning/example/ObstacleGridMap_demo"
-  "/home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/bin/planning/example/ObstacleGridMap_demo.pdb"
+  "/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/bin/planning/example/ObstacleGridMap_demo"
+  "/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/bin/planning/example/ObstacleGridMap_demo.pdb"
   "CMakeFiles/ObstacleGridMap_demo.dir/example/ObstacleGridMap_demo.cpp.o"
   "CMakeFiles/ObstacleGridMap_demo.dir/example/ObstacleGridMap_demo.cpp.o.d"
 )

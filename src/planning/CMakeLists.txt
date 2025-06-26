@@ -121,3 +121,19 @@ set_target_properties(${OBSTACLE_GRID_MAP_DEMO_NAME} PROPERTIES
 )
 
 
+# matplot类的编译
+
+set(MATPLOT_DEMO_NAME matplot_demo)
+add_executable(${MATPLOT_DEMO_NAME})  
+
+target_sources(${MATPLOT_DEMO_NAME} 
+    PRIVATE 
+    example/matplot_demo.cpp 
+)
+target_link_libraries(${MATPLOT_DEMO_NAME} 
+    Python3::Python
+)
+# 设置可执行文件输出目录
+set_target_properties(${MATPLOT_DEMO_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR}  
+)

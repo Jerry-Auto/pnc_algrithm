@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "/home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/bin/main"
-  "/home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/bin/main.pdb"
+  "/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/bin/main"
+  "/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/bin/main.pdb"
   "CMakeFiles/main.dir/src/main/main.cpp.o"
   "CMakeFiles/main.dir/src/main/main.cpp.o.d"
 )

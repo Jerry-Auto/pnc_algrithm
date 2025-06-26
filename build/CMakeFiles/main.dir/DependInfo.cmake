@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/src/main/main.cpp" "CMakeFiles/main.dir/src/main/main.cpp.o" "gcc" "CMakeFiles/main.dir/src/main/main.cpp.o.d"
+  "/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/src/main/main.cpp" "CMakeFiles/main.dir/src/main/main.cpp.o" "gcc" "CMakeFiles/main.dir/src/main/main.cpp.o.d"
   )
 
 # Targets to which this target links.

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/usr/include/python3.10 -I/usr/local/lib/python3.10/dist-packages/numpy/core/include -I/home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/src/libs/common/include -I/usr/include/eigen3 -I/home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/src/planning/include -isystem /home/zhangjinrui/AppDisk/anaconda3/envs/PNC/include/python3.10
+CXX_INCLUDES = -I/usr/local/lib/python3.10/dist-packages/numpy/core/include -I/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/src/libs/common/include -I/usr/include/eigen3 -I/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/src/planning/include -isystem /usr/include/python3.10
 
 CXX_FLAGS =  -Wall -g -std=gnu++14
 

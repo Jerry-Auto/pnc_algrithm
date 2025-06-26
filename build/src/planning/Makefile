@@ -57,18 +57,18 @@ RM = /usr/local/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project
+CMAKE_SOURCE_DIR = /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build
+CMAKE_BINARY_DIR = /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/local/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/local/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -132,14 +132,14 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build/CMakeFiles /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build/src/planning//CMakeFiles/progress.marks
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build/CMakeFiles 0
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build/CMakeFiles /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build/src/planning//CMakeFiles/progress.marks
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/clean
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/clean
 .PHONY : clean
 
 # The main clean target
@@ -148,22 +148,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/preinstall
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/preinstall
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 src/planning/CMakeFiles/graph.dir/rule:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/CMakeFiles/graph.dir/rule
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/CMakeFiles/graph.dir/rule
 .PHONY : src/planning/CMakeFiles/graph.dir/rule
 
 # Convenience name for target.
@@ -172,12 +172,12 @@ graph: src/planning/CMakeFiles/graph.dir/rule
 
 # fast build rule for target.
 graph/fast:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph.dir/build.make src/planning/CMakeFiles/graph.dir/build
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph.dir/build.make src/planning/CMakeFiles/graph.dir/build
 .PHONY : graph/fast
 
 # Convenience name for target.
 src/planning/CMakeFiles/graph_demo.dir/rule:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/CMakeFiles/graph_demo.dir/rule
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/CMakeFiles/graph_demo.dir/rule
 .PHONY : src/planning/CMakeFiles/graph_demo.dir/rule
 
 # Convenience name for target.
@@ -186,12 +186,12 @@ graph_demo: src/planning/CMakeFiles/graph_demo.dir/rule
 
 # fast build rule for target.
 graph_demo/fast:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph_demo.dir/build.make src/planning/CMakeFiles/graph_demo.dir/build
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph_demo.dir/build.make src/planning/CMakeFiles/graph_demo.dir/build
 .PHONY : graph_demo/fast
 
 # Convenience name for target.
 src/planning/CMakeFiles/ObstacleGridMap.dir/rule:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/CMakeFiles/ObstacleGridMap.dir/rule
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/CMakeFiles/ObstacleGridMap.dir/rule
 .PHONY : src/planning/CMakeFiles/ObstacleGridMap.dir/rule
 
 # Convenience name for target.
@@ -200,12 +200,12 @@ ObstacleGridMap: src/planning/CMakeFiles/ObstacleGridMap.dir/rule
 
 # fast build rule for target.
 ObstacleGridMap/fast:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap.dir/build.make src/planning/CMakeFiles/ObstacleGridMap.dir/build
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap.dir/build.make src/planning/CMakeFiles/ObstacleGridMap.dir/build
 .PHONY : ObstacleGridMap/fast
 
 # Convenience name for target.
 src/planning/CMakeFiles/ObstacleGridMap_demo.dir/rule:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/CMakeFiles/ObstacleGridMap_demo.dir/rule
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/CMakeFiles/ObstacleGridMap_demo.dir/rule
 .PHONY : src/planning/CMakeFiles/ObstacleGridMap_demo.dir/rule
 
 # Convenience name for target.
@@ -214,15 +214,29 @@ ObstacleGridMap_demo: src/planning/CMakeFiles/ObstacleGridMap_demo.dir/rule
 
 # fast build rule for target.
 ObstacleGridMap_demo/fast:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap_demo.dir/build.make src/planning/CMakeFiles/ObstacleGridMap_demo.dir/build
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap_demo.dir/build.make src/planning/CMakeFiles/ObstacleGridMap_demo.dir/build
 .PHONY : ObstacleGridMap_demo/fast
+
+# Convenience name for target.
+src/planning/CMakeFiles/matplot_demo.dir/rule:
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/planning/CMakeFiles/matplot_demo.dir/rule
+.PHONY : src/planning/CMakeFiles/matplot_demo.dir/rule
+
+# Convenience name for target.
+matplot_demo: src/planning/CMakeFiles/matplot_demo.dir/rule
+.PHONY : matplot_demo
+
+# fast build rule for target.
+matplot_demo/fast:
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/matplot_demo.dir/build.make src/planning/CMakeFiles/matplot_demo.dir/build
+.PHONY : matplot_demo/fast
 
 example/ObstacleGridMap_demo.o: example/ObstacleGridMap_demo.cpp.o
 .PHONY : example/ObstacleGridMap_demo.o
 
 # target to build an object file
 example/ObstacleGridMap_demo.cpp.o:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap_demo.dir/build.make src/planning/CMakeFiles/ObstacleGridMap_demo.dir/example/ObstacleGridMap_demo.cpp.o
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap_demo.dir/build.make src/planning/CMakeFiles/ObstacleGridMap_demo.dir/example/ObstacleGridMap_demo.cpp.o
 .PHONY : example/ObstacleGridMap_demo.cpp.o
 
 example/ObstacleGridMap_demo.i: example/ObstacleGridMap_demo.cpp.i
@@ -230,7 +244,7 @@ example/ObstacleGridMap_demo.i: example/ObstacleGridMap_demo.cpp.i
 
 # target to preprocess a source file
 example/ObstacleGridMap_demo.cpp.i:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap_demo.dir/build.make src/planning/CMakeFiles/ObstacleGridMap_demo.dir/example/ObstacleGridMap_demo.cpp.i
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap_demo.dir/build.make src/planning/CMakeFiles/ObstacleGridMap_demo.dir/example/ObstacleGridMap_demo.cpp.i
 .PHONY : example/ObstacleGridMap_demo.cpp.i
 
 example/ObstacleGridMap_demo.s: example/ObstacleGridMap_demo.cpp.s
@@ -238,7 +252,7 @@ example/ObstacleGridMap_demo.s: example/ObstacleGridMap_demo.cpp.s
 
 # target to generate assembly for a file
 example/ObstacleGridMap_demo.cpp.s:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap_demo.dir/build.make src/planning/CMakeFiles/ObstacleGridMap_demo.dir/example/ObstacleGridMap_demo.cpp.s
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap_demo.dir/build.make src/planning/CMakeFiles/ObstacleGridMap_demo.dir/example/ObstacleGridMap_demo.cpp.s
 .PHONY : example/ObstacleGridMap_demo.cpp.s
 
 example/graph_demo.o: example/graph_demo.cpp.o
@@ -246,7 +260,7 @@ example/graph_demo.o: example/graph_demo.cpp.o
 
 # target to build an object file
 example/graph_demo.cpp.o:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph_demo.dir/build.make src/planning/CMakeFiles/graph_demo.dir/example/graph_demo.cpp.o
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph_demo.dir/build.make src/planning/CMakeFiles/graph_demo.dir/example/graph_demo.cpp.o
 .PHONY : example/graph_demo.cpp.o
 
 example/graph_demo.i: example/graph_demo.cpp.i
@@ -254,7 +268,7 @@ example/graph_demo.i: example/graph_demo.cpp.i
 
 # target to preprocess a source file
 example/graph_demo.cpp.i:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph_demo.dir/build.make src/planning/CMakeFiles/graph_demo.dir/example/graph_demo.cpp.i
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph_demo.dir/build.make src/planning/CMakeFiles/graph_demo.dir/example/graph_demo.cpp.i
 .PHONY : example/graph_demo.cpp.i
 
 example/graph_demo.s: example/graph_demo.cpp.s
@@ -262,15 +276,39 @@ example/graph_demo.s: example/graph_demo.cpp.s
 
 # target to generate assembly for a file
 example/graph_demo.cpp.s:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph_demo.dir/build.make src/planning/CMakeFiles/graph_demo.dir/example/graph_demo.cpp.s
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph_demo.dir/build.make src/planning/CMakeFiles/graph_demo.dir/example/graph_demo.cpp.s
 .PHONY : example/graph_demo.cpp.s
+
+example/matplot_demo.o: example/matplot_demo.cpp.o
+.PHONY : example/matplot_demo.o
+
+# target to build an object file
+example/matplot_demo.cpp.o:
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/matplot_demo.dir/build.make src/planning/CMakeFiles/matplot_demo.dir/example/matplot_demo.cpp.o
+.PHONY : example/matplot_demo.cpp.o
+
+example/matplot_demo.i: example/matplot_demo.cpp.i
+.PHONY : example/matplot_demo.i
+
+# target to preprocess a source file
+example/matplot_demo.cpp.i:
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/matplot_demo.dir/build.make src/planning/CMakeFiles/matplot_demo.dir/example/matplot_demo.cpp.i
+.PHONY : example/matplot_demo.cpp.i
+
+example/matplot_demo.s: example/matplot_demo.cpp.s
+.PHONY : example/matplot_demo.s
+
+# target to generate assembly for a file
+example/matplot_demo.cpp.s:
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/matplot_demo.dir/build.make src/planning/CMakeFiles/matplot_demo.dir/example/matplot_demo.cpp.s
+.PHONY : example/matplot_demo.cpp.s
 
 src/ObstacleGridMap.o: src/ObstacleGridMap.cpp.o
 .PHONY : src/ObstacleGridMap.o
 
 # target to build an object file
 src/ObstacleGridMap.cpp.o:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap.dir/build.make src/planning/CMakeFiles/ObstacleGridMap.dir/src/ObstacleGridMap.cpp.o
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap.dir/build.make src/planning/CMakeFiles/ObstacleGridMap.dir/src/ObstacleGridMap.cpp.o
 .PHONY : src/ObstacleGridMap.cpp.o
 
 src/ObstacleGridMap.i: src/ObstacleGridMap.cpp.i
@@ -278,7 +316,7 @@ src/ObstacleGridMap.i: src/ObstacleGridMap.cpp.i
 
 # target to preprocess a source file
 src/ObstacleGridMap.cpp.i:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap.dir/build.make src/planning/CMakeFiles/ObstacleGridMap.dir/src/ObstacleGridMap.cpp.i
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap.dir/build.make src/planning/CMakeFiles/ObstacleGridMap.dir/src/ObstacleGridMap.cpp.i
 .PHONY : src/ObstacleGridMap.cpp.i
 
 src/ObstacleGridMap.s: src/ObstacleGridMap.cpp.s
@@ -286,7 +324,7 @@ src/ObstacleGridMap.s: src/ObstacleGridMap.cpp.s
 
 # target to generate assembly for a file
 src/ObstacleGridMap.cpp.s:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap.dir/build.make src/planning/CMakeFiles/ObstacleGridMap.dir/src/ObstacleGridMap.cpp.s
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/ObstacleGridMap.dir/build.make src/planning/CMakeFiles/ObstacleGridMap.dir/src/ObstacleGridMap.cpp.s
 .PHONY : src/ObstacleGridMap.cpp.s
 
 src/graph.o: src/graph.cpp.o
@@ -294,7 +332,7 @@ src/graph.o: src/graph.cpp.o
 
 # target to build an object file
 src/graph.cpp.o:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph.dir/build.make src/planning/CMakeFiles/graph.dir/src/graph.cpp.o
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph.dir/build.make src/planning/CMakeFiles/graph.dir/src/graph.cpp.o
 .PHONY : src/graph.cpp.o
 
 src/graph.i: src/graph.cpp.i
@@ -302,7 +340,7 @@ src/graph.i: src/graph.cpp.i
 
 # target to preprocess a source file
 src/graph.cpp.i:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph.dir/build.make src/planning/CMakeFiles/graph.dir/src/graph.cpp.i
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph.dir/build.make src/planning/CMakeFiles/graph.dir/src/graph.cpp.i
 .PHONY : src/graph.cpp.i
 
 src/graph.s: src/graph.cpp.s
@@ -310,7 +348,7 @@ src/graph.s: src/graph.cpp.s
 
 # target to generate assembly for a file
 src/graph.cpp.s:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph.dir/build.make src/planning/CMakeFiles/graph.dir/src/graph.cpp.s
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(MAKE) $(MAKESILENT) -f src/planning/CMakeFiles/graph.dir/build.make src/planning/CMakeFiles/graph.dir/src/graph.cpp.s
 .PHONY : src/graph.cpp.s
 
 # Help Target
@@ -329,12 +367,16 @@ help:
 	@echo "... ObstacleGridMap_demo"
 	@echo "... graph"
 	@echo "... graph_demo"
+	@echo "... matplot_demo"
 	@echo "... example/ObstacleGridMap_demo.o"
 	@echo "... example/ObstacleGridMap_demo.i"
 	@echo "... example/ObstacleGridMap_demo.s"
 	@echo "... example/graph_demo.o"
 	@echo "... example/graph_demo.i"
 	@echo "... example/graph_demo.s"
+	@echo "... example/matplot_demo.o"
+	@echo "... example/matplot_demo.i"
+	@echo "... example/matplot_demo.s"
 	@echo "... src/ObstacleGridMap.o"
 	@echo "... src/ObstacleGridMap.i"
 	@echo "... src/ObstacleGridMap.s"
@@ -352,6 +394,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

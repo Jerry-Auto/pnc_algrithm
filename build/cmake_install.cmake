@@ -1,4 +1,4 @@
-# Install script for directory: /home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project
+# Install script for directory: /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,7 +44,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build/src/planning/cmake_install.cmake")
+  include("/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build/src/planning/cmake_install.cmake")
 
 endif()
 
@@ -56,5 +56,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/zhangjinrui/AppDisk/auto_driving_algorithm/algorithm_project/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
