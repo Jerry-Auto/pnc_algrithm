@@ -118,6 +118,10 @@ public:
 
     std::pair<int ,int> getstr();
 
+    void set_robot_radius(double radius);
+
+    std::pair<int,int> index_to_grid(int index);
+
 private:
     double world_width_;     // 世界宽度（米）
     double world_height_;    // 世界高度（米）
@@ -125,6 +129,9 @@ private:
     int grid_width_;         // 栅格地图宽度（栅格数）
     int grid_height_;        // 栅格地图高度（栅格数）
     std::vector<float> grid_;// 栅格数据 (行优先存储)
+    double robot_radius=1.5;//移动机器人半径
+    std::pair<std::vector<int> ,std::vector<int> > obstacle_grid;
+
 
     //起点和终点信息,栅格坐标
     std::pair<int ,int> strpoint;
@@ -133,12 +140,15 @@ private:
     double plot_pause_time=0.001;
     // 内部辅助函数
     int coordToIndex(int gx, int gy) const;
+
     void initializeGrid();
 
     bool show_plot_=true; // 标志变量，控制是否在 plotWorldMap() 中调用 plt::show()
     bool point_plot=false;// 标志变量，控制是否在 plotWorldMap() 中新建图纸
     // 坐标转换辅助函数
     void convertCoords(CoordType coord_type, double& x, double& y) const;
+
+    void update_grid_();
 
 };
 

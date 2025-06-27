@@ -2,6 +2,7 @@ file(REMOVE_RECURSE
   "../../../bin/planning/example/graph_demo"
   "../../../bin/planning/example/graph_demo.pdb"
   "CMakeFiles/graph_demo.dir/example/graph_demo.cpp.o"
+  "CMakeFiles/graph_demo.dir/example/graph_demo.cpp.o.d"
 )
 
 # Per-language clean rules from dependency scanning.

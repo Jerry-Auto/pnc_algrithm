@@ -97,7 +97,10 @@ void ObstacleGridMap::setObstacle(double wx, double wy, float probability) {
     
     int gx, gy;
     worldToGrid(wx, wy, gx, gy);
+    this->obstacle_grid.first.push_back(gx);  
+    this->obstacle_grid.second.push_back(gy); 
     setCellProbability(gx, gy, probability);
+    update_grid_();
 }
 
 void ObstacleGridMap::setRectangleObstacle(double world_x, double world_y, 
@@ -110,10 +113,13 @@ void ObstacleGridMap::setRectangleObstacle(double world_x, double world_y,
     for (int gy = start_gy; gy <= end_gy; ++gy) {
         for (int gx = start_gx; gx <= end_gx; ++gx) {
             if (gx >= 0 && gx < grid_width_ && gy >= 0 && gy < grid_height_) {
+                this->obstacle_grid.first.push_back(gx);  
+                this->obstacle_grid.second.push_back(gy); 
                 setCellProbability(gx, gy, probability);
             }
         }
     }
+    update_grid_();
 }
 
 void ObstacleGridMap::setCircleObstacle(double center_x, double center_y, 
@@ -137,10 +143,13 @@ void ObstacleGridMap::setCircleObstacle(double center_x, double center_y,
             double dx = wx - center_x;
             double dy = wy - center_y;
             if (dx*dx + dy*dy <= radius_sq) {
+                this->obstacle_grid.first.push_back(gx);  
+                this->obstacle_grid.second.push_back(gy); 
                 setCellProbability(gx, gy, probability);
             }
         }
     }
+    update_grid_();
 }
 
 void ObstacleGridMap::setLineObstacle(double start_x, double start_y, 
@@ -166,6 +175,8 @@ void ObstacleGridMap::setLineObstacle(double start_x, double start_y,
     
     while (true) {
         if (x >= 0 && x < grid_width_ && y >= 0 && y < grid_height_) {
+            this->obstacle_grid.first.push_back(x);  
+            this->obstacle_grid.second.push_back(y); 
             setCellProbability(x, y, probability);
         }
         
@@ -181,6 +192,7 @@ void ObstacleGridMap::setLineObstacle(double start_x, double start_y,
             y += sy;
         }
     }
+    update_grid_();
 }
 
 void ObstacleGridMap::reset() {
@@ -434,4 +446,39 @@ std::pair<int, int> ObstacleGridMap::getstr() {
     } else {
         throw std::invalid_argument("还未设置起点");
     }
+}
+
+void ObstacleGridMap::set_robot_radius(double radius){
+    this->robot_radius=radius;
+    update_grid_();
+}
+void ObstacleGridMap::update_grid_(){
+    double R_2=this->robot_radius*this->robot_radius;
+    double wx,wy,owx,owy;
+    double ob_proba=0.9;
+    for(int i=0;i<this->grid_width_;i++)
+    {
+        for(int j=0;j<this->grid_height_;j++)
+        {
+            for(int k=0;k<this->obstacle_grid.first.size();k++)
+            {
+                gridToWorld(i,j,wx,wy);
+                gridToWorld(this->obstacle_grid.first[k],this->obstacle_grid.second[k],owx,owy);
+                double d=pow(wx-owx,2)+pow(wy-owy,2);
+                if(d<=R_2)
+                {
+                    setCellProbability(i,j,ob_proba);
+                }                
+            }
+        }
+    }
+}
+
+std::pair<int,int> ObstacleGridMap::index_to_grid(int index)
+{
+    std::pair<int,int> grid;
+    grid.first=
+    grid.second=;
+    return grid;
+
 }

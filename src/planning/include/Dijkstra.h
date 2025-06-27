@@ -17,9 +17,9 @@ public:
     struct Node{
             double x;
             double y;
-            float cost;
-            double parent_index;//与之相连的上一节点
-        Node(double x, double y, float cost, double parentIndex);
+            float cost;//起点到该节点的最小代价
+            int parent_index;//与之相连的上一节点
+        Node(double x, double y, float cost, int parentIndex);
     };
 
 private:
@@ -31,9 +31,21 @@ private:
     {-1, -1, sqrt(2)},
     {-1, 1, sqrt(2)},
     {1, -1, sqrt(2)},
-    {1, 1, sqrt(2)}};;//移动方向与代价
+    {1, 1, sqrt(2)}};//移动方向与代价
 
-    
+    bool Is_quit_map(Dijkstra::Node* node);
+
+    ObstacleGridMap* grid_map_=nullptr;
+
+
+public:
+    Dijkstra(ObstacleGridMap& grid_map);
+
+    void planning();
+
+    std::pair<std::vector<int>,std::vector<int>> GetGridPath();
+
+    std::pair<std::vector<double>,std::vector<double>> GetWorldPath();
 
 };
 

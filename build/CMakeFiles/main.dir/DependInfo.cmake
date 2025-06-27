@@ -1,21 +1,14 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
-  "CXX"
   )
-# The set of files for implicit dependencies of each language:
-set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/zhangjinrui/AppDisk/auto_driving_algorithm/pnc_algrithm/src/main/main.cpp" "/home/zhangjinrui/AppDisk/auto_driving_algorithm/pnc_algrithm/build/CMakeFiles/main.dir/src/main/main.cpp.o"
-  )
-set(CMAKE_CXX_COMPILER_ID "GNU")
 
-# The include file search paths:
-set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "/usr/include/python3.10"
-  "/usr/local/lib/python3.10/dist-packages/numpy/core/include"
-  "../src/libs/common/include"
-  "/usr/include/eigen3"
-  "/usr/include/python3.8"
-  "/home/zhangjinrui/.local/lib/python3.8/site-packages/numpy/core/include"
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/src/main/main.cpp" "CMakeFiles/main.dir/src/main/main.cpp.o" "gcc" "CMakeFiles/main.dir/src/main/main.cpp.o.d"
   )
 
 # Targets to which this target links.
