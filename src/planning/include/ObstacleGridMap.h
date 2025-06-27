@@ -110,6 +110,13 @@ public:
 
     void plotpoint(double x_index, double y_index,std::string point_type="xb");
 
+    void setgoal(double x_goal,double y_goal);
+
+    void setstr(double x_str,double y_str);
+
+    std::pair<int ,int> getgoal();
+
+    std::pair<int ,int> getstr();
 
 private:
     double world_width_;     // 世界宽度（米）
@@ -119,6 +126,9 @@ private:
     int grid_height_;        // 栅格地图高度（栅格数）
     std::vector<float> grid_;// 栅格数据 (行优先存储)
 
+    //起点和终点信息,栅格坐标
+    std::pair<int ,int> strpoint;
+    std::pair<int ,int> goalpoint;
     double point_size=resolution_*5;//栅格点尺寸
     double plot_pause_time=0.001;
     // 内部辅助函数

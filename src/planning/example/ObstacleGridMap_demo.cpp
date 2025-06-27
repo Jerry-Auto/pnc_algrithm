@@ -50,6 +50,11 @@ int main() {
     // 绘制路径
     //grid_map.plotpath(path_data);
 
+
+    //添加起点终点
+    grid_map.setstr(30,40);
+    grid_map.setgoal(120.1,119.3);
+
     //绘制点
     std::vector<double> x_coord;
     std::vector<double> y_coord;

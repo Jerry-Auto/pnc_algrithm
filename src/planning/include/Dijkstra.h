@@ -23,7 +23,17 @@ public:
     };
 
 private:
-    vector<vector<double>>motion;//移动方向与代价
+    std::vector<std::vector<double>>motion=
+    {{1, 0, 1},
+    {0, 1, 1},
+    {-1, 0, 1},
+    {0, -1, 1},
+    {-1, -1, sqrt(2)},
+    {-1, 1, sqrt(2)},
+    {1, -1, sqrt(2)},
+    {1, 1, sqrt(2)}};;//移动方向与代价
+
+    
 
 };
 

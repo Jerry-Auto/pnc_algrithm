@@ -10,14 +10,13 @@
 namespace plt = matplotlibcpp;
 
 ObstacleGridMap::ObstacleGridMap(double world_width, double world_height, double resolution)
-    : world_width_(world_width), world_height_(world_height), resolution_(resolution) {
+    : world_width_(world_width), world_height_(world_height), resolution_(resolution),strpoint(-1, -1), goalpoint(-1, -1){
     if (world_width <= 0 || world_height <= 0 || resolution <= 0) {
         throw std::invalid_argument("World dimensions and resolution must be positive");
     }
     
     grid_width_ = static_cast<int>(std::ceil(world_width / resolution));
     grid_height_ = static_cast<int>(std::ceil(world_height / resolution));
-    
     initializeGrid();
 }
 
@@ -245,21 +244,42 @@ void ObstacleGridMap::convertCoords(CoordType coord_type, double& x, double& y) 
 
  void ObstacleGridMap::plotWorldMap() const {
 
-
-            // 创建图形
-    plt::figure_size(1000, 800);
-    plt::title("Obstacle Grid Map (World Coordinates)");
-    // 设置坐标轴范围（添加一些边距）
-    plt::xlim(-resolution_*2, world_width_ + 2*resolution_);
-    plt::ylim(-resolution_*2, world_height_ + 2*resolution_);
-    plt::xlabel("World X (m)");
-    plt::ylabel("World Y (m)");
-    plt::grid(true);
-    // 绘制地图边界
-    std::vector<double> boundary_x = {0.0, resolution_*grid_width_, resolution_*grid_width_, 0.0, 0.0};
-    std::vector<double> boundary_y = {0.0, 0.0, resolution_*grid_height_, resolution_*grid_height_, 0.0};
-    plt::plot(boundary_x, boundary_y, "k-"); // 使用黑色线条绘制边界
-
+    if(!(this->point_plot))
+    {
+        // 创建图形
+        plt::figure_size(1000, 800);
+        plt::title("Obstacle Grid Map (World Coordinates)");
+        // 设置坐标轴范围（添加一些边距）
+        plt::xlim(-resolution_*2, world_width_ + 2*resolution_);
+        plt::ylim(-resolution_*2, world_height_ + 2*resolution_);
+        plt::xlabel("World X (m)");
+        plt::ylabel("World Y (m)");
+        plt::grid(true);
+        // 绘制地图边界
+        std::vector<double> boundary_x = {0.0, resolution_*grid_width_, resolution_*grid_width_, 0.0, 0.0};
+        std::vector<double> boundary_y = {0.0, 0.0, resolution_*grid_height_, resolution_*grid_height_, 0.0};
+        plt::plot(boundary_x, boundary_y, "k-"); // 使用黑色线条绘制边界
+    
+        //绘制起点和终点
+        std::map<std::string, std::string> str_point_kwargs = {
+            {"c", "green"},       
+            {"marker", "*"},  
+            {"label", "start"}
+        };
+        std::map<std::string, std::string> goal_point_kwargs = {
+            {"c", "red"},       
+            {"marker", "p"},  // 标记为五角星
+            {"label", "goal"}
+        };
+        if(this->strpoint.first!=-1&&this->goalpoint.second!=-1)
+        {      
+            std::pair<std::vector<double> ,std::vector<double>> world_str({-1},{-1});
+            gridToWorld(this->strpoint.first,this->strpoint.second, world_str.first[0], world_str.second[0]);
+            plt::scatter(world_str.first, world_str.second,point_size*10,str_point_kwargs);
+            gridToWorld(this->goalpoint.first,this->goalpoint.second, world_str.first[0], world_str.second[0]);
+            plt::scatter(world_str.first, world_str.second,point_size*10,goal_point_kwargs);
+        } 
+    }
     // 准备数据 - 绘制栅格点
     std::vector<double> obstacle_x, obstacle_y;
     std::vector<double> free_space_x, free_space_y;
@@ -309,16 +329,21 @@ void ObstacleGridMap::convertCoords(CoordType coord_type, double& x, double& y) 
     
     // 绘制自由空间点
     if (!free_space_x.empty() && !free_space_y.empty()) {
-        plt::scatter(free_space_x, free_space_y,point_size, free_space_kwargs);
+        plt::scatter(free_space_x, free_space_y,point_size/3, free_space_kwargs);
     }
     
     // 绘制未知区域点
     if (!unknown_x.empty() && !unknown_y.empty()) {
-        plt::scatter(unknown_x, unknown_y,point_size,unknown_kwargs);
+        plt::scatter(unknown_x, unknown_y,point_size/3,unknown_kwargs);
     }
 
-    plt::legend({{"loc", "upper left"}});
-    
+
+    if(!(this->point_plot))
+    {
+        plt::legend({{"loc", "upper left"}});
+        plt::pause(plot_pause_time);
+    }
+
     // 显示图形
     if (show_plot_) {
         plt::show();
@@ -327,10 +352,7 @@ void ObstacleGridMap::convertCoords(CoordType coord_type, double& x, double& y) 
 
 void ObstacleGridMap::plotpath(std::pair<std::vector<double>, std::vector<double>> path_data) {
     show_plot_=false;
-    if(!(this->point_plot))
-    {
-        plotWorldMap();
-    }
+    plotWorldMap();
     std::vector<double> x_coords;
     std::vector<double> y_coords;
     // 对 x 坐标进行缩放和偏移
@@ -351,10 +373,7 @@ void ObstacleGridMap::plotpath(std::pair<std::vector<double>, std::vector<double
 
 void ObstacleGridMap::plotpoint(double x_index, double y_index,std::string point_type) {
     show_plot_ = false; // 防止 plotWorldMap() 内部调用 plt::show()   
-    if(!(this->point_plot))
-    {
-        plotWorldMap();
-    }
+    plotWorldMap();
     this->point_plot=true;
     std::vector<double> x_coords;
     std::vector<double> y_coords;
@@ -370,9 +389,49 @@ void ObstacleGridMap::plotpoint(double x_index, double y_index,std::string point
 
     // 绘制点
     if (!x_coords.empty() && !y_coords.empty()) {
-        plt::scatter(x_coords, y_coords, this->point_size*2, obstacle_kwargs);
+        plt::scatter(x_coords, y_coords, this->point_size*5, obstacle_kwargs);
     }
-
     plt::pause(plot_pause_time);
     show_plot_ = true;
+}
+
+    // 设置终点
+void ObstacleGridMap::setgoal(double x_goal, double y_goal) {
+    std::pair<int, int> grid_coord;
+    worldToGrid(x_goal, y_goal, grid_coord.first, grid_coord.second);        
+        
+    if (isInWorldBounds(x_goal, y_goal) && (getCellProbability(grid_coord.first, grid_coord.second) < 0.8)) {
+        this->goalpoint = grid_coord;
+    } else {
+        throw std::invalid_argument("不在地图内或该处有障碍物，无效");
+    }
+}
+ 
+// 设置起点
+void ObstacleGridMap::setstr(double x_str, double y_str) {
+    std::pair<int, int> grid_coord;
+    worldToGrid(x_str, y_str, grid_coord.first, grid_coord.second); 
+    if (isInWorldBounds(x_str, y_str) && (getCellProbability(grid_coord.first, grid_coord.second) < 0.8)) {
+        this->strpoint = grid_coord;
+    } else {
+        throw std::invalid_argument("不在地图内或该处有障碍物，无效");
+    }
+}
+ 
+// 获取终点
+std::pair<int, int> ObstacleGridMap::getgoal() {
+    if (strpoint.first != -1 && goalpoint.second != -1) {
+        return this->goalpoint;
+    } else {
+        throw std::invalid_argument("还未设置终点");
+    }
+}
+ 
+// 获取起点
+std::pair<int, int> ObstacleGridMap::getstr() {
+    if (strpoint.first != -1 && goalpoint.second != -1) {
+        return this->strpoint;
+    } else {
+        throw std::invalid_argument("还未设置起点");
+    }
 }

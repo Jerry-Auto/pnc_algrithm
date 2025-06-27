@@ -1,1 +1,1 @@
-/usr/bin/c++  -Wall -g CMakeFiles/matplot_demo.dir/example/matplot_demo.cpp.o -o ../../../bin/planning/example/matplot_demo  /usr/lib/x86_64-linux-gnu/libpython3.10.so 
+/usr/bin/c++   -Wall -g   CMakeFiles/matplot_demo.dir/example/matplot_demo.cpp.o  -o ../../../bin/planning/example/matplot_demo  /usr/lib/x86_64-linux-gnu/libpython3.8.so 
