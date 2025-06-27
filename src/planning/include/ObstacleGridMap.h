@@ -108,7 +108,7 @@ public:
 
     void plotpath(std::pair<std::vector<double>, std::vector<double>> path_data);
 
-    void plotpoint(double x_index, double y_index);
+    void plotpoint(double x_index, double y_index,std::string point_type="xb");
 
 
 private:
@@ -120,6 +120,7 @@ private:
     std::vector<float> grid_;// 栅格数据 (行优先存储)
 
     double point_size=resolution_*5;//栅格点尺寸
+    double plot_pause_time=0.001;
     // 内部辅助函数
     int coordToIndex(int gx, int gy) const;
     void initializeGrid();

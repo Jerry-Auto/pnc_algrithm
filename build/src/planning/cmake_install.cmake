@@ -1,4 +1,4 @@
-# Install script for directory: /home/zhangjinrui/AppDisk/auto_driving_algorithm/pnc_algrithm/src/planning
+# Install script for directory: /home/zhangjinrui/my_program_code/autodriving_algrithm/algorithm_project/src/planning
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -35,5 +35,10 @@ endif()
 # Is this installation the result of a crosscompile?
 if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
+endif()
+
+# Set default install directory permissions.
+if(NOT DEFINED CMAKE_OBJDUMP)
+  set(CMAKE_OBJDUMP "/usr/bin/objdump")
 endif()
 

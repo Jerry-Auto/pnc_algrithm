@@ -2,6 +2,7 @@ file(REMOVE_RECURSE
   "../../../src/libs/planning/libObstacleGridMap.pdb"
   "../../../src/libs/planning/libObstacleGridMap.so"
   "CMakeFiles/ObstacleGridMap.dir/src/ObstacleGridMap.cpp.o"
+  "CMakeFiles/ObstacleGridMap.dir/src/ObstacleGridMap.cpp.o.d"
 )
 
 # Per-language clean rules from dependency scanning.

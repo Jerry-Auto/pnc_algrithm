@@ -20,7 +20,8 @@ file(MAKE_DIRECTORY
     ${LIB_OUTPUT_DIR}
     ${BIN_OUTPUT_DIR}
 )
-
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR})
 
 #包含公共头文件目录
 # 查找 Python 3
@@ -59,9 +60,9 @@ target_include_directories(${GRAPH_LIB_NAME}
     auto_driving_algorithm 
 )
 # 设置库输出目录
-set_target_properties(${GRAPH_LIB_NAME} PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR}
-)
+#set_target_properties(${GRAPH_LIB_NAME} PROPERTIES
+#    LIBRARY_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR}
+#)
 
 set(GRAPH_DEMO_NAME graph_demo)
 add_executable(${GRAPH_DEMO_NAME})  
@@ -73,9 +74,9 @@ target_sources(${GRAPH_DEMO_NAME}
 target_link_libraries(${GRAPH_DEMO_NAME} ${GRAPH_LIB_NAME})  
 
 # 设置可执行文件输出目录（修正拼写错误）
-set_target_properties(${GRAPH_DEMO_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR}  
-)
+#set_target_properties(${GRAPH_DEMO_NAME} PROPERTIES
+#    RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR}  
+#)
 
 
 
@@ -98,9 +99,9 @@ target_include_directories(${OBSTACLE_GRID_MAP_LIB_NAME}
 target_link_libraries(${OBSTACLE_GRID_MAP_LIB_NAME} PRIVATE Python3::Python)
 
 # 设置库输出目录
-set_target_properties(${OBSTACLE_GRID_MAP_LIB_NAME} PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR}
-)
+# set_target_properties(${OBSTACLE_GRID_MAP_LIB_NAME} PROPERTIES
+#     LIBRARY_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR}
+# )
 
 set(OBSTACLE_GRID_MAP_DEMO_NAME ObstacleGridMap_demo)
 add_executable(${OBSTACLE_GRID_MAP_DEMO_NAME})  
@@ -116,13 +117,12 @@ target_link_libraries(${OBSTACLE_GRID_MAP_DEMO_NAME}
 )
 
 # 设置可执行文件输出目录
-set_target_properties(${OBSTACLE_GRID_MAP_DEMO_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR}  
-)
+# set_target_properties(${OBSTACLE_GRID_MAP_DEMO_NAME} PROPERTIES
+#     RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR}  
+# )
 
 
 # matplot类的编译
-
 set(MATPLOT_DEMO_NAME matplot_demo)
 add_executable(${MATPLOT_DEMO_NAME})  
 
@@ -134,6 +134,40 @@ target_link_libraries(${MATPLOT_DEMO_NAME}
     Python3::Python
 )
 # 设置可执行文件输出目录
-set_target_properties(${MATPLOT_DEMO_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR}  
+# set_target_properties(${MATPLOT_DEMO_NAME} PROPERTIES
+#     RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR}  
+# )
+
+
+
+# dijkstra算法类的编译
+set(DIJKSTRA_LIB_NAME Dijkstra)
+add_library(${DIJKSTRA_LIB_NAME} SHARED)  
+
+target_sources(${DIJKSTRA_LIB_NAME}  
+    PRIVATE 
+    src/Dijkstra.cpp
+)
+
+target_include_directories(${DIJKSTRA_LIB_NAME}  
+    PUBLIC
+        include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+
+target_link_libraries(${DIJKSTRA_LIB_NAME} PRIVATE Python3::Python ${OBSTACLE_GRID_MAP_LIB_NAME})
+
+
+
+set(DIJKSTRA_DEMO_NAME Dijkstra_demo)
+add_executable(${DIJKSTRA_DEMO_NAME})  
+
+target_sources(${DIJKSTRA_DEMO_NAME} 
+    PRIVATE 
+    example/Dijkstra_demo.cpp 
+)
+target_link_libraries(${DIJKSTRA_DEMO_NAME} 
+    ${DIJKSTRA_LIB_NAME}
+    ${OBSTACLE_GRID_MAP_LIB_NAME}
 )

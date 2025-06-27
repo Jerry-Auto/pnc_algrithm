@@ -343,13 +343,13 @@ void ObstacleGridMap::plotpath(std::pair<std::vector<double>, std::vector<double
     }
     // 绘制路径
     plt::plot(x_coords, y_coords, "-r");
-    plt::pause(1);
+    plt::pause(plot_pause_time);
     plt::show();
     show_plot_=true;
     this->point_plot=false;
 }
 
-void ObstacleGridMap::plotpoint(double x_index, double y_index) {
+void ObstacleGridMap::plotpoint(double x_index, double y_index,std::string point_type) {
     show_plot_ = false; // 防止 plotWorldMap() 内部调用 plt::show()   
     if(!(this->point_plot))
     {
@@ -364,15 +364,15 @@ void ObstacleGridMap::plotpoint(double x_index, double y_index) {
     y_coords.push_back((y_index -0.5)* resolution_);
 
     std::map<std::string, std::string> obstacle_kwargs = {
-        {"c", "blue"},       // 颜色为蓝色
-        {"marker", "x"},     // 标记为 x
+        {"c", point_type.substr(1, 1)},       // 颜色为蓝色
+        {"marker", point_type.substr(0, 1)},     // 标记为 x
     };
 
     // 绘制点
     if (!x_coords.empty() && !y_coords.empty()) {
-        plt::scatter(x_coords, y_coords, this->point_size, obstacle_kwargs);
+        plt::scatter(x_coords, y_coords, this->point_size*2, obstacle_kwargs);
     }
 
-    plt::pause(1);
+    plt::pause(plot_pause_time);
     show_plot_ = true;
 }

@@ -40,7 +40,7 @@ int main() {
 
     // 测试世界坐标下的地图绘制
     std::cout << "Plotting world coordinates map..." << std::endl;
-    grid_map.plotWorldMap();
+    //grid_map.plotWorldMap();
     
         // 准备路径数据
     std::vector<double> x_coords = {10.0, 20.0, 30.0, 50.0}; // x 坐标
@@ -48,7 +48,7 @@ int main() {
     std::pair<std::vector<double>, std::vector<double>> path_data(x_coords, y_coords);
  
     // 绘制路径
-    grid_map.plotpath(path_data);
+    //grid_map.plotpath(path_data);
 
     //绘制点
     std::vector<double> x_coord;
@@ -62,14 +62,14 @@ int main() {
     
     for(std::vector<double>::size_type i=0;i<x_coord.size();i++)
     {
-        grid_map.plotpoint(x_coord[i],y_coord[i]);
+        grid_map.plotpoint(x_coord[i],y_coord[i],"+b");
     }
-
+    //+ x o * p s D > < v ^ |
     // 先画点再绘制路径
     grid_map.plotpath(path_data);
 
 
-    grid_map.plotWorldMap();
+    //grid_map.plotWorldMap();
 
 
     return 0;
