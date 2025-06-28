@@ -106,7 +106,7 @@ public:
     // 声明 plotWorldMap 函数
     void plotWorldMap() const;
 
-    void plotpath(std::pair<std::vector<int>, std::vector<int>> path_data);
+    void plotpath(std::pair<std::vector<int>, std::vector<int>> path_data,std::string outPNGname="out.png");
 
     void plotpoint(int x_index, int y_index,std::string point_type="xb");
 
@@ -123,6 +123,8 @@ public:
     std::pair<std::pair<int,int>,float> index_to_grid(int index);
 
     int coordToIndex(int gx, int gy) const;
+
+    void save_to_PNG(std::string filename);
 
 private:
     double world_width_;     // 世界宽度（米）

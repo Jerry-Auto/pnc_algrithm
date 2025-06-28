@@ -363,7 +363,7 @@ void ObstacleGridMap::convertCoords(CoordType coord_type, double& x, double& y) 
 }
 /// @brief 使用栅格坐标下的路径数据进行路径绘制
 /// @param path_data 
-void ObstacleGridMap::plotpath(std::pair<std::vector<int>, std::vector<int>> path_data) {
+void ObstacleGridMap::plotpath(std::pair<std::vector<int>, std::vector<int>> path_data,std::string outPNGname) {
     show_plot_=false;
     plotWorldMap();
     std::vector<double> x_coords;
@@ -377,8 +377,9 @@ void ObstacleGridMap::plotpath(std::pair<std::vector<int>, std::vector<int>> pat
         y_coords.push_back(y * resolution_ + 0.5 * resolution_);
     }
     // 绘制路径
-    plt::plot(x_coords, y_coords, "-r");
+    plt::plot(x_coords, y_coords, "-g");
     plt::pause(plot_pause_time);
+    save_to_PNG(outPNGname);
     plt::show();
     show_plot_=true;
     this->point_plot=false;
@@ -461,7 +462,7 @@ void ObstacleGridMap::update_grid_(){
     {
         for(int j=0;j<this->grid_height_;j++)
         {
-            for(int k=0;k<this->obstacle_grid.first.size();k++)
+            for(size_t k=0;k<this->obstacle_grid.first.size();k++)
             {
                 gridToWorld(i,j,wx,wy);
                 gridToWorld(this->obstacle_grid.first[k],this->obstacle_grid.second[k],owx,owy);
@@ -483,4 +484,10 @@ std::pair<std::pair<int,int>,float> ObstacleGridMap::index_to_grid(int index)
     grid.second=index/this->grid_width_;
     std::pair<std::pair<int,int>,float> grid_data={grid,this->grid_[index]};
     return grid_data;
+}
+
+void ObstacleGridMap::save_to_PNG(std::string filename)
+{
+    std::cout << "结果截图保存至：" << filename << std::endl;
+    plt::save(filename);
 }

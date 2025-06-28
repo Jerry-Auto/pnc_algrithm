@@ -73,7 +73,8 @@ int main() {
     // 先画点再绘制路径
     grid_map.plotpath(path_data);
 
-
+    // std::string PNG="./dijkstra_demo.png";
+    // grid_map.save_to_PNG(PNG);
     //grid_map.plotWorldMap();
 
 

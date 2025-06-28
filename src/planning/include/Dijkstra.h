@@ -45,7 +45,7 @@ private:
 public:
     Dijkstra(ObstacleGridMap* grid_map);
 
-    void planning();
+    void planning(std::string PNGpath=" ");
 
     std::pair<std::vector<int>,std::vector<int>> GetGridPath();
 

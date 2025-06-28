@@ -23,7 +23,7 @@ bool Dijkstra::Is_quit_map(Dijkstra::Node* node)
     }
     return false;
 }
-void Dijkstra::planning(){
+void Dijkstra::planning(std::string PNGpath){
     Dijkstra::Node* str_node=new Dijkstra::Node(this->grid_map_->getstr().first,this->grid_map_->getstr().second,0,-1);
     Dijkstra::Node* goal_node=new Dijkstra::Node(this->grid_map_->getgoal().first,this->grid_map_->getgoal().second,0,-1);
     std::map<int,Node*> O_set,C_set;
@@ -77,7 +77,13 @@ void Dijkstra::planning(){
         }       
     }
     cal_fina_path(goal_node,C_set);
-    this->grid_map_->plotpath(this->GetGridPath());
+    if(PNGpath==" ")
+    {   
+       this->grid_map_->plotpath(this->GetGridPath()); 
+    }
+    else{
+        this->grid_map_->plotpath(this->GetGridPath(),PNGpath);
+    }   
 }
 std::pair<std::vector<int>,std::vector<int>> Dijkstra::GetGridPath()
 {
