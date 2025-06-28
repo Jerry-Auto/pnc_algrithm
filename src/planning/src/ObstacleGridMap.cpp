@@ -361,19 +361,20 @@ void ObstacleGridMap::convertCoords(CoordType coord_type, double& x, double& y) 
         plt::show();
     }
 }
-
-void ObstacleGridMap::plotpath(std::pair<std::vector<double>, std::vector<double>> path_data) {
+/// @brief 使用栅格坐标下的路径数据进行路径绘制
+/// @param path_data 
+void ObstacleGridMap::plotpath(std::pair<std::vector<int>, std::vector<int>> path_data) {
     show_plot_=false;
     plotWorldMap();
     std::vector<double> x_coords;
     std::vector<double> y_coords;
     // 对 x 坐标进行缩放和偏移
     for (double x : path_data.first) {
-        x_coords.push_back(x * resolution_ - 0.5 * resolution_);
+        x_coords.push_back(x * resolution_ + 0.5 * resolution_);
     }
     // 对 y 坐标进行缩放和偏移
     for (double y : path_data.second) {
-        y_coords.push_back(y * resolution_ - 0.5 * resolution_);
+        y_coords.push_back(y * resolution_ + 0.5 * resolution_);
     }
     // 绘制路径
     plt::plot(x_coords, y_coords, "-r");
@@ -383,16 +384,16 @@ void ObstacleGridMap::plotpath(std::pair<std::vector<double>, std::vector<double
     this->point_plot=false;
 }
 
-void ObstacleGridMap::plotpoint(double x_index, double y_index,std::string point_type) {
+void ObstacleGridMap::plotpoint(int x_index, int y_index,std::string point_type) {
     show_plot_ = false; // 防止 plotWorldMap() 内部调用 plt::show()   
     plotWorldMap();
     this->point_plot=true;
     std::vector<double> x_coords;
     std::vector<double> y_coords;
     // 对 x 坐标进行缩放和偏移
-    x_coords.push_back((x_index-0.5)* resolution_);
+    x_coords.push_back((x_index+0.5)* resolution_);
     // 对 y 坐标进行缩放和偏移
-    y_coords.push_back((y_index -0.5)* resolution_);
+    y_coords.push_back((y_index+0.5)* resolution_);
 
     std::map<std::string, std::string> obstacle_kwargs = {
         {"c", point_type.substr(1, 1)},       // 颜色为蓝色
@@ -401,7 +402,7 @@ void ObstacleGridMap::plotpoint(double x_index, double y_index,std::string point
 
     // 绘制点
     if (!x_coords.empty() && !y_coords.empty()) {
-        plt::scatter(x_coords, y_coords, this->point_size*5, obstacle_kwargs);
+        plt::scatter(x_coords, y_coords, this->point_size*3, obstacle_kwargs);
     }
     plt::pause(plot_pause_time);
     show_plot_ = true;
@@ -474,11 +475,12 @@ void ObstacleGridMap::update_grid_(){
     }
 }
 
-std::pair<int,int> ObstacleGridMap::index_to_grid(int index)
+std::pair<std::pair<int,int>,float> ObstacleGridMap::index_to_grid(int index)
 {
     std::pair<int,int> grid;
-    grid.first=
-    grid.second=;
-    return grid;
-
+    //gy * grid_width_ + gx
+    grid.first=index%this->grid_width_;
+    grid.second=index/this->grid_width_;
+    std::pair<std::pair<int,int>,float> grid_data={grid,this->grid_[index]};
+    return grid_data;
 }

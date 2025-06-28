@@ -106,9 +106,9 @@ public:
     // 声明 plotWorldMap 函数
     void plotWorldMap() const;
 
-    void plotpath(std::pair<std::vector<double>, std::vector<double>> path_data);
+    void plotpath(std::pair<std::vector<int>, std::vector<int>> path_data);
 
-    void plotpoint(double x_index, double y_index,std::string point_type="xb");
+    void plotpoint(int x_index, int y_index,std::string point_type="xb");
 
     void setgoal(double x_goal,double y_goal);
 
@@ -120,7 +120,9 @@ public:
 
     void set_robot_radius(double radius);
 
-    std::pair<int,int> index_to_grid(int index);
+    std::pair<std::pair<int,int>,float> index_to_grid(int index);
+
+    int coordToIndex(int gx, int gy) const;
 
 private:
     double world_width_;     // 世界宽度（米）
@@ -138,8 +140,7 @@ private:
     std::pair<int ,int> goalpoint;
     double point_size=resolution_*5;//栅格点尺寸
     double plot_pause_time=0.001;
-    // 内部辅助函数
-    int coordToIndex(int gx, int gy) const;
+
 
     void initializeGrid();
 

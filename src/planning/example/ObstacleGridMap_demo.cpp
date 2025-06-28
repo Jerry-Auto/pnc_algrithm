@@ -43,9 +43,9 @@ int main() {
     //grid_map.plotWorldMap();
     
         // 准备路径数据
-    std::vector<double> x_coords = {10.0, 20.0, 30.0, 50.0}; // x 坐标
-    std::vector<double> y_coords = {10.0, 20.0, 30.0, 40.0}; // y 坐标
-    std::pair<std::vector<double>, std::vector<double>> path_data(x_coords, y_coords);
+    std::vector<int> x_coords = {1, 12, 23, 25}; // x 坐标
+    std::vector<int> y_coords = {1, 12, 23, 24}; // y 坐标
+    std::pair<std::vector<int>, std::vector<int>> path_data(x_coords, y_coords);
  
     // 绘制路径
     //grid_map.plotpath(path_data);

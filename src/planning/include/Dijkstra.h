@@ -8,8 +8,11 @@
 #include <stdlib.h>
 #include <time.h>
 #include <map>
+#include <limits>  // 用于 std::numeric_limits
 #include"ObstacleGridMap.h"
 
+
+#define err 1e-4
 class Dijkstra
 {
     
@@ -36,16 +39,18 @@ private:
     bool Is_quit_map(Dijkstra::Node* node);
 
     ObstacleGridMap* grid_map_=nullptr;
-
+    std::pair<std::vector<int>,std::vector<int>> final_path;
+    void cal_fina_path(Node* node,std::map<int,Node*> closed_set);
 
 public:
-    Dijkstra(ObstacleGridMap& grid_map);
+    Dijkstra(ObstacleGridMap* grid_map);
 
     void planning();
 
     std::pair<std::vector<int>,std::vector<int>> GetGridPath();
 
     std::pair<std::vector<double>,std::vector<double>> GetWorldPath();
+
 
 };
 
