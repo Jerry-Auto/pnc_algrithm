@@ -171,3 +171,36 @@ target_link_libraries(${DIJKSTRA_DEMO_NAME}
     ${DIJKSTRA_LIB_NAME}
     ${OBSTACLE_GRID_MAP_LIB_NAME}
 )
+
+
+# 蚁群算法类的编译
+set(ANTCOLONY_LIB_NAME AntColony)
+add_library(${ANTCOLONY_LIB_NAME} SHARED)  
+
+target_sources(${ANTCOLONY_LIB_NAME}  
+    PRIVATE 
+    src/AntColony.cpp
+)
+
+target_include_directories(${ANTCOLONY_LIB_NAME}  
+    PUBLIC
+        include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+
+target_link_libraries(${ANTCOLONY_LIB_NAME} PRIVATE Python3::Python ${OBSTACLE_GRID_MAP_LIB_NAME})
+
+
+
+set(ANTCOLONY_DEMO_NAME AntColony_demo)
+add_executable(${ANTCOLONY_DEMO_NAME})  
+
+target_sources(${ANTCOLONY_DEMO_NAME} 
+    PRIVATE 
+    example/AntColony_demo.cpp 
+)
+target_link_libraries(${ANTCOLONY_DEMO_NAME} 
+    ${ANTCOLONY_LIB_NAME}
+    ${OBSTACLE_GRID_MAP_LIB_NAME}
+)
