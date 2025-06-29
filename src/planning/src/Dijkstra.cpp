@@ -23,6 +23,7 @@ bool Dijkstra::Is_quit_map(Dijkstra::Node* node)
     }
     return false;
 }
+
 void Dijkstra::planning(std::string PNGpath){
     Dijkstra::Node* str_node=new Dijkstra::Node(this->grid_map_->getstr().first,this->grid_map_->getstr().second,0,-1);
     Dijkstra::Node* goal_node=new Dijkstra::Node(this->grid_map_->getgoal().first,this->grid_map_->getgoal().second,0,-1);
