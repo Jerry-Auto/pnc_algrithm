@@ -16,10 +16,9 @@ class AntColony
 {
 public:
     struct Node{
-            double x;
-            double y;
-            int index;
-        Node(double x, double y);
+            int x;
+            int y;
+        Node(int x, int y);
     };
 
 
@@ -34,13 +33,14 @@ private:
     double Q;     // 每次旅程的信息素总量
     ObstacleGridMap* grid_map_=nullptr;//障碍物地图
 
+    int nodetoindex(Node* node);
 
     std::vector<int> bestPath;//最优路径
     double bestLength = std::numeric_limits<double>::max();//最短距离
 
     std::vector<std::vector<int>> All_Best_path;//历代最优路径
 
-    std::vector<double> All_Best_length(this->num_of_iterations, std::numeric_limits<double>::max());//历代最短距离
+    std::vector<double> All_Best_length;//历代最短距离
 
 //邻接矩阵（节点之间的代价）vector<vector<double>> width*height，width*height
 //启发式信息（节点数） vector<double> width*height,1
@@ -67,16 +67,19 @@ private:
 
     std::pair<double,std::vector<int>> single_ant_go(Node* start,Node* goal,int size);//单个蚂蚁从起点出发找到去终点的<距离，路径>
 
-
+    void update_pheromono(std::vector<std::vector<int>> ants_ROUTES_per_round,std::vector<double> ants_PL_per_round);
 public:
 
     AntColony(ObstacleGridMap* grid_map,int num_i=100,double alp=1.0,double bet=7.0,double rho=0.3,double q=1);
 
     void set_ant_num(int n);
 
+    bool Is_quit_map(Node* node);
+
     void planning();
 
-    ~AntColony();
+    std::pair<std::vector<int>,std::vector<int>> GetBestGridPath();
+
 };
 
 

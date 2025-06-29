@@ -86,6 +86,8 @@ void Dijkstra::planning(std::string PNGpath){
         this->grid_map_->plotpath(this->GetGridPath(),PNGpath);
     }   
 }
+
+
 std::pair<std::vector<int>,std::vector<int>> Dijkstra::GetGridPath()
 {
     return this->final_path;

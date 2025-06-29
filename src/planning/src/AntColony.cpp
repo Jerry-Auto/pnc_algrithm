@@ -1,18 +1,17 @@
 #include "AntColony.h"
 
-
-
-
 #define err 1e-4
 
-AntColony::Node::Node(double x, double y) : x(x), y(y) {
-    this->index=AntColony::grid_map_->coordToIndex(x,y);
-}
-AntColony::AntColony(ObstacleGridMap* grid_map,int num_i,double alp,double bet,double rho,double q)
-:grid_map_(grid_map),num_of_iterations(num_i),Alpha(alp),Beta(bet),Rho(rho),Q(q)
-{
-    this->num_of_ant=1.5*free_pnt_num(grid_map_);
-
+AntColony::Node::Node(int x, int y) : x(x), y(y) {}
+AntColony::AntColony(ObstacleGridMap* grid_map, int num_i, double alp, double bet, double rho, double q)
+    : num_of_iterations(num_i),  // 先初始化声明顺序靠前的成员
+      Alpha(alp),
+      Beta(bet),
+      Rho(rho),
+      Q(q),
+      grid_map_(grid_map) {     // 最后初始化 grid_map_
+    this->num_of_ant = 1.5 * free_pnt_num(grid_map_);
+    this->All_Best_length = std::vector<double>(this->num_of_iterations, std::numeric_limits<double>::max());
 }
 
 int AntColony::free_pnt_num(ObstacleGridMap* map)
@@ -51,11 +50,11 @@ double AntColony::calcu_dis_to_end(Node* node)
 std::pair<double,std::vector<int>> AntColony::single_ant_go(Node* start,Node* goal,int size)
 {
     double distance;
-    std::vector<int> Path = {start->index};
+    std::vector<int> Path = {this->nodetoindex(start)};
     std::vector<int> TABU(size,1);
-    TABU[start->index]=0;
+    TABU[this->nodetoindex(start)]=0;
     Node* current=start;
-    while(current->index!=goal->index)
+    while(this->nodetoindex(current)!=this->nodetoindex(goal))
     {
         std::pair<std::vector<Node*>,std::vector<double>> node_prob;
         //八个可行方向，计算各个方向的概率
@@ -66,12 +65,12 @@ std::pair<double,std::vector<int>> AntColony::single_ant_go(Node* start,Node* go
             if(TABU[n_id]==0){continue;}
             if(Is_quit_map(node)){continue;}
             node_prob.first.push_back(node);
-            if(n_id=goal->index)
+            if(n_id==this->nodetoindex(goal))
             {
-                node_prob.second.push_back(pow(this->Pheromone[current->index][node->index], this->Alpha) * pow(100.0, this->Beta));               
+                node_prob.second.push_back(pow(this->Pheromone[this->nodetoindex(current)][this->nodetoindex(node)], this->Alpha) * pow(100.0, this->Beta));               
             }
             else{
-                node_prob.second.push_back(pow(this->Pheromone[current->index][node->index], this->Alpha) * pow(1/calcu_dis_to_end(node), this->Beta));  
+                node_prob.second.push_back(pow(this->Pheromone[this->nodetoindex(current)][this->nodetoindex(node)], this->Alpha) * pow(1/calcu_dis_to_end(node), this->Beta));  
             }
         }
         // 如果没有可选节点，退出
@@ -81,16 +80,16 @@ std::pair<double,std::vector<int>> AntColony::single_ant_go(Node* start,Node* go
         {
             p /= sumP;
         }
-        Node* next=node_index.first[rotate_wheel_slt(ode_prob.second)];
+        Node* next=node_prob.first[rotate_wheel_slt(node_prob.second)];
         distance+=(std::abs(current->x-next->x)+std::abs(current->y-next->y)==1)?1.0:std::sqrt(2.0);
         current=next;
-        Path.push_back(current->index);
-        TABU[current->index]=0;
+        Path.push_back(this->nodetoindex(current));
+        TABU[this->nodetoindex(current)]=0;
     }
-    return {distance,path};
+    return {distance,Path};
 }
 
-int AntColony::rotate_wheel_slt(const vector<double>& prob) {
+int AntColony::rotate_wheel_slt(const std::vector<double>& prob) {
     double r =getrandm(0.0,1.0);
     double sum = 0.0;
     for (size_t i = 0; i < prob.size(); ++i) {
@@ -126,8 +125,8 @@ void AntColony::planning()
 {
     AntColony::Node* str_node=new AntColony::Node(this->grid_map_->getstr().first,this->grid_map_->getstr().second);
     AntColony::Node* goal_node=new AntColony::Node(this->grid_map_->getgoal().first,this->grid_map_->getgoal().second);
-    int N=this->grid_map_->getGridHeigh()*this->grid_map_->getGridWidth();
-    this->Pheromone = std::vector<std::vector<double>>(N, vector<double>(N, 8.0));
+    int N=this->grid_map_->getGridHeight()*this->grid_map_->getGridWidth();
+    this->Pheromone = std::vector<std::vector<double>>(N, std::vector<double>(N, 8.0));
     for(int i=0;i<this->num_of_iterations;i++)
     {
         std::vector<std::vector<int>> ROUTES(this->num_of_ant);
@@ -135,12 +134,9 @@ void AntColony::planning()
         for(int j=0;j<this->num_of_ant;j++)
         {
             std::pair<double,std::vector<int>> dis_path=single_ant_go(str_node,goal_node,N);
-            //记录历代路径
-            this->All_Best_path.push_back(dis_path.second);
-            this->All_Best_length.push_back(dis_path.first);
             //记录最小及路径
             ROUTES[j] = dis_path.second;
-            if(dis_path.second.back()==goal_node->index)
+            if(dis_path.second.back()==this->nodetoindex(goal_node))
             {
                 PL[j] = dis_path.first;
                 if (PL[j]< this->bestLength) {
@@ -149,15 +145,61 @@ void AntColony::planning()
                 }
             }
             else{
-                PL[j] = numeric_limits<double>::max();
+                PL[j] = std::numeric_limits<double>::max();
             }
             
         }
         //更新信息素
-
-        //记录当前代最优路径及距离
-
+        update_pheromono(ROUTES,PL);
+        //记录当前代最优路径及距离,记录历代路径
+        auto min_it = std::min_element(PL.begin(), PL.end());
+        // 计算索引：距离起始迭代器的偏移量
+        int min_index = std::distance(PL.begin(), min_it);
+        this->All_Best_length.push_back(*min_it);
+        this->All_Best_path.push_back(ROUTES[min_index]);
     }
+        // 输出结果
+    std::cout << "Best path length: " << bestLength << std::endl;
+    this->grid_map_->plotpath(this->GetBestGridPath()); 
+}
 
+void AntColony::update_pheromono(std::vector<std::vector<int>> ants_ROUTES_per_round,std::vector<double> ants_PL_per_round)
+{
 
+    // 更新信息素
+    std::vector<std::vector<double>> Delta_Tau(this->Pheromone.size(), std::vector<double>(this->Pheromone.size(), 0.0));
+    for (int m = 0; m < this->num_of_ant; ++m) {
+        if (ants_PL_per_round[m] != std::numeric_limits<double>::max()) {
+            for (size_t s = 0; s < ants_ROUTES_per_round[m].size() - 1; ++s) {
+                int x = ants_ROUTES_per_round[m][s];
+                int y = ants_ROUTES_per_round[m][s + 1];
+                Delta_Tau[x][y] += this->Q / ants_PL_per_round[m];
+                Delta_Tau[y][x] += this->Q / ants_PL_per_round[m];
+            }
+        }
+    }
+    // 信息素挥发和增强
+    for (size_t i = 0; i < this->Pheromone.size(); ++i) {
+        for (size_t j = 0; j < this->Pheromone.size(); ++j) {
+            this->Pheromone[i][j] = (1 - this->Rho) * this->Pheromone[i][j] + Delta_Tau[i][j];
+        }
+    }
+}
+
+int AntColony::nodetoindex(Node* node)
+{
+    return grid_map_->coordToIndex(node->x,node->y);
+}
+
+std::pair<std::vector<int>,std::vector<int>> AntColony::GetBestGridPath()
+{
+    std::pair<std::vector<int>,std::vector<int>>grids;
+    std::pair<std::pair<int,int>,float> grid;
+    for(size_t i=0;i<this->bestPath.size();i++)
+    {
+        grid=grid_map_->index_to_grid(this->bestPath[i]);
+        grids.first.push_back(grid.first.first);
+        grids.second.push_back(grid.first.second);
+    }
+    return grids;
 }
