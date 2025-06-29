@@ -24,7 +24,7 @@ const int M = 50;         // 蚂蚁数量
 const double Alpha = 1.0; // 信息素重要程度
 const double Beta = 7.0;  // 启发式信息重要程度
 const double Rho = 0.3;   // 信息素蒸发系数
-const double Q = 1.0;     // 信息素增加强度
+const double Q = 1.0;     // 每次旅程的信息素总量
 
 // 网格地图（1表示障碍物）
 vector<vector<int>> G = {
@@ -244,6 +244,7 @@ void antColonyOptimization() {
     }
     outFile.close();
 }
+
 
 int main() {
     antColonyOptimization();

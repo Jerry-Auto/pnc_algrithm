@@ -68,7 +68,8 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "variant": "cpp",
-        "span": "cpp"
+        "span": "cpp",
+        "format": "cpp"
     },
     "python.autoComplete.extraPaths": [
         "/home/zhangjinrui/ROS2/dev_ws_foxy/install/learning_urdf/lib/python3.8/site-packages",
