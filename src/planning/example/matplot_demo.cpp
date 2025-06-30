@@ -40,9 +40,18 @@ int main() {
 
     // 绘制折线图
 
-    plt::plot(x1, y1, "r-"); // 红色实线
+    // plt::plot(x1, y1, "r-"); // 红色实线
 
-    plt::plot(x1, y2, "g--"); // 绿色虚线
+    // plt::plot(x1, y2, "g--"); // 绿色虚线
+
+    plt::Plot* line=new plt::Plot("My Line",x1, y1,"g-");
+    plt::pause(1);
+    line->remove();
+    delete line;
+    line=new plt::Plot("My Line",x1, y2,"g-");
+    //plt::draw(); 
+    plt::show(); // 显示空线条（不可见）
+
 
         // ============================
 

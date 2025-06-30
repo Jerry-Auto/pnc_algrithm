@@ -108,6 +108,8 @@ public:
 
     void plotpath(std::pair<std::vector<int>, std::vector<int>> path_data,std::string outPNGname="out.png");
 
+    void plot_iterate_path(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& path_data);
+
     void plotpoint(int x_index, int y_index,std::string point_type="xb");
 
     void setgoal(double x_goal,double y_goal);

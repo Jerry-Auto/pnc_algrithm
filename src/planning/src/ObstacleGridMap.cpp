@@ -377,7 +377,7 @@ void ObstacleGridMap::plotpath(std::pair<std::vector<int>, std::vector<int>> pat
         y_coords.push_back(y * resolution_ + 0.5 * resolution_);
     }
     // 绘制路径
-    plt::plot(x_coords, y_coords, "-g");
+    plt::plot(x_coords, y_coords, "-r");
     plt::pause(plot_pause_time);
     save_to_PNG(outPNGname);
     plt::show();
@@ -490,4 +490,32 @@ void ObstacleGridMap::save_to_PNG(std::string filename)
 {
     std::cout << "结果截图保存至：" << filename << std::endl;
     plt::save(filename);
+}
+
+void ObstacleGridMap::plot_iterate_path(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& path_data) {
+    show_plot_=false;
+    plotWorldMap();
+    plt::Plot* line;
+    std::vector<double> x_coords;
+    std::vector<double> y_coords;
+    for(size_t i=0;i<path_data.size();i++)
+    {
+        std::cout<<"共"<<path_data.size()<<"张，第"<<i+1<<"张"<<std::endl;       
+        // 对 x 坐标进行缩放和偏移
+        for (double x : path_data[i].first) {
+            x_coords.push_back(x * resolution_ + 0.5 * resolution_);
+        }
+        // 对 y 坐标进行缩放和偏移
+        for (double y : path_data[i].second) {
+            y_coords.push_back(y * resolution_ + 0.5 * resolution_);
+        }
+        // 绘制路径
+        line=new plt::Plot("path",x_coords, y_coords,"g-");
+        plt::pause(plot_pause_time*800);
+        line->remove();       
+        delete line;
+        x_coords=std::vector<double>();
+        y_coords=std::vector<double>();
+    }
+    this->point_plot=true;
 }

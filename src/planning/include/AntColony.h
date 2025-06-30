@@ -76,10 +76,15 @@ public:
 
     bool Is_quit_map(Node* node);
 
-    void planning();
+    void planning(std::string PNGpath=" ");
 
     std::pair<std::vector<int>,std::vector<int>> GetBestGridPath();
 
+    std::vector<std::pair<std::vector<int>,std::vector<int>>> GetAllGridPath();
+
+    std::vector<double> GetAllGridLength();
+
+    double GetBestGridLength();
 };
 
 

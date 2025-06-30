@@ -121,7 +121,7 @@ bool AntColony::Is_quit_map(Node* node)
 }
 
 
-void AntColony::planning()
+void AntColony::planning(std::string PNGpath)
 {
     AntColony::Node* str_node=new AntColony::Node(this->grid_map_->getstr().first,this->grid_map_->getstr().second);
     AntColony::Node* goal_node=new AntColony::Node(this->grid_map_->getgoal().first,this->grid_map_->getgoal().second);
@@ -157,10 +157,21 @@ void AntColony::planning()
         int min_index = std::distance(PL.begin(), min_it);
         this->All_Best_length.push_back(*min_it);
         this->All_Best_path.push_back(ROUTES[min_index]);
+        std::cout <<"第"<<i+1<< "次迭代最短距离: " << *min_it << std::endl;
+        
     }
         // 输出结果
-    std::cout << "Best path length: " << bestLength << std::endl;
-    this->grid_map_->plotpath(this->GetBestGridPath()); 
+    std::cout << "全局最优距离: " << bestLength << std::endl;
+    this->grid_map_->plot_iterate_path(this->GetAllGridPath());
+    if(PNGpath==" ")
+    {   
+       this->grid_map_->plotpath(this->GetBestGridPath()); 
+    }
+    else
+    {       
+        this->grid_map_->plotpath(this->GetBestGridPath(),PNGpath);
+    } 
+    
 }
 
 void AntColony::update_pheromono(std::vector<std::vector<int>> ants_ROUTES_per_round,std::vector<double> ants_PL_per_round)
@@ -202,4 +213,33 @@ std::pair<std::vector<int>,std::vector<int>> AntColony::GetBestGridPath()
         grids.second.push_back(grid.first.second);
     }
     return grids;
+}
+
+std::vector<std::pair<std::vector<int>,std::vector<int>>> AntColony::GetAllGridPath()
+{
+    std::vector<std::pair<std::vector<int>,std::vector<int>>> all_grids;
+    std::pair<std::pair<int,int>,float> grid_1;
+    std::pair<std::vector<int>,std::vector<int>> grid_coord;
+    for(size_t i=0;i<this->All_Best_path.size();i++)
+    {
+        for(size_t j=0;j<this->All_Best_path[i].size();j++)
+        {
+            grid_1=grid_map_->index_to_grid(this->All_Best_path[i][j]);
+            grid_coord.first.push_back(grid_1.first.first);
+            grid_coord.second.push_back(grid_1.first.second);      
+        }
+        all_grids.push_back(grid_coord);
+        grid_coord.first=std::vector<int>();
+        grid_coord.second=std::vector<int>();
+    }
+    return all_grids;
+}
+std::vector<double> AntColony::GetAllGridLength()
+{
+    return this->All_Best_length;
+}
+
+double AntColony::GetBestGridLength()
+{
+    return this->bestLength;
 }
