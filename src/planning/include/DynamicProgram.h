@@ -49,21 +49,14 @@ private:
 
     double best_grid_length;
 
+    std::pair<std::vector<int>,std::vector<int>> GetBestGridPath()
+
 public:
     DynamicProgram(ObstacleGridMap* grid_map);
 
     void planning(std::string PNGpath=" ");
 
-
-
-
-
-
 };
-
-
-
-
 
 
 

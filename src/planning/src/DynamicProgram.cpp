@@ -27,27 +27,27 @@ void DynamicProgram::planning(std::string PNGpath)
     Node* str_node=new Node(this->grid_map_->getstr().first,this->grid_map_->getstr().second,0,-1);
     Node* goal_node=new Node(this->grid_map_->getgoal().first,this->grid_map_->getgoal().second,0,-1);
     int g_id=this->grid_map_->coordToIndex(goal_node->x,goal_node->y);
-    this->DPArray[this->grid_map_->coordToIndex(str_node->x,str_node->y)]=str_node;
-    std::map<int,Node*> DP_init;
+    std::map<int,Node*> DP_current;
+    std::map<int,Node*> DP_next;
+    DP_next[this->grid_map_->coordToIndex(str_node->x,str_node->y)]=str_node;
 
     while(true)
     {
-        if(DPArray.find(g_id)!=DPArray.end())
+        if(DP_current.find(g_id)!=DP_current.end())
         {
-            this->best_grid_length=DPArray[g_id]->cost;
+            this->best_grid_length=DP_current[g_id]->cost;
+            goal_node->parent_index=DP_current[g_id]->parent_index;
+            goal_node->cost=DP_current[g_id]->cost;
             break;
         }
-
-        for(auto it = this->DPArray.begin(); it != this->DPArray.end(); ++it)
+        for(auto it = this->DP_current.begin(); it != this->DP_current.end(); ++it)
         {
-            this->createnode(DP_init,it->second);
+            this->createnode(DP_next,it->second);
         }
-        for (auto& pair : DPArray) {
-            delete pair.second;
-        }
-        DPArray.clear();
-        DPArray=DP_init;
-        DP_init.clear();
+        this->DPArray.insert(DP_current.begin(),DP_current.end());
+        DP_current.clear();
+        DP_current=DP_next;
+        DP_next.clear();
     }
     std::cout<<"最优距离为："<<this->best_grid_length<<std::endl;
 }
@@ -71,4 +71,18 @@ void DynamicProgram::createnode(std::map<int,Node*>& DP_init,Node* current_node)
             DP_init[n_id]=node;
         }   
     }
+}
+
+std::pair<std::vector<int>,std::vector<int>> DynamicProgram::GetBestGridPath()
+{
+    int g_id=this->grid_map_->coordToIndex(this->grid_map_->getstr().first,this->grid_map_->getstr().second);
+    std::pair<std::vector<int>,std::vector<int>> grids;
+    std::pair<std::pair<int,int>,float> grid;
+    for(size_t i=0;i<this->bestPath.size();i++)
+    {
+        grid=grid_map_->index_to_grid(this->bestPath[i]);
+        grids.first.push_back(grid.first.first);
+        grids.second.push_back(grid.first.second);
+    }
+    return grids;
 }
