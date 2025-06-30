@@ -39,8 +39,11 @@ private:
     bool Is_quit_map(Dijkstra::Node* node);
 
     ObstacleGridMap* grid_map_=nullptr;
+    
     std::pair<std::vector<int>,std::vector<int>> final_path;
+
     void cal_fina_path(Node* node,std::map<int,Node*> closed_set);
+
     double Best_grid_length;
 
 public:
