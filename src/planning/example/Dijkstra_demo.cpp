@@ -30,7 +30,7 @@ int main() {
     //grid_map.plotWorldMap();
 
     Dijkstra Dijk_solver(&grid_map);
-    std::string outpath=".dijkstra";
+    std::string outpath="dijkstra.png";
     Dijk_solver.planning(outpath);
 
 

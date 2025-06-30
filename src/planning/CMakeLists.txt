@@ -204,3 +204,35 @@ target_link_libraries(${ANTCOLONY_DEMO_NAME}
     ${ANTCOLONY_LIB_NAME}
     ${OBSTACLE_GRID_MAP_LIB_NAME}
 )
+
+# 动态规划算法类的编译
+set(DynamicProgram_LIB_NAME DynamicProgram)
+add_library(${DynamicProgram_LIB_NAME} SHARED)  
+
+target_sources(${DynamicProgram_LIB_NAME}  
+    PRIVATE 
+    src/DynamicProgram.cpp
+)
+
+target_include_directories(${DynamicProgram_LIB_NAME}  
+    PUBLIC
+        include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+
+target_link_libraries(${DynamicProgram_LIB_NAME} PRIVATE Python3::Python ${OBSTACLE_GRID_MAP_LIB_NAME})
+
+
+
+set(DynamicProgram_DEMO_NAME DynamicProgram_demo)
+add_executable(${DynamicProgram_DEMO_NAME})  
+
+target_sources(${DynamicProgram_DEMO_NAME} 
+    PRIVATE 
+    example/DynamicProgram_demo.cpp 
+)
+target_link_libraries(${DynamicProgram_DEMO_NAME} 
+    ${DynamicProgram_LIB_NAME}
+    ${OBSTACLE_GRID_MAP_LIB_NAME}
+)
