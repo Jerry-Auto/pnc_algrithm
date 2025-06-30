@@ -26,7 +26,7 @@ int main() {
     grid_map.setstr(30,15);
     grid_map.setgoal(290,195);
 
-    AntColony ACO(&grid_map,20);
-    ACO.planning();
+    AntColony ACO(&grid_map,300);
+    ACO.planning("ant.png");
     return 0;
 }

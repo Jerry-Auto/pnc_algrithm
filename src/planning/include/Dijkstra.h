@@ -41,6 +41,7 @@ private:
     ObstacleGridMap* grid_map_=nullptr;
     std::pair<std::vector<int>,std::vector<int>> final_path;
     void cal_fina_path(Node* node,std::map<int,Node*> closed_set);
+    double Best_grid_length;
 
 public:
     Dijkstra(ObstacleGridMap* grid_map);
@@ -50,7 +51,6 @@ public:
     std::pair<std::vector<int>,std::vector<int>> GetGridPath();
 
     std::pair<std::vector<double>,std::vector<double>> GetWorldPath();
-
 
 };
 

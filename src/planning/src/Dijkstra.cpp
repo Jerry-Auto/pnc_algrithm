@@ -57,7 +57,7 @@ void Dijkstra::planning(std::string PNGpath){
             break;
         }
         std::cout<<"当前节点最小代价："<<current->cost<<std::endl;
-        this->grid_map_->plotpoint(current->x,current->y,"+b");
+        //this->grid_map_->plotpoint(current->x,current->y,"+b");
         for(std::vector<double>move:this->motion)
         {
             Node*node=new Node(current->x+move[0],current->y+move[1],current->cost+move[2],c_id);
@@ -78,6 +78,7 @@ void Dijkstra::planning(std::string PNGpath){
         }       
     }
     cal_fina_path(goal_node,C_set);
+    std::cout<<"最短距离"<<this->Best_grid_length<<std::endl;
     if(PNGpath==" ")
     {   
        this->grid_map_->plotpath(this->GetGridPath()); 
@@ -97,6 +98,7 @@ std::pair<std::vector<int>,std::vector<int>> Dijkstra::GetGridPath()
     std::vector<int>rx,ry;
     rx.push_back(node->x);
     ry.push_back(node->y);
+    this->Best_grid_length=node->cost;
     double parent_index=node->parent_index;
     while(parent_index!=-1)
     {

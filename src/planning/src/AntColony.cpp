@@ -162,7 +162,7 @@ void AntColony::planning(std::string PNGpath)
     }
         // 输出结果
     std::cout << "全局最优距离: " << bestLength << std::endl;
-    this->grid_map_->plot_iterate_path(this->GetAllGridPath());
+    //this->grid_map_->plot_iterate_path(this->GetAllGridPath());
     if(PNGpath==" ")
     {   
        this->grid_map_->plotpath(this->GetBestGridPath()); 
