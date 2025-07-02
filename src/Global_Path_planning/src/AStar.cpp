@@ -3,7 +3,12 @@
 AStar::Node::Node(double x, double y, float cost, int parentIndex) : x(x), y(y), cost(cost), parent_index(parentIndex) {}
 
 AStar::AStar(ObstacleGridMap* grid_map,bool plotfinalpath,bool plotpoint,bool plotgridpath)
-:grid_map_(grid_map),plotfinalpath(plotfinalpath),plotpoint(plotpoint),plotgridpath(plotgridpath){}
+:grid_map_(grid_map),plotfinalpath(plotfinalpath),plotpoint(plotpoint),plotgridpath(plotgridpath){
+
+    this->str_node=new AStar::Node(this->grid_map_->getstr().first,this->grid_map_->getstr().second,0,-1);
+    
+    this->goal_node=new AStar::Node(this->grid_map_->getgoal().first,this->grid_map_->getgoal().second,0,-1);
+}
 
 bool AStar::Is_quit_map(AStar::Node* node)
 {
@@ -24,8 +29,6 @@ bool AStar::Is_quit_map(AStar::Node* node)
 }
 
 void AStar::planning(std::string PNGpath){
-    AStar::Node* str_node=new AStar::Node(this->grid_map_->getstr().first,this->grid_map_->getstr().second,0,-1);
-    AStar::Node* goal_node=new AStar::Node(this->grid_map_->getgoal().first,this->grid_map_->getgoal().second,0,-1);
     std::map<int,Node*> O_set,C_set;
 
     O_set[this->grid_map_->coordToIndex(str_node->x,str_node->y)]=str_node;
@@ -34,12 +37,13 @@ void AStar::planning(std::string PNGpath){
     {
         float temp_cost=std::numeric_limits<float>::max();
         int c_id=std::numeric_limits<int>::max();
-
+        //开集里寻找最小代价点
         for(auto it=O_set.begin();it!=O_set.end();it++)
         {
-            if(it->second->cost<temp_cost)
+            if(it->second->cost+cal_h_x(it->second)<temp_cost)
             {
-                temp_cost=it->second->cost;
+                //开集比较f(x)=g(x)+h(x)
+                temp_cost=it->second->cost+cal_h_x(it->second);
                 c_id=it->first;
             }
         }
@@ -55,14 +59,16 @@ void AStar::planning(std::string PNGpath){
             goal_node->cost=current->cost;
             break;
         }
-        std::cout<<"当前节点最小代价："<<current->cost<<std::endl;
+        std::cout<<"当前节点最小代价："<<current->cost+cal_h_x(current)<<std::endl;
         if(plotpoint)
         {
             this->grid_map_->plotpoint(current->x,current->y,"+b"); 
         }
         for(std::vector<double>move:this->motion)
         {
+            //cost即f(x),现在要加上h(x)，注意node里面的cost仍然是从起点到node的最短距离，h(x)不做累加
             Node*node=new Node(current->x+move[0],current->y+move[1],current->cost+move[2],c_id);
+
             int n_id=this->grid_map_->coordToIndex(node->x,node->y);
 
             if(C_set.find(n_id)!=C_set.end()){continue;}
@@ -71,7 +77,8 @@ void AStar::planning(std::string PNGpath){
 
             if(O_set.find(n_id)!=O_set.end())
             {
-                if(node->cost<O_set[n_id]->cost)
+                //比较f(x)的大小，更新开集重复节点，取代价最小的
+                if(node->cost+cal_h_x(node)<O_set[n_id]->cost+cal_h_x(O_set[n_id]))
                 {
                     O_set[n_id]=node;
                 }
@@ -79,6 +86,8 @@ void AStar::planning(std::string PNGpath){
             else{O_set[n_id]=node;}
         }       
     }
+
+
     cal_fina_path(goal_node,C_set);
     std::cout<<"最短距离"<<this->Best_grid_length<<std::endl;
     if(this->plotfinalpath)
@@ -126,4 +135,16 @@ std::pair<std::vector<int>,std::vector<int>> AStar::GetGridPath()
         world_path.second.push_back(wy);
     }
     return world_path;
+}
+
+double AStar::cal_h_x(Node* node)
+{
+    double h_x=this->weight*sqrt(pow(node->x-this->goal_node->x,2)+pow(node->y-this->goal_node->y,2));//欧几里德距离
+    //double h_x=this->weight*(abs(node->x-this->goal_node->x)+abs(node->y-this->goal_node->y))//曼哈顿距离
+    return h_x;
+}
+
+void AStar::set_h_weight(double w)
+{
+    this->weight=w;
 }

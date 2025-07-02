@@ -38,6 +38,10 @@ private:
 
     bool Is_quit_map(Node* node);
 
+    AStar::Node* str_node;
+
+    AStar::Node* goal_node;
+
     ObstacleGridMap* grid_map_=nullptr;
 
     bool plotfinalpath;
@@ -45,13 +49,16 @@ private:
     bool plotpoint;
 
     bool plotgridpath;
-
     
     std::pair<std::vector<int>,std::vector<int>> final_path;
 
     void cal_fina_path(Node* node,std::map<int,Node*> closed_set);
 
     double Best_grid_length;
+
+    double cal_h_x(Node* node);
+
+    double weight=1.0;
 
 public:
     AStar(ObstacleGridMap* grid_map,bool plotfinalpath=true,bool plotpoint=true,bool plotgridpath=true);
@@ -61,6 +68,8 @@ public:
     std::pair<std::vector<int>,std::vector<int>> GetGridPath();
 
     std::pair<std::vector<double>,std::vector<double>> GetWorldPath();
+
+    void set_h_weight(double w);
 
 };
 

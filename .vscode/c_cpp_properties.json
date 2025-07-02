@@ -7,7 +7,7 @@
                 "/usr/include/eigen3"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/gcc-13",
+            "compilerPath": "/usr/bin/gcc",
             "cStandard": "c17",
             "cppStandard": "c++14",
             "intelliSenseMode": "linux-gcc-x64"

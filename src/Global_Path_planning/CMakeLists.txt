@@ -13,13 +13,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set(CMAKE_BUILD_TYPE Debug)
 
 # 创建输出目录
-set(LIB_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/src/libs/planning)
-set(BIN_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/bin/planning/example)
+set(LIB_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/src/libs/Global_Path_planning)
+set(BIN_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/bin/Global_Path_planning/example)
 
 file(MAKE_DIRECTORY 
     ${LIB_OUTPUT_DIR}
     ${BIN_OUTPUT_DIR}
-    ${CMAKE_SOURCE_DIR}/bin/planning/example/image
+    ${CMAKE_SOURCE_DIR}/bin/Global_Path_planning/example/image
 )
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR})

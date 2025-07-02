@@ -1,4 +1,5 @@
-#include"AStar.h"
+#include"Dijkstra.h"
+#include"ObstacleGridMap.h"
 
 int main() {
     //地图信息生成
@@ -26,13 +27,17 @@ int main() {
     grid_map.setgoal(290,195);
 
 
-    //grid_map.plotWorldMap();
+    // double world_width = 20;
+    // double world_height = 12;
+    // double resolution = 1;
+    // ObstacleGridMap grid_map(world_width, world_height, resolution);
+    // grid_map.set_robot_radius(0.5);
+    // grid_map.setstr(1.2,2.3);
+    // grid_map.setgoal(18.3,10.8);
 
-    AStar Astar_solver(&grid_map,true,false,false);
-
-    std::string outpath="AStar.png";
-
-    Astar_solver.planning(outpath);
+    Dijkstra Dijk_solver(&grid_map,true,true,false);
+    std::string outpath="dijkstra.png";
+    Dijk_solver.planning(outpath);
 
 
     return 0;

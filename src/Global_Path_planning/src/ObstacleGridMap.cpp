@@ -10,13 +10,14 @@
 namespace plt = matplotlibcpp;
 
 ObstacleGridMap::ObstacleGridMap(double world_width, double world_height, double resolution)
-    : world_width_(world_width), world_height_(world_height), resolution_(resolution),strpoint(-1, -1), goalpoint(-1, -1){
+    :resolution_(resolution),strpoint(-1, -1), goalpoint(-1, -1){
     if (world_width <= 0 || world_height <= 0 || resolution <= 0) {
         throw std::invalid_argument("World dimensions and resolution must be positive");
     }
-    
-    grid_width_ = static_cast<int>(std::ceil(world_width / resolution));
-    grid_height_ = static_cast<int>(std::ceil(world_height / resolution));
+    this->grid_width_ = static_cast<int>(std::ceil(world_width / resolution));
+    this->grid_height_ = static_cast<int>(std::ceil(world_height / resolution));
+    this->world_width_=this->grid_width_*resolution;
+    this->world_height_=this->grid_height_*resolution;
     initializeGrid();
 }
 

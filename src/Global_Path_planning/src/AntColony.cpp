@@ -52,7 +52,7 @@ std::pair<double, std::vector<int>> AntColony::single_ant_go(Node* start, Node* 
     std::vector<int> TABU(size, 1);
     TABU[this->nodetoindex(start)] = 0;
     Node* current = start;
-    double k=calcu_dis_to_end(start);
+    //double k=calcu_dis_to_end(start);
     
     while (this->nodetoindex(current) != this->nodetoindex(goal)) {
         std::pair<std::vector<Node*>, std::vector<double>> node_prob;
@@ -96,7 +96,7 @@ std::pair<double, std::vector<int>> AntColony::single_ant_go(Node* start, Node* 
             p /= sumP;
         }
         
-        int selected_idx = rotate_wheel_slt(node_prob.second);
+        size_t selected_idx = rotate_wheel_slt(node_prob.second);
         Node* next = node_prob.first[selected_idx];
         
         // 计算距离
@@ -108,7 +108,7 @@ std::pair<double, std::vector<int>> AntColony::single_ant_go(Node* start, Node* 
         TABU[this->nodetoindex(current)] = 0;
         
         // 释放未被选中的节点（除了选中的那个）
-        for (auto i = 0; i < node_prob.first.size(); ++i) {
+        for (size_t i = 0; i < node_prob.first.size(); ++i) {
             if (i != selected_idx) {
                 delete node_prob.first[i];
             }

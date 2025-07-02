@@ -1,5 +1,4 @@
-#include"Dijkstra.h"
-#include"ObstacleGridMap.h"
+#include"DynamicProgram.h"
 
 int main() {
     //地图信息生成
@@ -26,13 +25,9 @@ int main() {
     grid_map.setstr(30,15);
     grid_map.setgoal(290,195);
 
+    DynamicProgram DPsolver(&grid_map,true,true,false);
 
-    //grid_map.plotWorldMap();
-
-    Dijkstra Dijk_solver(&grid_map,true,false,false);
-    std::string outpath="dijkstra.png";
-    Dijk_solver.planning(outpath);
-
+    DPsolver.planning("DP.png");
 
     return 0;
 }
