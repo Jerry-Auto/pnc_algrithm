@@ -128,6 +128,12 @@ public:
 
     void save_to_PNG(std::string filename);
 
+    void plot_extra_curve(std::pair<std::vector<double>, std::vector<double>> path_data,std::string outPNGname="curve.png");
+
+    void writeVectorToCSV(const std::vector<double>& data, const std::string& filename) ;
+    
+    std::vector<double> readCSVToVector(const std::string& filename) ;
+
 private:
     double world_width_;     // 世界宽度（米）
     double world_height_;    // 世界高度（米）

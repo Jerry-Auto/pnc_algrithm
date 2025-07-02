@@ -5,7 +5,6 @@ project(auto_driving_algorithm)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 
-
 #include(GNUInstallDirs)
 set(PACKAGE_NAME auto_driving_algorithm)
 
@@ -49,7 +48,6 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 
 add_executable(main src/main/main.cpp)
 target_link_libraries(main PRIVATE auto_driving_algorithm)
-
 
 
 # 添加子目录

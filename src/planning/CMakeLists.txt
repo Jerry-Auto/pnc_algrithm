@@ -19,6 +19,7 @@ set(BIN_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/bin/planning/example)
 file(MAKE_DIRECTORY 
     ${LIB_OUTPUT_DIR}
     ${BIN_OUTPUT_DIR}
+    ${CMAKE_SOURCE_DIR}/bin/planning/example/image
 )
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR})
@@ -198,12 +199,14 @@ add_executable(${ANTCOLONY_DEMO_NAME})
 
 target_sources(${ANTCOLONY_DEMO_NAME} 
     PRIVATE 
-    example/AntColony_demo.cpp 
+    example/AntColony_demo.cpp
 )
 target_link_libraries(${ANTCOLONY_DEMO_NAME} 
     ${ANTCOLONY_LIB_NAME}
     ${OBSTACLE_GRID_MAP_LIB_NAME}
 )
+
+# add_executable(ant_colony2_demo example/antcolony_demo2.cpp)
 
 # 动态规划算法类的编译
 set(DynamicProgram_LIB_NAME DynamicProgram)
@@ -234,5 +237,39 @@ target_sources(${DynamicProgram_DEMO_NAME}
 )
 target_link_libraries(${DynamicProgram_DEMO_NAME} 
     ${DynamicProgram_LIB_NAME}
+    ${OBSTACLE_GRID_MAP_LIB_NAME}
+)
+
+
+
+# AStar算法类的编译
+set(AStar_LIB_NAME AStar)
+add_library(${AStar_LIB_NAME} SHARED)  
+
+target_sources(${AStar_LIB_NAME}  
+    PRIVATE 
+    src/AStar.cpp
+)
+
+target_include_directories(${AStar_LIB_NAME}  
+    PUBLIC
+        include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+
+target_link_libraries(${AStar_LIB_NAME} PRIVATE Python3::Python ${OBSTACLE_GRID_MAP_LIB_NAME})
+
+
+
+set(AStar_DEMO_NAME AStar_demo)
+add_executable(${AStar_DEMO_NAME})  
+
+target_sources(${AStar_DEMO_NAME} 
+    PRIVATE 
+    example/AStar_demo.cpp 
+)
+target_link_libraries(${AStar_DEMO_NAME} 
+    ${AStar_LIB_NAME}
     ${OBSTACLE_GRID_MAP_LIB_NAME}
 )

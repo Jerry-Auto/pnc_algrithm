@@ -385,6 +385,20 @@ void ObstacleGridMap::plotpath(std::pair<std::vector<int>, std::vector<int>> pat
     this->point_plot=false;
 }
 
+void ObstacleGridMap::plot_extra_curve(std::pair<std::vector<double>, std::vector<double>> path_data,std::string outPNGname) {
+    plt::figure();
+    plt::title("curve");
+    plt::xlabel("iteration");
+    plt::ylabel("length(m)");
+    plt::grid(true);
+    // 绘制路径
+    plt::plot(path_data.first, path_data.second, "g-");
+    plt::pause(plot_pause_time);
+    save_to_PNG(outPNGname);
+    plt::show();
+}
+
+
 void ObstacleGridMap::plotpoint(int x_index, int y_index,std::string point_type) {
     show_plot_ = false; // 防止 plotWorldMap() 内部调用 plt::show()   
     plotWorldMap();
@@ -488,8 +502,9 @@ std::pair<std::pair<int,int>,float> ObstacleGridMap::index_to_grid(int index)
 
 void ObstacleGridMap::save_to_PNG(std::string filename)
 {
+    std::string folderPath = "./image";
     std::cout << "结果截图保存至：" << filename << std::endl;
-    plt::save(filename);
+    plt::save(folderPath+"/"+filename);
 }
 
 void ObstacleGridMap::plot_iterate_path(const std::vector<std::pair<std::vector<int>, std::vector<int>>>& path_data) {
@@ -518,4 +533,61 @@ void ObstacleGridMap::plot_iterate_path(const std::vector<std::pair<std::vector<
         y_coords=std::vector<double>();
     }
     this->point_plot=true;
+}
+
+// 写入 CSV 文件（带标题行）
+void ObstacleGridMap::writeVectorToCSV(const std::vector<double>& data, const std::string& filename) {
+    std::ofstream outFile(filename);
+    if (!outFile.is_open()) {
+        std::cerr << "Error: Could not open file " << filename << " for writing." << std::endl;
+        return;
+    }
+ 
+    // 写入标题行
+    outFile << "Index,Value\n";
+ 
+    // 写入数据（索引 + 值）
+    for (size_t i = 0; i < data.size(); ++i) {
+        outFile << i << "," << data[i] << "\n";
+    }
+ 
+    outFile.close();
+    std::cout << "Data saved to " << filename << std::endl;
+}
+ 
+
+// 读取 CSV 文件到 vector
+std::vector<double> ObstacleGridMap::readCSVToVector(const std::string& filename) {
+    std::vector<double> data;
+    std::ifstream inFile(filename);
+    if (!inFile.is_open()) {
+        std::cerr << "Error: Could not open file " << filename << " for reading." << std::endl;
+        return data;
+    }
+ 
+    std::string line;
+    bool isHeader = true; // 跳过标题行
+ 
+    while (std::getline(inFile, line)) {
+        if (isHeader) {
+            isHeader = false;
+            continue;
+        }
+ 
+        std::istringstream iss(line);
+        std::string indexStr, valueStr;
+ 
+        // 解析 CSV 行（格式：Index,Value）
+        if (std::getline(iss, indexStr, ',') && std::getline(iss, valueStr)) {
+            try {
+                double value = std::stod(valueStr); // 字符串转 double
+                data.push_back(value);
+            } catch (const std::invalid_argument& e) {
+                std::cerr << "Warning: Invalid data in line '" << line << "'" << std::endl;
+            }
+        }
+    }
+ 
+    inFile.close();
+    return data;
 }

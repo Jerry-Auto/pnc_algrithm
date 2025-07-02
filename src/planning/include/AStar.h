@@ -1,5 +1,5 @@
-#ifndef DIJKSTRA_H
-#define DIJKSTRA_H
+#ifndef ASTAR_H
+#define ASTAR_H
 
 #include<iostream>
 #include<vector>
@@ -13,7 +13,7 @@
 
 
 #define err 1e-4
-class Dijkstra
+class AStar
 {
     
 public:
@@ -36,7 +36,7 @@ private:
     {1, -1, sqrt(2)},
     {1, 1, sqrt(2)}};//移动方向与代价
 
-    bool Is_quit_map(Dijkstra::Node* node);
+    bool Is_quit_map(Node* node);
 
     ObstacleGridMap* grid_map_=nullptr;
 
@@ -54,7 +54,7 @@ private:
     double Best_grid_length;
 
 public:
-    Dijkstra(ObstacleGridMap* grid_map,bool plotfinalpath=true,bool plotpoint=true,bool plotgridpath=true);
+    AStar(ObstacleGridMap* grid_map,bool plotfinalpath=true,bool plotpoint=true,bool plotgridpath=true);
 
     void planning(std::string PNGpath=" ");
 
@@ -64,4 +64,4 @@ public:
 
 };
 
-#endif // !DIJKSTRA_H
+#endif // !ASTAR_H

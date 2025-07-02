@@ -8,7 +8,7 @@
             "name": "(gdb) 启动",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/planning/example/AntColony_demo",
+            "program": "${workspaceFolder}/bin/planning/example/DynamicProgram_demo",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

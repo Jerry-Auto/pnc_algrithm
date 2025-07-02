@@ -1,11 +1,11 @@
-#include"Dijkstra.h"
+#include"AStar.h"
 
-Dijkstra::Node::Node(double x, double y, float cost, int parentIndex) : x(x), y(y), cost(cost), parent_index(parentIndex) {}
+AStar::Node::Node(double x, double y, float cost, int parentIndex) : x(x), y(y), cost(cost), parent_index(parentIndex) {}
 
-Dijkstra::Dijkstra(ObstacleGridMap* grid_map,bool plotfinalpath,bool plotpoint,bool plotgridpath)
+AStar::AStar(ObstacleGridMap* grid_map,bool plotfinalpath,bool plotpoint,bool plotgridpath)
 :grid_map_(grid_map),plotfinalpath(plotfinalpath),plotpoint(plotpoint),plotgridpath(plotgridpath){}
 
-bool Dijkstra::Is_quit_map(Dijkstra::Node* node)
+bool AStar::Is_quit_map(AStar::Node* node)
 {
     //判断是否在地图内部
     std::pair<double,double> world_coord;
@@ -23,9 +23,9 @@ bool Dijkstra::Is_quit_map(Dijkstra::Node* node)
     return false;
 }
 
-void Dijkstra::planning(std::string PNGpath){
-    Dijkstra::Node* str_node=new Dijkstra::Node(this->grid_map_->getstr().first,this->grid_map_->getstr().second,0,-1);
-    Dijkstra::Node* goal_node=new Dijkstra::Node(this->grid_map_->getgoal().first,this->grid_map_->getgoal().second,0,-1);
+void AStar::planning(std::string PNGpath){
+    AStar::Node* str_node=new AStar::Node(this->grid_map_->getstr().first,this->grid_map_->getstr().second,0,-1);
+    AStar::Node* goal_node=new AStar::Node(this->grid_map_->getgoal().first,this->grid_map_->getgoal().second,0,-1);
     std::map<int,Node*> O_set,C_set;
 
     O_set[this->grid_map_->coordToIndex(str_node->x,str_node->y)]=str_node;
@@ -95,11 +95,11 @@ void Dijkstra::planning(std::string PNGpath){
 }
 
 
-std::pair<std::vector<int>,std::vector<int>> Dijkstra::GetGridPath()
+std::pair<std::vector<int>,std::vector<int>> AStar::GetGridPath()
 {
     return this->final_path;
 }
- void Dijkstra::cal_fina_path(Node* node,std::map<int,Node*> closed_set)
+ void AStar::cal_fina_path(Node* node,std::map<int,Node*> closed_set)
  {
     std::vector<int>rx,ry;
     rx.push_back(node->x);
@@ -115,7 +115,7 @@ std::pair<std::vector<int>,std::vector<int>> Dijkstra::GetGridPath()
     }
     this->final_path={rx,ry};
  }
- std::pair<std::vector<double>,std::vector<double>> Dijkstra::GetWorldPath()
+ std::pair<std::vector<double>,std::vector<double>> AStar::GetWorldPath()
 {
     double wx,wy;
     std::pair<std::vector<double>,std::vector<double>> world_path;

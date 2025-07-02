@@ -41,7 +41,7 @@ private:
 
     ObstacleGridMap* grid_map_;
 
-    std::map<int,Node*> DPArray;//DP数组
+    std::map<int,Node*> DPArray;//DP数组，第一位是节点一维索引
 
     bool Is_quit_map(Node* node);
 
@@ -49,12 +49,22 @@ private:
 
     double best_grid_length;
 
-    std::pair<std::vector<int>,std::vector<int>> GetBestGridPath()
+    std::pair<std::vector<int>,std::vector<int>> GetGridPath(Node* Node);
+
+    bool plotfinalpath;
+
+    bool plotpoint;
+
+    bool plotgridpath;
 
 public:
-    DynamicProgram(ObstacleGridMap* grid_map);
+    DynamicProgram(ObstacleGridMap* grid_map,bool plotfinalpath=true,bool plotpoint=true,bool plotgridpath=true);
 
     void planning(std::string PNGpath=" ");
+
+    std::pair<std::vector<int>,std::vector<int>> GetBestGridPath();
+
+    double GetBestGridLength();
 
 };
 

@@ -70,13 +70,13 @@ private:
     void update_pheromono(std::vector<std::vector<int>> ants_ROUTES_per_round,std::vector<double> ants_PL_per_round);
 public:
 
-    AntColony(ObstacleGridMap* grid_map,int num_i=100,double alp=1.0,double bet=7.0,double rho=0.3,double q=1);
+    AntColony(ObstacleGridMap* grid_map,int num_i=100,double alp=2,double bet=4.0,double rho=0.3,double q=8);
 
     void set_ant_num(int n);
 
     bool Is_quit_map(Node* node);
 
-    void planning(std::string PNGpath=" ");
+    void planning(std::string PNGpath=" ",bool plotfinalpath=true,bool plotgridpath=true);
 
     std::pair<std::vector<int>,std::vector<int>> GetBestGridPath();
 

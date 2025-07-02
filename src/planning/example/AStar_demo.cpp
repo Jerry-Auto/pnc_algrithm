@@ -1,4 +1,4 @@
-#include"DynamicProgram.h"
+#include"AStar.h"
 
 int main() {
     //地图信息生成
@@ -25,9 +25,15 @@ int main() {
     grid_map.setstr(30,15);
     grid_map.setgoal(290,195);
 
-    DynamicProgram DPsolver(&grid_map,true,false,false);
 
-    DPsolver.planning("DP.png");
+    //grid_map.plotWorldMap();
+
+    AStar Astar_solver(&grid_map,true,false,false);
+
+    std::string outpath="AStar.png";
+
+    Astar_solver.planning(outpath);
+
 
     return 0;
 }
