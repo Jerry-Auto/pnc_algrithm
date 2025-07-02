@@ -51,4 +51,6 @@ target_link_libraries(main PRIVATE auto_driving_algorithm)
 
 
 # 添加子目录
-add_subdirectory(src/Global_Path_planning)
+#add_subdirectory(src/Global_Path_planning)
+
+add_subdirectory(src/Local_Path_Planning)
