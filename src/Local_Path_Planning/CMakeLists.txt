@@ -40,29 +40,39 @@ include_directories(
 
 find_package(OsqpEigen REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui)
 include_directories(
     ${OSQPEIGEN_INCLUDE_DIR}
     ${EIGEN3_INCLUDE_DIR}
+    ${Qt6Core_INCLUDE_DIRS}
+    ${Qt6Widgets_INCLUDE_DIRS}
+    ${Qt6Gui_INCLUDE_DIRS}
 )
 
-
+set(CMAKE_AUTOMOC ON)
 # Vehicle类的编译
 set(VEHICLE_LIB_NAME Vehicle)
-add_library(${VEHICLE_LIB_NAME} SHARED src/Vehicle.cpp)  
+add_library(${VEHICLE_LIB_NAME} SHARED)  
 
+target_sources(${VEHICLE_LIB_NAME}  
+    PRIVATE 
+    src/Vehicle.cpp 
+    src/worldmap.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Vehicle.h 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/worldmap.h
+)
 
 target_include_directories(${VEHICLE_LIB_NAME}  
-    PUBLIC
-    include 
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include 
     PRIVATE 
     auto_driving_algorithm 
 )
-
+target_link_libraries(Vehicle PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui)
 
 set(VEHICLE_DEMO_NAME Vehicle_demo)
 add_executable(${VEHICLE_DEMO_NAME} example/Vehicle_demo.cpp)  
 
-target_link_libraries(${VEHICLE_DEMO_NAME} ${VEHICLE_LIB_NAME})  
+target_link_libraries(${VEHICLE_DEMO_NAME} ${VEHICLE_LIB_NAME} Qt6::Widgets )  
 
 
 # 多项式曲线（poly_algorithm）类的编译
@@ -81,5 +91,8 @@ target_include_directories(${POLY_LIB_NAME}
 set(POLY_DEMO_NAME PolynomialAlgorithm_demo)
 add_executable(${POLY_DEMO_NAME} example/PolynomialAlgorithm_demo.cpp)  
 
-target_link_libraries(${POLY_DEMO_NAME} ${POLY_LIB_NAME})  
+target_link_libraries(${POLY_DEMO_NAME} ${POLY_LIB_NAME} Python3::Python)   
+
+add_executable(plot_path example/plot_vehicle.cpp) 
+target_link_libraries(plot_path Python3::Python)  
 
