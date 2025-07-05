@@ -70,7 +70,8 @@
         "variant": "cpp",
         "span": "cpp",
         "format": "cpp",
-        "codecvt": "cpp"
+        "codecvt": "cpp",
+        "future": "cpp"
     },
     "python.autoComplete.extraPaths": [
         "/home/zhangjinrui/ROS2/dev_ws_foxy/install/learning_urdf/lib/python3.8/site-packages",

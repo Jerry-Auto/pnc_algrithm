@@ -2,7 +2,6 @@
 
 // Python headers must be included before any system headers, since
 // they define _POSIX_C_SOURCE
-#include <Python.h>
 
 #include <vector>
 #include <map>
@@ -14,6 +13,9 @@
 #include <cstdint> // <cstdint> requires c++11 support
 #include <functional>
 #include <string> // std::stod
+#include <iostream>  // 用于错误输出
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
 
 #ifndef WITHOUT_NUMPY
 #  define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
@@ -1831,20 +1833,53 @@ bool stem(const std::vector<Numeric>& y, const std::string& format = "")
 }
 
 template<typename Numeric>
-void text(Numeric x, Numeric y, const std::string& s = "")
-{
+void text(Numeric x, Numeric y, const std::string& s = "") {
+    // 确保Python解释器初始化
     detail::_interpreter::get();
-
-    PyObject* args = PyTuple_New(3);
-    PyTuple_SetItem(args, 0, PyFloat_FromDouble(x));
-    PyTuple_SetItem(args, 1, PyFloat_FromDouble(y));
-    PyTuple_SetItem(args, 2, PyString_FromString(s.c_str()));
-
-    PyObject* res = PyObject_CallObject(detail::_interpreter::get().s_python_function_text, args);
-    if(!res) throw std::runtime_error("Call to text() failed.");
-
-    Py_DECREF(args);
-    Py_DECREF(res);
+    
+    PyObject *args = nullptr, *kwargs = nullptr, *res = nullptr;
+    
+    try {
+        // 创建参数元组
+        args = PyTuple_New(2);
+        if (!args) throw std::runtime_error("Failed to create Python tuple");
+        
+        PyTuple_SetItem(args, 0, PyFloat_FromDouble(static_cast<double>(x)));
+        PyTuple_SetItem(args, 1, PyFloat_FromDouble(static_cast<double>(y)));
+        
+        // 创建关键字参数字典
+        kwargs = PyDict_New();
+        if (!kwargs) throw std::runtime_error("Failed to create Python dict");
+        
+        PyDict_SetItemString(kwargs, "s", PyUnicode_FromString(s.c_str()));
+        
+        // 添加字体安全参数
+        PyDict_SetItemString(kwargs, "family", PyUnicode_FromString("sans-serif"));
+        PyDict_SetItemString(kwargs, "fontsize", PyLong_FromLong(10));
+        PyDict_SetItemString(kwargs, "ha", PyUnicode_FromString("center"));
+        
+        // 安全调用
+        res = PyObject_Call(
+            detail::_interpreter::get().s_python_function_text,
+            args, kwargs);
+            
+        if (!res) {
+            PyErr_Print();  // 打印Python错误但不抛出异常
+            std::cerr << "Warning: Text rendering failed for: " << s << std::endl;
+        }
+        
+    } catch (...) {
+        // 清理资源
+        if (args) Py_DECREF(args);
+        if (kwargs) Py_DECREF(kwargs);
+        if (res) Py_DECREF(res);
+        throw;  // 重新抛出异常
+    }
+    
+    // 正常清理
+    Py_XDECREF(args);
+    Py_XDECREF(kwargs);
+    Py_XDECREF(res);
 }
 
 inline void colorbar(PyObject* mappable = NULL, const std::map<std::string, float>& keywords = {})

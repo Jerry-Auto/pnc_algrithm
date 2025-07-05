@@ -94,5 +94,8 @@ add_executable(${POLY_DEMO_NAME} example/PolynomialAlgorithm_demo.cpp)
 target_link_libraries(${POLY_DEMO_NAME} ${POLY_LIB_NAME} Python3::Python)   
 
 add_executable(plot_path example/plot_vehicle.cpp) 
-target_link_libraries(plot_path Python3::Python)  
+target_link_libraries(plot_path Python3::Python)
+
+add_executable(vehicle_model example/vehicle_model.cpp) 
+target_link_libraries(vehicle_model Python3::Python) 
 
