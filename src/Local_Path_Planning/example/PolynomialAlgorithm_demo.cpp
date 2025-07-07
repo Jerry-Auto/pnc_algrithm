@@ -1,6 +1,8 @@
 #include "PolynomialAlgorithm.h"
 #include "matplotlibcpp.h"
+#include "vehicle_model.h"
 namespace plt = matplotlibcpp;
+
 int main()
 {
     std::pair<std::vector<double> ,std::vector<double>> str_state,end_state;
@@ -18,8 +20,10 @@ int main()
 
     std::vector<std::vector<double>> planning_data=poly_solver.planning_series(0.05);
     //画图
+    ElectricVehicleDynamicsModel vehicle;
+    vehicle.plot_planning(planning_data);
     //poly_solver.plotallcurve(planning_data);
-    poly_solver.plotpositioncurve(planning_data);
-    poly_solver.plotthetacurve(planning_data);
+    // poly_solver.plotpositioncurve(planning_data);
+    // poly_solver.plotthetacurve(planning_data);
     return 0;
 }

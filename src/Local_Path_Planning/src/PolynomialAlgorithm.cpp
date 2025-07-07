@@ -40,6 +40,7 @@ std::vector<double> PolynomialAlgorithm::GetState(double t)
     double X_State=this->A.dot(poly_t);
     Eigen::VectorXd poly_x=Calculpoly(X_State);
     double Y_State=this->B.dot(poly_x);
+    
     double dX_State=diff_factor(A).dot(poly_t);
     double dY_dx_State=diff_factor(B).dot(poly_x);
     double dY_dt_State=dY_dx_State*dX_State;

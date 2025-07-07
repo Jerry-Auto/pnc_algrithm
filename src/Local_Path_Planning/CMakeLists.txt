@@ -40,62 +40,48 @@ include_directories(
 
 find_package(OsqpEigen REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui)
+
 include_directories(
     ${OSQPEIGEN_INCLUDE_DIR}
     ${EIGEN3_INCLUDE_DIR}
-    ${Qt6Core_INCLUDE_DIRS}
-    ${Qt6Widgets_INCLUDE_DIRS}
-    ${Qt6Gui_INCLUDE_DIRS}
 )
 
-set(CMAKE_AUTOMOC ON)
-# Vehicle类的编译
-set(VEHICLE_LIB_NAME Vehicle)
-add_library(${VEHICLE_LIB_NAME} SHARED)  
+#set(CMAKE_AUTOMOC ON)
 
+
+# Vehicle_model类的编译
+set(VEHICLE_LIB_NAME vehicle_model)
+add_library(${VEHICLE_LIB_NAME} SHARED)  
 target_sources(${VEHICLE_LIB_NAME}  
     PRIVATE 
-    src/Vehicle.cpp 
-    src/worldmap.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Vehicle.h 
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/worldmap.h
+    src/vehicle_model.cpp 
 )
-
 target_include_directories(${VEHICLE_LIB_NAME}  
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include 
+    PUBLIC include 
     PRIVATE 
     auto_driving_algorithm 
 )
-target_link_libraries(Vehicle PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui)
-
-set(VEHICLE_DEMO_NAME Vehicle_demo)
-add_executable(${VEHICLE_DEMO_NAME} example/Vehicle_demo.cpp)  
-
-target_link_libraries(${VEHICLE_DEMO_NAME} ${VEHICLE_LIB_NAME} Qt6::Widgets )  
+set(VEHICLE_DEMO_NAME vehicle_model_demo)
+add_executable(${VEHICLE_DEMO_NAME} example/vehicle_model_demo.cpp)  
+target_link_libraries(${VEHICLE_DEMO_NAME} ${VEHICLE_LIB_NAME} Python3::Python Python3::NumPy)  
 
 
 # 多项式曲线（poly_algorithm）类的编译
 set(POLY_LIB_NAME PolynomialAlgorithm)
 add_library(${POLY_LIB_NAME} SHARED src/PolynomialAlgorithm.cpp)  
-
-
 target_include_directories(${POLY_LIB_NAME}  
-    PUBLIC
-    include 
+    PUBLIC include 
     PRIVATE 
     auto_driving_algorithm 
 )
-
-
+target_link_libraries(${POLY_LIB_NAME} Python3::Python) 
 set(POLY_DEMO_NAME PolynomialAlgorithm_demo)
 add_executable(${POLY_DEMO_NAME} example/PolynomialAlgorithm_demo.cpp)  
+target_link_libraries(${POLY_DEMO_NAME} ${POLY_LIB_NAME} ${VEHICLE_LIB_NAME} Python3::Python Python3::NumPy)
+#target_link_directories(${POLY_DEMO_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/Local_Path_Planning)   
 
-target_link_libraries(${POLY_DEMO_NAME} ${POLY_LIB_NAME} Python3::Python)   
 
-add_executable(plot_path example/plot_vehicle.cpp) 
-target_link_libraries(plot_path Python3::Python)
+add_executable(test example/test.cpp) 
+target_link_libraries(test Python3::Python Python3::NumPy) 
 
-add_executable(vehicle_model example/vehicle_model.cpp) 
-target_link_libraries(vehicle_model Python3::Python) 
 
