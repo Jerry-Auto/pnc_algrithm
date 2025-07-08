@@ -37,7 +37,7 @@ int main() {
         if (i % 50 == 0) {
             plt::cla();
             plt::plot(traj_x, traj_y, {{"color", "blue"}, {"linestyle", "-"}, {"linewidth", "1"}});
-            vehicle.plot_vehicle(state, steer);
+            vehicle.plot_vehicle();
             plt::xlim(state.x-10, state.x+10);
             plt::ylim(state.y-10, state.y+10);
             plt::pause(0.6);

@@ -22,7 +22,7 @@ int main()
     ElectricVehicleDynamicsModel vehicle;
 
     vehicle.plot_planning(planning_data);
-
+    
     //poly_solver.plotallcurve(planning_data);
     //poly_solver.plotpositioncurve(planning_data);
     //poly_solver.plotthetacurve(planning_data);

@@ -31,6 +31,8 @@ void ElectricVehicleDynamicsModel::update(double steering_angle, double desired_
 
         // 1. 计算轮胎侧偏角（小角度近似）
         //steering_angle=-steering_angle;
+        this->steering_angle=steering_angle;
+        this->desired_accel=desired_accel;
         double alpha_f = steering_angle - (state_.vy + params_.lf * state_.yaw_rate) / (state_.vx + 1e-6);
         double alpha_r = -(state_.vy - params_.lr * state_.yaw_rate) / (state_.vx + 1e-6);
 
@@ -86,7 +88,7 @@ void ElectricVehicleDynamicsModel::reset(const VehicleState& new_state) {
     state_ = new_state;
 }
  
-void ElectricVehicleDynamicsModel::plot_vehicle(const VehicleState& state, double steer_angle, const std::string& color) {
+void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
     // 车辆轮廓点 (局部坐标系)
     std::vector<double> vehicle_x = {-params_.lr, params_.lf, params_.lf, -params_.lr, -params_.lr};
     std::vector<double> vehicle_y = {-1.0, -1.0, 1.0, 1.0, -1.0};
@@ -97,11 +99,12 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const VehicleState& state, doubl
         double x_local = vehicle_x[i];
         double y_local = vehicle_y[i];
         
-        double x_rot = x_local * std::cos(state.yaw) - y_local * std::sin(state.yaw);
-        double y_rot = x_local * std::sin(state.yaw) + y_local * std::cos(state.yaw);
+        double x_rot = x_local * std::cos(state_.yaw) - y_local * std::sin(state_.yaw);
+        double y_rot = x_local * std::sin(state_.yaw) + y_local * std::cos(state_.yaw);
         
-        global_x.push_back(state.x + x_rot);
-        global_y.push_back(state.y + y_rot);
+        global_x.push_back(state_.x + x_rot);
+        global_y.push_back(state_.y + y_rot);
+
     }
     
     // 绘制车辆主体
@@ -114,8 +117,7 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const VehicleState& state, doubl
     
     auto draw_wheel = [&](double x, double y, double steer, bool is_front) {
         std::vector<double> wx = {-wheel_len/2, wheel_len/2, wheel_len/2, -wheel_len/2, -wheel_len/2};
-        std::vector<double> wy = {-wheel_width/2, -wheel_width/2, wheel_width/2, wheel_width/2, -wheel_width/2};
-        
+        std::vector<double> wy = {-wheel_width/2, -wheel_width/2, wheel_width/2, wheel_width/2, -wheel_width/2};    
         std::vector<double> gx, gy;
         for (size_t i = 0; i < wx.size(); ++i) {
             double x_rel = wx[i];
@@ -126,10 +128,10 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const VehicleState& state, doubl
             double y_rot = x_rel * std::sin(steer) + y_rel * std::cos(steer);
             
             // 车辆坐标系 -> 全局坐标系
-            double x_global = state.x + (x * std::cos(state.yaw) - y * std::sin(state.yaw)) + 
-                             (x_rot * std::cos(state.yaw) - y_rot * std::sin(state.yaw));
-            double y_global = state.y + (x * std::sin(state.yaw) + y * std::cos(state.yaw)) + 
-                             (x_rot * std::sin(state.yaw) + y_rot * std::cos(state.yaw));
+            double x_global = state_.x + (x * std::cos(state_.yaw) - y * std::sin(state_.yaw)) + 
+                             (x_rot * std::cos(state_.yaw) - y_rot * std::sin(state_.yaw));
+            double y_global = state_.y + (x * std::sin(state_.yaw) + y * std::cos(state_.yaw)) + 
+                             (x_rot * std::sin(state_.yaw) + y_rot * std::cos(state_.yaw));
             
             gx.push_back(x_global);
             gy.push_back(y_global);
@@ -144,8 +146,9 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const VehicleState& state, doubl
     };
     
     // 绘制四个车轮（前轮用红色强调）
-    draw_wheel(params_.lf, half_track, steer_angle, true);   // 左前（驱动轮）
-    draw_wheel(params_.lf, -half_track, steer_angle, true);  // 右前（驱动轮）
+    
+    draw_wheel(params_.lf, half_track, this->steering_angle, true);   // 左前（驱动轮）
+    draw_wheel(params_.lf, -half_track, this->steering_angle, true);  // 右前（驱动轮）
     draw_wheel(-params_.lr, half_track, 0, false);           // 左后
     draw_wheel(-params_.lr, -half_track, 0, false);          // 右后
 }
@@ -154,6 +157,8 @@ void ElectricVehicleDynamicsModel::reset_for_planning_only(std::tuple<double,dou
     state_.x = std::get<0>(new_state);
     state_.y = std::get<1>(new_state);
     state_.yaw = std::get<2>(new_state);
+    traj_x.push_back(state_.x);
+    traj_y.push_back(state_.y);
 }
  
 void ElectricVehicleDynamicsModel::plot_planning(std::vector<std::vector<double>> planning_data) {
@@ -170,22 +175,18 @@ void ElectricVehicleDynamicsModel::plot_planning(std::vector<std::vector<double>
     double dt=planning_data[0][1]-planning_data[0][0];
     int k=3;
     double time_factor=0.8;
-    std::vector<double> traj_x, traj_y;
+
     
     for (int i = 0; i < steps; i++) {
         std::tuple<double,double,double> new_state = 
             {planning_data[1][i], planning_data[2][i], planning_data[3][i]};
-        reset_for_planning_only(new_state);
-        auto state = getState();
-        traj_x.push_back(state.x);
-        traj_y.push_back(state.y);
-        
+        reset_for_planning_only(new_state);        
         if (i % k == 0) {
             plt::cla();
             plt::plot(traj_x, traj_y, {{"color", "blue"}, {"linestyle", "-"}, {"linewidth", "1"}});
-            plot_vehicle(state);
-            plt::xlim(state.x-10, state.x+10);
-            plt::ylim(state.y-10, state.y+10);
+            plot_vehicle();
+            plt::xlim(state_.x-10, state_.x+10);
+            plt::ylim(state_.y-10, state_.y+10);
             plt::title("XOY coordinate");
             plt::xlabel("World X (m)");
             plt::ylabel("World Y (m)");

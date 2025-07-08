@@ -1,22 +1,15 @@
+#ifndef VEHICLE_MODEL_H
+#define VEHICLE_MODEL_H
+
+
 #include <iostream>
-
 #include <vector>
-
 #include <cmath>
-
 #include <algorithm>
-
 #include <map>
-
 #include <string>
-
 #include "matplotlibcpp.h"
-
- 
-
 namespace plt = matplotlibcpp;
-
- 
 
 // 自定义clamp函数
 
@@ -28,36 +21,20 @@ T clamp(T value, T min_val, T max_val) {
 
 }
 
- 
-
 class ElectricVehicleDynamicsModel {
-
 public:
-
     // 车辆状态结构体
-
     struct VehicleState {
-
         double x;
-
         double y;
-
         double yaw;
-
         double vx;
-
         double vy;
-
         double yaw_rate;
-
         double wheel_speed;
-
     };
 
- 
-
     // 车辆参数结构体
-
     struct VehicleParams {
         double mass;
         double lf;
@@ -83,40 +60,22 @@ public:
 
     };
 
- 
-
     // 构造函数
-
     ElectricVehicleDynamicsModel();
-
- 
-
     void update(double steering_angle, double desired_accel, double dt);
-
- 
-
     VehicleState getState() const;
-
- 
-
     void reset(const VehicleState& new_state);
-
- 
-
-    void plot_vehicle(const VehicleState& state, double steer_angle=0.0, const std::string& color="blue");
-
+    void plot_vehicle(const std::string& color="blue");
     void reset_for_planning_only(std::tuple<double,double,double>& new_state);
-
- 
-
     void plot_planning(std::vector<std::vector<double>> planning_data);
-
- 
+    std::vector<double> traj_x, traj_y;
 
 private:
-
     VehicleState state_;
-
     VehicleParams params_;
+    double steering_angle;//方向盘转角
+    double desired_accel;//输入加速度
 
 };
+
+#endif

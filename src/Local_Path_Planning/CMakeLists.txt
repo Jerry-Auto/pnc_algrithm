@@ -81,7 +81,25 @@ target_link_libraries(${POLY_DEMO_NAME} ${POLY_LIB_NAME} ${VEHICLE_LIB_NAME} Pyt
 #target_link_directories(${POLY_DEMO_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/Local_Path_Planning)   
 
 
+# World_map类的编译
+set(WORLD_MAP_LIB_NAME World_map)
+add_library(${WORLD_MAP_LIB_NAME} SHARED)  
+target_sources(${WORLD_MAP_LIB_NAME}  
+    PRIVATE 
+    src/World_map.cpp 
+)
+target_link_libraries(${WORLD_MAP_LIB_NAME} ${VEHICLE_LIB_NAME} Python3::Python ) 
+target_include_directories(${WORLD_MAP_LIB_NAME}  
+    PUBLIC include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+set(WORLD_MAP_DEMO_NAME World_map_demo)
+add_executable(${WORLD_MAP_DEMO_NAME} example/World_map_demo.cpp)  
+target_link_libraries(${WORLD_MAP_DEMO_NAME} ${WORLD_MAP_LIB_NAME} ${POLY_LIB_NAME} Python3::Python Python3::NumPy)  
+
+
 add_executable(test example/test.cpp) 
-target_link_libraries(test Python3::Python Python3::NumPy) 
+target_link_libraries(test ${VEHICLE_LIB_NAME} ${POLY_LIB_NAME} Python3::Python Python3::NumPy) 
 
 
