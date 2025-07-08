@@ -19,7 +19,6 @@ int main() {
     
     // 设置车辆初始状态
     ElectricVehicleDynamicsModel::VehicleState state2 = {30, -15, -M_PI/6, 3, 0, -0.05, 0};
-    
     //vehicle1->reset(state1);
     vehicle2.reset(state2);
     
@@ -41,11 +40,12 @@ int main() {
     str_state.second=y_str;
     end_state.first=x_end;
     end_state.second=y_end;
-    PolynomialAlgorithm poly_solver(str_state,end_state,t0,t1);
 
+    PolynomialAlgorithm poly_solver(str_state,end_state,t0,t1);
+    
     std::vector<std::vector<double>> planning_data=poly_solver.planning_series(0.05);
     //画图
-    world.plot_planning(&vehicle1,planning_data);
+    world.plot_planning(&vehicle1,planning_data,"poly.png");
 
     return 0;
 }

@@ -76,7 +76,7 @@ void WorldMap::updateAndVisualize(bool show_grid, bool equal_aspect) {
 }
 
     // 更新车辆状态并可视化
-    void WorldMap::plot_planning(ElectricVehicleDynamicsModel* vehicle,std::vector<std::vector<double>> planning_data)
+    void WorldMap::plot_planning(ElectricVehicleDynamicsModel* vehicle,std::vector<std::vector<double>> planning_data,std::string filename)
     {
         int steps = static_cast<int>(planning_data[0].size());
         std::vector<double> traj_x, traj_y;
@@ -90,6 +90,7 @@ void WorldMap::updateAndVisualize(bool show_grid, bool equal_aspect) {
                 visualize(true,true,false);
             }
         }
+        save_to_PNG(filename);
         plt::show();
     }
 
@@ -108,4 +109,11 @@ void WorldMap::setBounds(double x_min, double x_max, double y_min, double y_max)
 void WorldMap::clear() {
     obstacles_.clear();
     vehicles_.clear();
+}
+
+void WorldMap::save_to_PNG(std::string filename)
+{
+    std::string folderPath = "./image";
+    std::cout << "结果截图保存至：" << filename << std::endl;
+    plt::save(folderPath+"/"+filename);
 }

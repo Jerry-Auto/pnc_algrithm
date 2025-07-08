@@ -43,10 +43,13 @@ public:
     void updateAndVisualize(bool show_grid = true, bool equal_aspect = true);
 
     // 更新车辆状态并可视化
-    void plot_planning(ElectricVehicleDynamicsModel* vehicle,std::vector<std::vector<double>> planning_data);
+    void plot_planning(ElectricVehicleDynamicsModel* vehicle,std::vector<std::vector<double>> planning_data,std::string filename="out.png");
 
     // 设置边界
     void setBounds(double x_min, double x_max, double y_min, double y_max);
+    
+    //保存结果图
+    void save_to_PNG(std::string filename);
 
     // 清除所有对象
     void clear();
