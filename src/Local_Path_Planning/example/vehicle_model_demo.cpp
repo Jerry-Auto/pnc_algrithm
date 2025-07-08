@@ -6,15 +6,17 @@ int main() {
     
     // 模拟参数
     double dt = 0.01;  // 适当增大步长提高性能
-    double sim_time = 20.0;
+    double sim_time = 28.0;
     int steps = static_cast<int>(sim_time / dt);
  
     // 输入序列
     std::vector<std::tuple<double, double>> inputs = {
         {0.0, 1.0},    // 直行加速
-        {-0.1, 0.5},   // 左转向加速
+        {0.3, 0.5},   // 左转向加速
         {0.0, 0.0},    // 匀速
-        {0.0, -2.0},   // 减速
+        {0.0, -0.5},   // 减速
+        {-0.3, 0.5},   // 右转向加速
+        {0.0, -1.0},   // 减速
         {0.0, 0.0}     // 停止
     };
     // 存储轨迹
@@ -38,7 +40,7 @@ int main() {
             vehicle.plot_vehicle(state, steer);
             plt::xlim(state.x-10, state.x+10);
             plt::ylim(state.y-10, state.y+10);
-            plt::pause(0.5);
+            plt::pause(0.6);
         }
     }
     

@@ -1,4 +1,5 @@
-#include"vehicle_model.h"    
+#include"vehicle_model.h"
+#include <chrono>    
     
     // 构造函数 - 调整参数更适合前驱车
 ElectricVehicleDynamicsModel::ElectricVehicleDynamicsModel() {
@@ -20,84 +21,52 @@ ElectricVehicleDynamicsModel::ElectricVehicleDynamicsModel() {
     params_.track_width = 1.5;
     params_.max_accel = 2.5;
     params_.max_decel = 7.0;
+    params_.Cd = 0.3;        // 空气阻力系数
+    params_.damping = 0.95;  // 横摆角速度阻尼
     state_ = {0, 0, 0, 0, 0, 0, 0};
 }
  
 void ElectricVehicleDynamicsModel::update(double steering_angle, double desired_accel, double dt) {
-    // 限制输入范围
-    steering_angle = clamp(steering_angle, -params_.max_steer, params_.max_steer);
-    desired_accel = clamp(desired_accel, -params_.max_decel, params_.max_accel);
+    // 更新车辆状态
+
+        // 1. 计算轮胎侧偏角（小角度近似）
+        //steering_angle=-steering_angle;
+        double alpha_f = steering_angle - (state_.vy + params_.lf * state_.yaw_rate) / (state_.vx + 1e-6);
+        double alpha_r = -(state_.vy - params_.lr * state_.yaw_rate) / (state_.vx + 1e-6);
+
+        // 2. 限制侧偏角范围（非线性保护）
+        alpha_f = std::max(-0.5, std::min(0.5, alpha_f));
+        alpha_r = std::max(-0.5, std::min(0.5, alpha_r));
+
  
-    // 安全速度计算
-    double vx_safe = std::max(state_.vx, 0.1);
- 
-    // 轮胎侧偏角计算
-    double alpha_f = steering_angle - std::atan2(state_.vy + params_.lf * state_.yaw_rate, vx_safe);
-    double alpha_r = -std::atan2(state_.vy - params_.lr * state_.yaw_rate, vx_safe);
- 
-    // 轮胎力计算
-    double F_fy = -params_.cf * alpha_f;
-    double F_ry = -params_.cr * alpha_r;
- 
-    // 限制最大侧向力（防止侧滑）
-    double max_lat_force = 0.35 * params_.mass * 9.81;
-    F_fy = clamp(F_fy, -max_lat_force, max_lat_force);
-    F_ry = clamp(F_ry, -max_lat_force, max_lat_force);
- 
-    // 阻力计算
-    double F_air = params_.drag_coeff * state_.vx * std::abs(state_.vx) * 0.5;
-    double F_rr = params_.rr_coeff * (state_.vx < 0 ? -state_.vx : state_.vx);
- 
-    // 前驱车特性：只有前轮提供驱动力
-    double F_total_required = desired_accel * params_.mass + F_air + F_rr;
-    
-    // 计算前轮最大可用牵引力（考虑侧向力）
-    double F_long_max_front = std::sqrt(std::pow(max_lat_force, 2) - std::pow(F_fy, 2));
-    double F_drive_front = clamp(F_total_required, -F_long_max_front, F_long_max_front);
- 
-    // 后轮没有驱动力，只有侧向力
-    double F_drive_rear = 0.0;
- 
-    // 计算所需电机扭矩（前驱）
-    double wheel_torque_front = F_drive_front * params_.wheel_radius;
-    double motor_torque = wheel_torque_front / (params_.gear_ratio * params_.motor_efficiency);
-    motor_torque = clamp(motor_torque, -params_.max_motor_torque, params_.max_motor_torque);
- 
-    // 重新计算实际前轮驱动力
-    wheel_torque_front = motor_torque * params_.gear_ratio * params_.motor_efficiency;
-    F_drive_front = wheel_torque_front / params_.wheel_radius;
- 
-    // 动力学方程
-    double x_dot = state_.vx * std::cos(state_.yaw) - state_.vy * std::sin(state_.yaw);
-    double y_dot = state_.vx * std::sin(state_.yaw) + state_.vy * std::cos(state_.yaw);
-    
-    // 前驱车：总纵向力来自前轮
-    double vx_dot = (F_drive_front * std::cos(steering_angle) - F_air - F_rr) / params_.mass;
-    
-    // 侧向力（前后轮贡献）
-    double vy_dot = (F_fy * std::sin(steering_angle) + F_ry) / params_.mass - state_.yaw_rate * state_.vx;
-    
-    // 修正的yaw力矩计算（前驱车特性）
-    double torque_yaw = params_.lf * F_fy * std::cos(steering_angle) - params_.lr * F_ry;
-    
-    // 考虑前轮驱动力产生的附加力矩
-    double torque_drive = F_drive_front * std::sin(steering_angle) * params_.wheel_radius;
-    double yaw_rate_dot = (torque_yaw + torque_drive) / params_.iz;
- 
-    // 车轮动力学（前轮驱动）
-    double wheel_inertia = 0.5 * params_.mass * std::pow(params_.wheel_radius, 2);
-    double front_wheel_speed_dot = (wheel_torque_front - F_drive_front * params_.wheel_radius) / wheel_inertia;
-    
-    // 欧拉积分
-    state_.x += x_dot * dt;
-    state_.y += y_dot * dt;
-    state_.yaw += state_.yaw_rate * dt;
-    state_.vx += vx_dot * dt;
-    state_.vy += vy_dot * dt;
-    state_.yaw_rate += yaw_rate_dot * dt;
-    
-    // 前轮速度更新（只有前轮有驱动）
-    state_.wheel_speed += front_wheel_speed_dot * dt;
+
+        // 3. 计算轮胎力（线性模型）
+        double Fyf = 2 * params_.cf * alpha_f;
+        double Fyr = 2 * params_.cr * alpha_r;
+
+        // 4. 计算纵向力（简化模型）
+        double Fx = desired_accel * params_.mass;
+        // 5. 更新横向速度（博客公式14）
+        double ay = (-(params_.cf + params_.cr) * state_.vy 
+                    - (params_.lf * params_.cf - params_.lr * params_.cr) * state_.yaw_rate 
+                    + params_.cf * steering_angle * state_.vx) / params_.mass;
+        state_.vy += ay * dt;
+
+        // 6. 更新横摆角速度（博客公式17+阻尼）
+        double yaw_accel = (params_.lf * Fyf - params_.lr * Fyr) / params_.iz;
+        state_.yaw_rate = params_.damping * state_.yaw_rate + yaw_accel * dt;
+
+        // 7. 更新纵向速度（考虑空气阻力）
+        double air_drag = 0.5 * 1.225 * params_.Cd * 2.0 * (state_.vx > 0 ? state_.vx * state_.vx : 0); // 假设迎风面积2m²
+        state_.vx += (Fx - air_drag) / params_.mass * dt;
+
+        // 8. 更新航向角
+        state_.yaw += state_.yaw_rate * dt;
+        // 规范化yaw角度到[-π, π]
+        state_.yaw = std::atan2(std::sin(state_.yaw), std::cos(state_.yaw));
+        // 9. 更新全局位置
+        state_.x += (state_.vx * cos(state_.yaw) - state_.vy * sin(state_.yaw)) * dt;
+        state_.y += (state_.vx * sin(state_.yaw) + state_.vy * cos(state_.yaw)) * dt;
  
     // 防止低速不稳定
     if (state_.vx < 0.1 && desired_accel <= 0) {
@@ -105,8 +74,7 @@ void ElectricVehicleDynamicsModel::update(double steering_angle, double desired_
         state_.wheel_speed = 0;
     }
     
-    // 规范化yaw角度到[-π, π]
-    state_.yaw = std::atan2(std::sin(state_.yaw), std::cos(state_.yaw));
+
 }
  
 // 其余函数保持不变...
@@ -141,8 +109,8 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const VehicleState& state, doubl
     
     // 绘制车轮（前驱车强调前轮）
     double half_track = params_.track_width / 2.0;
-    double wheel_len = 0.25;  // 前轮稍长表示驱动轮
-    double wheel_width = 0.1;
+    double wheel_len = params_.wheel_radius*2;  // 前轮稍长表示驱动轮
+    double wheel_width = params_.wheel_width;
     
     auto draw_wheel = [&](double x, double y, double steer, bool is_front) {
         std::vector<double> wx = {-wheel_len/2, wheel_len/2, wheel_len/2, -wheel_len/2, -wheel_len/2};
@@ -189,15 +157,22 @@ void ElectricVehicleDynamicsModel::reset_for_planning_only(std::tuple<double,dou
 }
  
 void ElectricVehicleDynamicsModel::plot_planning(std::vector<std::vector<double>> planning_data) {
+
+        // 开始计时
+    auto start = std::chrono::high_resolution_clock::now();
+
     auto min_it = std::min_element(planning_data[1].begin(), planning_data[1].end());
     double min_val = *min_it;
     auto max_it = std::max_element(planning_data[1].begin(), planning_data[1].end());
     double max_val = *max_it;
-    
+
     int steps = static_cast<int>(planning_data[0].size());
+    double dt=planning_data[0][1]-planning_data[0][0];
+    int k=3;
+    double time_factor=0.8;
     std::vector<double> traj_x, traj_y;
     
-    for (int i = 0; i < steps; ++i) {
+    for (int i = 0; i < steps; i++) {
         std::tuple<double,double,double> new_state = 
             {planning_data[1][i], planning_data[2][i], planning_data[3][i]};
         reset_for_planning_only(new_state);
@@ -205,14 +180,24 @@ void ElectricVehicleDynamicsModel::plot_planning(std::vector<std::vector<double>
         traj_x.push_back(state.x);
         traj_y.push_back(state.y);
         
-        if (i % 50 == 0) {
+        if (i % k == 0) {
             plt::cla();
             plt::plot(traj_x, traj_y, {{"color", "blue"}, {"linestyle", "-"}, {"linewidth", "1"}});
             plot_vehicle(state);
-            plt::xlim(min_val-10, max_val+10);
-            plt::ylim(min_val-10, max_val+10);
-            plt::pause(0.01);
+            plt::xlim(state.x-10, state.x+10);
+            plt::ylim(state.y-10, state.y+10);
+            plt::title("XOY coordinate");
+            plt::xlabel("World X (m)");
+            plt::ylabel("World Y (m)");
+            plt::grid(true);
+            plt::pause(dt*time_factor*k);
         }
     }
+              // 结束计时
+    auto end = std::chrono::high_resolution_clock::now();
+    // 计算耗时（单位：毫秒）
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "耗时: " << duration.count() << " 毫秒" << std::endl;
+
     plt::show();
 }

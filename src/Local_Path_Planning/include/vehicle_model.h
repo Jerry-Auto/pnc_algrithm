@@ -59,42 +59,27 @@ public:
     // 车辆参数结构体
 
     struct VehicleParams {
-
         double mass;
-
         double lf;
-
         double lr;
-
         double iz;
-
         double cf;
-
         double cr;
-
         double drag_coeff;
-
         double rr_coeff;
-
         double max_steer;
-
         double max_motor_torque;
-
         double max_brake_torque;
-
         double wheel_radius;
-
         double gear_ratio;
-
         double motor_efficiency;
-
         double wheel_width;
-
         double track_width;
-
         double max_accel;
-
         double max_decel;
+        double Cd;      // 空气阻力系数
+
+        double damping; // 横摆角速度阻尼
 
     };
 

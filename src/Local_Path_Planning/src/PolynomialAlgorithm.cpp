@@ -11,6 +11,9 @@ PolynomialAlgorithm::PolynomialAlgorithm(std::pair<std::vector<double> ,std::vec
     double xt=this->A.dot(Calculpoly(this->t1));
     Eigen::MatrixXd TY=CalculT(x0,xt);
     this->B = TY.inverse()*Y;
+
+    // std::cout<<"A"<<this->A <<std::endl;
+    // std::cout<<"B"<<this->B<<std::endl;
 }
 
 Eigen::MatrixXd PolynomialAlgorithm::CalculT(double state_0,double state_t)
@@ -40,8 +43,10 @@ std::vector<double> PolynomialAlgorithm::GetState(double t)
     double X_State=this->A.dot(poly_t);
     Eigen::VectorXd poly_x=Calculpoly(X_State);
     double Y_State=this->B.dot(poly_x);
-    
+
     double dX_State=diff_factor(A).dot(poly_t);
+    // double dX_S=0*poly_t(0)+5*A(0)*poly_t(1)+4*A(1)*poly_t(2)+3*A(2)*poly_t(3)+2*A(3)*poly_t(4)+A(4)*poly_t(5);
+    // std::cout<<dX_State<<" "<<dX_S<<std::endl;
     double dY_dx_State=diff_factor(B).dot(poly_x);
     double dY_dt_State=dY_dx_State*dX_State;
     double ddX_State=diff_factor(diff_factor(A)).dot(poly_t);
@@ -50,6 +55,7 @@ std::vector<double> PolynomialAlgorithm::GetState(double t)
 
     std::vector<double> x_state={X_State,dX_State,ddX_State};
     std::vector<double> y_state={Y_State,dY_dt_State,ddY_dt_State};
+
     double theta=std::atan(dY_dx_State);
     double kappa=ddY_dx_State/pow(1+pow(dY_dx_State,2),1.5);
     double vp=sqrt(pow(dY_dt_State,2)+pow(dX_State,2));
@@ -60,19 +66,22 @@ std::vector<double> PolynomialAlgorithm::GetState(double t)
     return plan;
 }
 
+
 /// @brief 对多项式系数进行求导，最终用返回值乘以多项式基底向量即为导数值（x=A*poly(t),dx/dt=D*A*poly(t)）
 /// @param origin_factor 
 /// @return 
 Eigen::VectorXd PolynomialAlgorithm::diff_factor(Eigen::VectorXd origin_factor)
 {
     Eigen::MatrixXd D(6,6);
-    D<<0,1,0,0,0,0,
-    0,0,2,0,0,0,
-    0,0,0,3,0,0,
-    0,0,0,0,4,0,
-    0,0,0,0,0,5,
-    0,0,0,0,0,0;
+    D<<0,0,0,0,0,0,
+    5,0,0,0,0,0,
+    0,4,0,0,0,0,
+    0,0,3,0,0,0,
+    0,0,0,2,0,0,
+    0,0,0,0,1,0;
     Eigen::VectorXd out=D*origin_factor;
+    // std::cout<<"输入向量"<<origin_factor<<std::endl;
+    // std::cout<<"输出向量"<<out<<std::endl;
     return out;
 }
 /// @brief 输出规划信息序列，包含时刻，x,y,theta,kappa,vp,ap
@@ -103,12 +112,13 @@ std::vector<std::vector<double>> PolynomialAlgorithm::planning_series(double dt)
 
 void PolynomialAlgorithm::plotpositioncurve(std::vector<std::vector<double>> plan_data)
 {
+
     plt::figure(1);
     plt::title("XOY coordinate");
     plt::xlabel("World X (m)");
     plt::ylabel("World Y (m)");
-    plt::xlim(0, 200);
-    plt::ylim(0, 200);
+    // plt::xlim(0, 200);
+    // plt::ylim(0, 200);
     plt::grid(true);
     plt::plot(plan_data[1], plan_data[2],"r");
 

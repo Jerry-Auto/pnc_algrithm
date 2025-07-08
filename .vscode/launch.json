@@ -8,7 +8,7 @@
             "name": "(gdb) 启动",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/Local_Path_Planning/example/vehicle_model",
+            "program": "${workspaceFolder}/bin/Local_Path_Planning/example/PolynomialAlgorithm_demo",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
