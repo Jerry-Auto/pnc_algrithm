@@ -16,6 +16,11 @@ void WorldMap::addVehicle(ElectricVehicleDynamicsModel* vehicle,
     vehicles_.emplace_back(vehicle, color);
 }
 
+void WorldMap::add_control_point(std::pair<std::vector<double>,std::vector<double>> control_point)
+{
+    this->control_point_.push_back(control_point);
+}
+
 void WorldMap::visualize(bool show_grid, bool equal_aspect, bool blocking) {
     if (!is_interactive_) {
         plt::figure_size(1200, 800);
@@ -31,6 +36,12 @@ void WorldMap::visualize(bool show_grid, bool equal_aspect, bool blocking) {
     if (equal_aspect) plt::axis("equal");
     if (show_grid) plt::grid(true);
 
+    //绘制控制点
+    for(size_t i=0;i<control_point_.size();i++)
+    {
+        plt::plot(control_point_[i].first, control_point_[i].second, {{"color", "green"}, {"linewidth", "1"}}); 
+    }
+    
     // 绘制障碍物（提取为独立方法更佳）
     for (const auto& obstacle : obstacles_) {
         std::vector<double> local_x = {-obstacle.width/2, obstacle.width/2, 

@@ -26,6 +26,7 @@ public:
     };
 
     // 构造函数
+    
     WorldMap(double x_min = -100.0, double x_max = 100.0, 
              double y_min = -100.0, double y_max = 100.0);
 
@@ -51,6 +52,9 @@ public:
     //保存结果图
     void save_to_PNG(std::string filename);
 
+    //添加控制点
+    void add_control_point(std::pair<std::vector<double>,std::vector<double>> control_point);
+
     // 清除所有对象
     void clear();
 
@@ -60,6 +64,7 @@ private:
     double y_min_, y_max_;
     std::vector<Obstacle> obstacles_;
     std::vector<std::pair<ElectricVehicleDynamicsModel*, std::string>> vehicles_;
+    std::vector<std::pair<std::vector<double>,std::vector<double>>> control_point_;
 };
 
 #endif

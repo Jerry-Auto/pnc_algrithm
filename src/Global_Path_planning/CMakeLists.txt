@@ -4,7 +4,7 @@ project(auto_driving_algorithm)
 
 set(PACKAGE_NAME auto_driving_algorithm)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # 设置编译选项
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")

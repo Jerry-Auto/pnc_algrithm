@@ -1,9 +1,11 @@
 #include "PolynomialAlgorithm.h"
-#include "vehicle_model.h"
+#include"World_map.h"
+
 
 
 int main()
 {
+    WorldMap world(-50, 50, -50, 50);
     std::pair<std::vector<double> ,std::vector<double>> str_state,end_state;
     double t0=0;
     double t1=30;
@@ -21,7 +23,10 @@ int main()
     //画图
     ElectricVehicleDynamicsModel vehicle;
 
-    vehicle.plot_planning(planning_data);
+    //vehicle.plot_planning(planning_data);
+
+    world.addVehicle(&vehicle, "red");
+    world.plot_planning(&vehicle,planning_data,"poly.png");
     
     //poly_solver.plotallcurve(planning_data);
     //poly_solver.plotpositioncurve(planning_data);

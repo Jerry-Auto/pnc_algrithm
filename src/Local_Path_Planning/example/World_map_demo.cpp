@@ -1,5 +1,5 @@
 #include "PolynomialAlgorithm.h"
-#include"World_map.h"
+#include "World_map.h"
 
 
 int main() {
@@ -45,7 +45,7 @@ int main() {
     
     std::vector<std::vector<double>> planning_data=poly_solver.planning_series(0.05);
     //画图
-    world.plot_planning(&vehicle1,planning_data,"poly.png");
+    world.plot_planning(&vehicle1,planning_data,"worldmap.png");
 
     return 0;
 }

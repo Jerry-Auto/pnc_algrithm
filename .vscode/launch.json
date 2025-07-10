@@ -8,7 +8,7 @@
             "name": "(gdb) 启动",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/Local_Path_Planning/example/test",
+            "program": "${workspaceFolder}/bin/Local_Path_Planning/example/B_spline_demo",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

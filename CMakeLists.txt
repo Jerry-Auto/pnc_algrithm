@@ -4,6 +4,9 @@ project(auto_driving_algorithm)
 # 设置输出目录
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
+set(CMAKE_CXX_STANDARD 17)
+
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #include(GNUInstallDirs)
 set(PACKAGE_NAME auto_driving_algorithm)

@@ -4,7 +4,7 @@ project(auto_driving_algorithm)
 
 set(PACKAGE_NAME auto_driving_algorithm)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # 设置编译选项
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -65,23 +65,7 @@ set(VEHICLE_DEMO_NAME vehicle_model_demo)
 add_executable(${VEHICLE_DEMO_NAME} example/vehicle_model_demo.cpp)  
 target_link_libraries(${VEHICLE_DEMO_NAME} ${VEHICLE_LIB_NAME} Python3::Python Python3::NumPy)  
 
-
-# 多项式曲线（poly_algorithm）类的编译
-set(POLY_LIB_NAME PolynomialAlgorithm)
-add_library(${POLY_LIB_NAME} SHARED src/PolynomialAlgorithm.cpp)  
-target_include_directories(${POLY_LIB_NAME}  
-    PUBLIC include 
-    PRIVATE 
-    auto_driving_algorithm 
-)
-target_link_libraries(${POLY_LIB_NAME} Python3::Python) 
-set(POLY_DEMO_NAME PolynomialAlgorithm_demo)
-add_executable(${POLY_DEMO_NAME} example/PolynomialAlgorithm_demo.cpp)  
-target_link_libraries(${POLY_DEMO_NAME} ${POLY_LIB_NAME} ${VEHICLE_LIB_NAME} Python3::Python Python3::NumPy)
-#target_link_directories(${POLY_DEMO_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/Local_Path_Planning)   
-
-
-# World_map类的编译
+# World_map类so库的编译
 set(WORLD_MAP_LIB_NAME World_map)
 add_library(${WORLD_MAP_LIB_NAME} SHARED)  
 target_sources(${WORLD_MAP_LIB_NAME}  
@@ -94,12 +78,46 @@ target_include_directories(${WORLD_MAP_LIB_NAME}
     PRIVATE 
     auto_driving_algorithm 
 )
+
+
+# 多项式曲线（poly_algorithm）类的编译
+set(POLY_LIB_NAME PolynomialAlgorithm)
+add_library(${POLY_LIB_NAME} SHARED src/PolynomialAlgorithm.cpp)  
+target_include_directories(${POLY_LIB_NAME}  
+    PUBLIC include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+target_link_libraries(${POLY_LIB_NAME} Python3::Python) 
+set(POLY_DEMO_NAME PolynomialAlgorithm_demo)
+add_executable(${POLY_DEMO_NAME} example/PolynomialAlgorithm_demo.cpp)  
+target_link_libraries(${POLY_DEMO_NAME} ${POLY_LIB_NAME} ${WORLD_MAP_LIB_NAME} Python3::Python Python3::NumPy)
+#target_link_directories(${POLY_DEMO_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/Local_Path_Planning)   
+
+
+#World_map_demo的编译
 set(WORLD_MAP_DEMO_NAME World_map_demo)
 add_executable(${WORLD_MAP_DEMO_NAME} example/World_map_demo.cpp)  
 target_link_libraries(${WORLD_MAP_DEMO_NAME} ${WORLD_MAP_LIB_NAME} ${POLY_LIB_NAME} Python3::Python Python3::NumPy)  
 
 
+#用作测试的cpp文件
 add_executable(test example/test.cpp) 
-target_link_libraries(test ${VEHICLE_LIB_NAME} ${POLY_LIB_NAME} Python3::Python Python3::NumPy) 
+target_link_libraries(test ${WORLD_MAP_LIB_NAME} Python3::Python Python3::NumPy) 
+
+
+
+# B样条曲线（B_spline）类的编译
+set(B_SPLINE_LIB_NAME B_spline)
+add_library(${B_SPLINE_LIB_NAME} SHARED src/B_spline.cpp)  
+target_include_directories(${B_SPLINE_LIB_NAME}  
+    PUBLIC include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+target_link_libraries(${B_SPLINE_LIB_NAME} Python3::Python) 
+set(B_SPLINE_DEMO_NAME B_spline_demo)
+add_executable(${B_SPLINE_DEMO_NAME} example/B_spline_demo.cpp)  
+target_link_libraries(${B_SPLINE_DEMO_NAME} ${B_SPLINE_LIB_NAME} ${WORLD_MAP_LIB_NAME} Python3::Python Python3::NumPy)
 
 
