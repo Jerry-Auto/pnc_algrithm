@@ -97,6 +97,8 @@ private:
     bool check_collision(
         const std::vector<std::vector<double>>& trajectory,
         const std::vector<WorldMap::Obstacle>& obstacles) const;
+
+    void kinematics_update_State(ElectricVehicleDynamicsModel::VehicleState& state ,double v,double w,double dt);
     
     Config config_;
     std::vector<WorldMap::Obstacle> obstacles_;

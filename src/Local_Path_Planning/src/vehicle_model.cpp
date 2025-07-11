@@ -40,8 +40,6 @@ void ElectricVehicleDynamicsModel::update(double steering_angle, double desired_
         alpha_f = std::max(-0.5, std::min(0.5, alpha_f));
         alpha_r = std::max(-0.5, std::min(0.5, alpha_r));
 
- 
-
         // 3. 计算轮胎力（线性模型）
         double Fyf = 2 * params_.cf * alpha_f;
         double Fyr = 2 * params_.cr * alpha_r;
@@ -64,8 +62,11 @@ void ElectricVehicleDynamicsModel::update(double steering_angle, double desired_
 
         // 8. 更新航向角
         state_.yaw += state_.yaw_rate * dt;
+
         // 规范化yaw角度到[-π, π]
         state_.yaw = std::atan2(std::sin(state_.yaw), std::cos(state_.yaw));
+        state_.beta = std::atan2(state_.vy,state_.vx);
+
         // 9. 更新全局位置
         state_.x += (state_.vx * cos(state_.yaw) - state_.vy * sin(state_.yaw)) * dt;
         state_.y += (state_.vx * sin(state_.yaw) + state_.vy * cos(state_.yaw)) * dt;
@@ -76,7 +77,19 @@ void ElectricVehicleDynamicsModel::update(double steering_angle, double desired_
         state_.wheel_speed = 0;
     }
     
+}
 
+
+// 车辆运动学模型函数,采样时间（秒）
+void ElectricVehicleDynamicsModel::kinematics_update_State(double v,double w,double dt) {
+    // 更新速度
+    state_.vx=v;
+    state_.yaw_rate=w;
+    // 更新航向角
+    state_.yaw +=w*dt;
+    // 更新位置（全局坐标）
+    state_.x += state_.vx * cos(state_.yaw) * dt;
+    state_.y += state_.vx * sin(state_.yaw) * dt;
 }
  
 //
@@ -146,9 +159,10 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
         }
     };
     //绘制DWA预测轨迹
-    if(!state_.DWA_pre_traj.first.empty())
+    if(!std::get<0>(state_.DWA_pre_traj).empty() && !std::get<1>(state_.DWA_pre_traj).empty() && !std::get<2>(state_.DWA_pre_traj).empty())
     {
-        plt::plot(state_.DWA_pre_traj.first, state_.DWA_pre_traj.second, {{"color", "black"}, {"linestyle", "--"}, {"linewidth", "1"}});
+        auto [pre_traj_x, pre_traj_y, pre_traj_theta] =state_.DWA_pre_traj;
+        plt::plot(pre_traj_x, pre_traj_y, {{"color", "black"}, {"linestyle", "--"}, {"linewidth", "1"}});            
     }
 
     // 绘制四个车轮（前轮用红色强调）
@@ -177,7 +191,8 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
     plt::plot({state_.x}, {state_.y}, "bo");  // 蓝色圆点
 }
  
-void ElectricVehicleDynamicsModel::reset_for_planning_only(std::tuple<double,double,double>& new_state,std::optional<std::tuple<double, double, double>> DWA_p_t) {
+void ElectricVehicleDynamicsModel::reset_for_planning_only(std::tuple<double,double,double>& new_state,
+    std::optional<std::tuple<std::vector<double>, std::vector<double>,std::vector<double>>> DWA_p_t) {
     state_.x = std::get<0>(new_state);
     state_.y = std::get<1>(new_state);
     state_.yaw = std::get<2>(new_state);

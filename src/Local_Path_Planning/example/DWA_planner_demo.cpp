@@ -28,36 +28,36 @@ int main() {
         best_traj[3].back()
     };
         
-    for (int i = 0; i < 100; ++i) {
-        auto current_state = vehicle.getState();
-        std::tuple<double, double, double> state = {
-            current_state.x, 
-            current_state.y, 
-            current_state.yaw
-        };
-        auto [best_v, best_yaw_rate, best_traj] = planner.plan(
-            current_state, goal, world_map.get_Obstacle(), vehicle);
+    // for (int i = 0; i < 100; ++i) {
+    //     auto current_state = vehicle.getState();
+    //     std::tuple<double, double, double> state = {
+    //         current_state.x, 
+    //         current_state.y, 
+    //         current_state.yaw
+    //     };
+    //     auto [best_v, best_yaw_rate, best_traj] = planner.plan(
+    //         current_state, goal, world_map.get_Obstacle(), vehicle);
         
-        // 使用reset_for_planning_only更新状态
-        std::tuple<double, double, double> pre_state = {
-            best_traj[1].back(), 
-            best_traj[2].back(), 
-            best_traj[3].back()
-        };
-        vehicle.reset_for_planning_only(new_state,pre_state);
+    //     // 使用reset_for_planning_only更新状态
+    //     std::tuple<double, double, double> pre_state = {
+    //         best_traj[1].back(), 
+    //         best_traj[2].back(), 
+    //         best_traj[3].back()
+    //     };
+    //     vehicle.reset_for_planning_only(new_state,pre_state);
         
-        // 使用plot_planning进行可视化
-        world_map.plot_planning(&vehicle, best_traj, "dwa_path.png");
+    //     // 使用plot_planning进行可视化
+    //     world_map.plot_planning(&vehicle, best_traj, "dwa_path.png");
         
-        double dist_to_goal = std::hypot(current_state.x - goal.first, 
-                                        current_state.y - goal.second);
-        if (dist_to_goal < 1.0) {
-            std::cout << "Goal reached!" << std::endl;
-            break;
-        }
+    //     double dist_to_goal = std::hypot(current_state.x - goal.first, 
+    //                                     current_state.y - goal.second);
+    //     if (dist_to_goal < 1.0) {
+    //         std::cout << "Goal reached!" << std::endl;
+    //         break;
+    //     }
         
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // }
     
     return 0;
 }

@@ -18,10 +18,9 @@ std::tuple<double, double, std::vector<std::vector<double>>> DWAPlanner::plan(
     
     const int v_samples = 10;
     const int yaw_rate_samples = 10;
-    
+
     for (int i = 0; i < v_samples; ++i) {
         double v = min_v + (max_v - min_v) * i / (v_samples - 1);
-        
         for (int j = 0; j < yaw_rate_samples; ++j) {
             double yaw_rate = min_yaw_rate + (max_yaw_rate - min_yaw_rate) * j / (yaw_rate_samples - 1);
             
@@ -35,8 +34,7 @@ std::tuple<double, double, std::vector<std::vector<double>>> DWAPlanner::plan(
                 best_trajectory = trajectory;
             }
         }
-    }
-    
+    }  
     return {best_v, best_yaw_rate, best_trajectory};
 }
 
@@ -55,10 +53,45 @@ std::tuple<double, double, double, double> DWAPlanner::calc_dynamic_window(
     return {v_min, v_max, yaw_rate_min, yaw_rate_max};
 }
 
-std::vector<std::vector<double>> DWAPlanner::predict_trajectory(
+// 车辆运动学模型函数,采样时间（秒）
+void DWAPlanner::kinematics_update_State(ElectricVehicleDynamicsModel::VehicleState& state ,double v,double w,double dt) {
+    // 更新速度
+    state.vx=v;
+    state.yaw_rate=w;
+    // 更新航向角
+    state.yaw +=w*dt;
+    // 更新位置（全局坐标）
+    state.x += state_.vx * cos(state_.yaw) * dt;
+    state.y += state_.vx * sin(state_.yaw) * dt;
+}
+
+/**
+ * 轨迹推算
+ * @param state 当前状态---x,y,yaw,v,w
+ * @param v 当前时刻线速度
+ * @param w 当前时刻线速度
+ * @return 推算后的轨迹
+ */
+vector<VectorXd> DWAPlanner::trajectoryPredict(VectorXd state, double v, double w) {
+    vector<VectorXd> trajectory;
+    trajectory.push_back(state);
+    double time =0;
+    while(time<=predict_time){
+        state = kinematicModel(state,{v,w},dt);
+        trajectory.push_back(state);
+        time+=dt;
+    }
+    return trajectory;
+}
+
+/// @brief 
+/// @param v 
+/// @param yaw_rate 
+/// @param state 
+/// @return 
+std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> DWAPlanner::predict_trajectory(
     double v, double yaw_rate, 
-    const ElectricVehicleDynamicsModel::VehicleState& state,
-    ElectricVehicleDynamicsModel& vehicle_model) const {
+    const ElectricVehicleDynamicsModel::VehicleState& state) const {
     
     std::vector<std::vector<double>> trajectory(4);
     double time = 0.0;
