@@ -1,110 +1,6 @@
-
-
-#include <vector>
-#include <cmath>
-#include <algorithm>
-#include <limits>
-#include <tuple>
-#include "World_map.h"
-
-class DWAPlanner {
-public:
-    // 配置参数结构体
-    // 配置参数结构体
-    struct Config {
-        // 动态窗口参数
-        double max_speed;           // 最大速度 (m/s)
-        double min_speed;          // 最小速度 (m/s) (允许倒车)
-        double max_yaw_rate;        // 最大偏航率 (rad/s)
-        double max_accel;           // 最大加速度 (m/s^2)
-        double max_decel;           // 最大减速度 (m/s^2)
-        double max_delta_yaw_rate;  // 最大偏航率变化率 (rad/s^2)
-        
-        // 轨迹预测参数
-        double dt;                  // 时间步长 (s)
-        double predict_time;        // 预测时间 (s)
-        
-        // 代价函数权重
-        double goal_cost_weight;    // 目标代价权重
-        double speed_cost_weight;   // 速度代价权重
-        double obstacle_cost_weight;// 障碍物代价权重
-        double path_cost_weight;    // 路径跟踪代价权重
-        
-        // 机器人参数
-        double robot_radius;       // 机器人半径 (m)
-        
-        // 障碍物阈值
-        double obstacle_threshold; // 障碍物安全距离 (m)
-
-        // 构造函数提供默认值
-        Config() :
-            max_speed(5.0),
-            min_speed(-1.0),
-            max_yaw_rate(1.0),
-            max_accel(2.5),
-            max_decel(7.0),
-            max_delta_yaw_rate(0.5),
-            dt(0.1),
-            predict_time(3.0),
-            goal_cost_weight(1.0),
-            speed_cost_weight(0.1),
-            obstacle_cost_weight(1.0),
-            path_cost_weight(0.5),
-            robot_radius(1.5),
-            obstacle_threshold(2.0) {}
-    };
-
-    // 构造函数
-    //explicit DWAPlanner(const Config& config = Config());
-    
-    explicit DWAPlanner(const Config& config = Config()) : config_(config) {}
-    
-    std::tuple<double, double, std::vector<std::vector<double>>> plan(
-        const ElectricVehicleDynamicsModel::VehicleState& current_state,
-        const std::pair<double, double>& goal,
-        const std::vector<WorldMap::Obstacle>& obstacles,
-        ElectricVehicleDynamicsModel& vehicle_model);
-
-private:
-    std::tuple<double, double, double, double> calc_dynamic_window(
-        const ElectricVehicleDynamicsModel::VehicleState& state) const;
-    
-    std::vector<std::vector<double>> predict_trajectory(
-        double v, double yaw_rate, 
-        const ElectricVehicleDynamicsModel::VehicleState& state,
-        ElectricVehicleDynamicsModel& vehicle_model) const;
-    
-    double calc_trajectory_cost(
-        const std::vector<std::vector<double>>& trajectory,
-        const std::pair<double, double>& goal,
-        const std::vector<WorldMap::Obstacle>& obstacles) const;
-    
-    double calc_goal_cost(
-        const std::vector<std::vector<double>>& trajectory,
-        const std::pair<double, double>& goal) const;
-    
-    double calc_speed_cost(double v) const;
-    
-    double calc_obstacle_cost(
-        const std::vector<std::vector<double>>& trajectory,
-        const std::vector<WorldMap::Obstacle>& obstacles) const;
-    
-    double calc_path_cost(
-        const std::vector<std::vector<double>>& trajectory,
-        const std::pair<double, double>& goal) const;
-    
-    bool check_collision(
-        const std::vector<std::vector<double>>& trajectory,
-        const std::vector<WorldMap::Obstacle>& obstacles) const;
-    
-    Config config_;
-    std::vector<WorldMap::Obstacle> obstacles_;
-};
-
-
-// DWA实现
 #include <chrono>
 #include <thread>
+#include "DWA_planner.h"
 
 std::tuple<double, double, std::vector<std::vector<double>>> DWAPlanner::plan(
     const ElectricVehicleDynamicsModel::VehicleState& current_state,
@@ -209,9 +105,8 @@ double DWAPlanner::calc_trajectory_cost(
            config_.obstacle_cost_weight * calc_obstacle_cost(trajectory, obstacles) +
            config_.path_cost_weight * calc_path_cost(trajectory, goal);
 }
-
-// 其他成员函数实现保持不变...
- double DWAPlanner::calc_goal_cost(
+    
+    double DWAPlanner::calc_goal_cost(
         const std::vector<std::vector<double>>& trajectory,
         const std::pair<double, double>& goal) const {
         
@@ -285,48 +180,3 @@ double DWAPlanner::calc_trajectory_cost(
     
     Config config_;
 };
-
-// 主函数
-int main() {
-    WorldMap world_map(-10, 50, -10, 50);
-    world_map.addObstacle({15, 15, 3, 3, 0, "red"});
-    world_map.addObstacle({25, 20, 4, 4, 0, "red"});
-    world_map.addObstacle({35, 15, 3, 3, 0, "red"});
-    
-    ElectricVehicleDynamicsModel vehicle;
-    ElectricVehicleDynamicsModel::VehicleState initial_state = {0, 0, 0, 0, 0, 0, 0};
-    vehicle.reset(initial_state);
-    
-    DWAPlanner::Config config;
-    DWAPlanner planner(config);
-    
-    std::pair<double, double> goal = {40, 40};
-    
-    for (int i = 0; i < 100; ++i) {
-        auto current_state = vehicle.getState();
-        auto [best_v, best_yaw_rate, best_traj] = planner.plan(
-            current_state, goal, world_map.get_Obstacle(), vehicle);
-        
-        // 使用reset_for_planning_only更新状态
-        std::tuple<double, double, double> new_state = {
-            best_traj[1].back(), 
-            best_traj[2].back(), 
-            best_traj[3].back()
-        };
-        vehicle.reset_for_planning_only(new_state);
-        
-        // 使用plot_planning进行可视化
-        world_map.plot_planning(&vehicle, best_traj, "dwa_path.png");
-        
-        double dist_to_goal = std::hypot(current_state.x - goal.first, 
-                                        current_state.y - goal.second);
-        if (dist_to_goal < 1.0) {
-            std::cout << "Goal reached!" << std::endl;
-            break;
-        }
-        
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
-    
-    return 0;
-}

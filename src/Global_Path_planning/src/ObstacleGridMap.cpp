@@ -292,6 +292,7 @@ void ObstacleGridMap::convertCoords(CoordType coord_type, double& x, double& y) 
             gridToWorld(this->goalpoint.first,this->goalpoint.second, world_str.first[0], world_str.second[0]);
             plt::scatter(world_str.first, world_str.second,point_size*10,goal_point_kwargs);
         } 
+
     }
     // 准备数据 - 绘制栅格点
     std::vector<double> obstacle_x, obstacle_y;

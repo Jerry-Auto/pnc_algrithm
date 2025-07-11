@@ -10,15 +10,27 @@ void WorldMap::addObstacle(const Obstacle& obstacle) {
     obstacles_.push_back(obstacle);
 }
 
+//获取障碍物信息
+std::vector<WorldMap::Obstacle>  WorldMap::get_Obstacle()
+{
+    return obstacles_;
+}
+
 // 添加车辆
 void WorldMap::addVehicle(ElectricVehicleDynamicsModel* vehicle, 
                          const std::string& color) {
     vehicles_.emplace_back(vehicle, color);
 }
-
+//添加样条曲线的控制点来绘制折线
 void WorldMap::add_control_point(std::pair<std::vector<double>,std::vector<double>> control_point)
 {
     this->control_point_.push_back(control_point);
+}
+
+//添加目标点
+void WorldMap::set_goal(std::pair<double, double> goal)
+{
+    this->goal_point=goal;
 }
 
 void WorldMap::visualize(bool show_grid, bool equal_aspect, bool blocking) {
@@ -39,7 +51,18 @@ void WorldMap::visualize(bool show_grid, bool equal_aspect, bool blocking) {
     //绘制控制点
     for(size_t i=0;i<control_point_.size();i++)
     {
-        plt::plot(control_point_[i].first, control_point_[i].second, {{"color", "green"}, {"linewidth", "1"}}); 
+        plt::plot(control_point_[i].first, control_point_[i].second, {{"color", "green"}}); 
+    }
+    //绘制目标点
+    if(goal_point.first!=NAN)
+    {
+        std::map<std::string, std::string> goal_point_kwargs = {
+            {"c", "red"},       
+            {"marker", "p"}  // 标记为五角星
+        };
+        std::vector<double> goal_x={goal_point.first};
+        std::vector<double> goal_y={goal_point.second};
+        plt::scatter(goal_x,goal_y,300.0,goal_point_kwargs);       
     }
     
     // 绘制障碍物（提取为独立方法更佳）

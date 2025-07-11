@@ -23,10 +23,8 @@ int main()
     world.add_control_point({x,y});
     // 创建 B 样条对象（显式提供所有参数）
     B_spline B_spline_solver(
-        std::make_optional(control_point), // control_point
-        std::make_optional(3),             // k (曲线阶数)
-        std::nullopt,                      // node_vector (不提供，自动计算)
-        0                                  // type (默认值)
+        control_point, // control_point
+        std::make_optional(3)            // k (曲线阶数)
     );
 
     std::vector<std::vector<double>> planning_data=B_spline_solver.planning_series(1000);

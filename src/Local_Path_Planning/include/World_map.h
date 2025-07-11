@@ -32,6 +32,8 @@ public:
 
     // 添加障碍物
     void addObstacle(const Obstacle& obstacle);
+
+    std::vector<Obstacle> get_Obstacle();
     
     // 添加车辆
     void addVehicle(ElectricVehicleDynamicsModel* vehicle, 
@@ -54,6 +56,9 @@ public:
 
     //添加控制点
     void add_control_point(std::pair<std::vector<double>,std::vector<double>> control_point);
+    
+    //设置目标点
+    void set_goal(std::pair<double, double> goal);
 
     // 清除所有对象
     void clear();
@@ -62,6 +67,7 @@ private:
     bool is_interactive_ = false;  // 标记是否处于交互模式
     double x_min_, x_max_;
     double y_min_, y_max_;
+    std::pair<double, double> goal_point={NAN, NAN};;
     std::vector<Obstacle> obstacles_;
     std::vector<std::pair<ElectricVehicleDynamicsModel*, std::string>> vehicles_;
     std::vector<std::pair<std::vector<double>,std::vector<double>>> control_point_;

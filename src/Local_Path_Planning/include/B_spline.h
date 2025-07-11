@@ -29,9 +29,9 @@ private:
 
 public:
     B_spline(
-    std::optional<std::vector<Eigen::Vector2d>> control_point,
-    std::optional<int> k,
-    std::optional<std::vector<double>> node_vector,
+    std::vector<Eigen::Vector2d> control_point,
+    std::optional<int> k=std::nullopt,
+    std::optional<std::vector<double>> node_vector=std::nullopt,
     int type=0);
     std::vector<std::vector<double>> planning_series(int n);
 };

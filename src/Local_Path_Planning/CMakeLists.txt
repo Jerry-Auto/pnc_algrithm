@@ -120,4 +120,17 @@ set(B_SPLINE_DEMO_NAME B_spline_demo)
 add_executable(${B_SPLINE_DEMO_NAME} example/B_spline_demo.cpp)  
 target_link_libraries(${B_SPLINE_DEMO_NAME} ${B_SPLINE_LIB_NAME} ${WORLD_MAP_LIB_NAME} Python3::Python Python3::NumPy)
 
+# DWA类的编译
+set(DWA_LIB_NAME DWA)
+add_library(${DWA_LIB_NAME} SHARED src/DWA_planner.cpp)  
+target_include_directories(${DWA_LIB_NAME}  
+    PUBLIC include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+target_link_libraries(${DWA_LIB_NAME} ${WORLD_MAP_LIB_NAME} Python3::Python) 
+set(DWA_DEMO_NAME DWA_demo)
+add_executable(${DWA_DEMO_NAME} example/DWA_planner_demo.cpp)  
+target_link_libraries(${DWA_DEMO_NAME} ${DWA_LIB_NAME} Python3::Python Python3::NumPy)
+
 

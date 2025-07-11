@@ -1,14 +1,12 @@
 #include"B_spline.h"
 
     B_spline::B_spline(
-    std::optional<std::vector<Eigen::Vector2d>> control_point,
+    std::vector<Eigen::Vector2d> control_point,
     std::optional<int> k,
     std::optional<std::vector<double>> node_vector,
     int type)
     {
             // 检查输入有效性（必须恰好有两个已知参数）
-        if(!control_point.has_value())
-        {throw std::invalid_argument("必须输入控制点");}
         int knownCount = 0;
         knownCount += (node_vector.has_value() ? 1 : 0);
         knownCount += (k.has_value() ? 1 : 0);
@@ -19,13 +17,13 @@
 
         if(!node_vector.has_value())
         {
-            this->control_point=control_point.value();
+            this->control_point=control_point;
             this->curve_order=k.value();
             calcu_node_vect();
         }
         else if(!k.has_value())
         {
-            this->control_point=control_point.value();
+            this->control_point=control_point;
             this->node_vector_=node_vector.value();
             this->curve_order=node_vector_.size()-1-this->control_point.size();
         }
