@@ -8,6 +8,7 @@
 #include <memory>
 #include <thread>
 #include <chrono>
+#include <optional>
 #include "matplotlibcpp.h"
 #include "vehicle_model.h"
 
@@ -46,7 +47,9 @@ public:
     void updateAndVisualize(bool show_grid = true, bool equal_aspect = true);
 
     // 更新车辆状态并可视化
-    void plot_planning(ElectricVehicleDynamicsModel* vehicle,std::vector<std::vector<double>> planning_data,std::string filename="out.png");
+    void plot_planning(ElectricVehicleDynamicsModel* vehicle,std::vector<std::vector<double>> planning_data
+        ,std::string filename="out.png",std::vector<std::vector<std::vector<double>>> DWA_p_t = {});
+    
 
     // 设置边界
     void setBounds(double x_min, double x_max, double y_min, double y_max);
@@ -59,6 +62,9 @@ public:
     
     //设置目标点
     void set_goal(std::pair<double, double> goal);
+
+    std::pair<double, double> get_goal();
+
 
     // 清除所有对象
     void clear();

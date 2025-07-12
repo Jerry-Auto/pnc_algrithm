@@ -159,12 +159,10 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
         }
     };
     //绘制DWA预测轨迹
-    if(!std::get<0>(state_.DWA_pre_traj).empty() && !std::get<1>(state_.DWA_pre_traj).empty() && !std::get<2>(state_.DWA_pre_traj).empty())
+    if(state_.DWA_pre_traj.size()!=0)
     {
-        auto [pre_traj_x, pre_traj_y, pre_traj_theta] =state_.DWA_pre_traj;
-        plt::plot(pre_traj_x, pre_traj_y, {{"color", "black"}, {"linestyle", "--"}, {"linewidth", "1"}});            
+        plt::plot(state_.DWA_pre_traj[0],state_.DWA_pre_traj[1], {{"color", "blue"}, {"linestyle", "-"}, {"linewidth", "1"}});            
     }
-
     // 绘制四个车轮（前轮用红色强调）
     
     draw_wheel(params_.lf, half_track, this->steering_angle, true);   // 左前（驱动轮）
@@ -192,13 +190,13 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
 }
  
 void ElectricVehicleDynamicsModel::reset_for_planning_only(std::tuple<double,double,double>& new_state,
-    std::optional<std::tuple<std::vector<double>, std::vector<double>,std::vector<double>>> DWA_p_t) {
+    std::vector<std::vector<double>> DWA_p_t) {
     state_.x = std::get<0>(new_state);
     state_.y = std::get<1>(new_state);
     state_.yaw = std::get<2>(new_state);
-    if(DWA_p_t.has_value())
+    if(DWA_p_t.size()!=0)
     {
-        state_.DWA_pre_traj=DWA_p_t.value();;        
+        state_.DWA_pre_traj=DWA_p_t;      
     }
     traj_x.push_back(state_.x);
     traj_y.push_back(state_.y);

@@ -34,7 +34,7 @@ public:
         double vy;
         double yaw_rate;
         double wheel_speed;
-        std::tuple<std::vector<double>, std::vector<double>,std::vector<double>> DWA_pre_traj;
+        std::vector<std::vector<double>> DWA_pre_traj;
     };
 
     // 车辆参数结构体
@@ -69,7 +69,7 @@ public:
     void reset(const VehicleState& new_state);
     void plot_vehicle(const std::string& color="blue");
     void reset_for_planning_only(std::tuple<double,double,double>& new_state,
-    std::optional<std::tuple<std::vector<double>, std::vector<double>,std::vector<double>>> DWA_p_t = std::nullopt);
+    std::vector<std::vector<double>> DWA_p_t = {});
     void plot_planning(std::vector<std::vector<double>> planning_data);
 
     void kinematics_update_State(double v,double w,double dt);
@@ -78,7 +78,7 @@ public:
 private:
     VehicleState state_;
     VehicleParams params_;
-    double steering_angle;//方向盘转角
+    double steering_angle=0.0;//方向盘转角
     double desired_accel;//输入加速度
 
 };

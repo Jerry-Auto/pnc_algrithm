@@ -32,6 +32,10 @@ void WorldMap::set_goal(std::pair<double, double> goal)
 {
     this->goal_point=goal;
 }
+std::pair<double, double> WorldMap::get_goal()
+{
+    return this->goal_point;
+}
 
 void WorldMap::visualize(bool show_grid, bool equal_aspect, bool blocking) {
     if (!is_interactive_) {
@@ -54,7 +58,7 @@ void WorldMap::visualize(bool show_grid, bool equal_aspect, bool blocking) {
         plt::plot(control_point_[i].first, control_point_[i].second, {{"color", "green"}}); 
     }
     //绘制目标点
-    if(goal_point.first!=NAN)
+    if (!std::isnan(goal_point.first))  // 正确写法
     {
         std::map<std::string, std::string> goal_point_kwargs = {
             {"c", "red"},       
@@ -110,18 +114,36 @@ void WorldMap::updateAndVisualize(bool show_grid, bool equal_aspect) {
 }
 
     // 更新车辆状态并可视化
-    void WorldMap::plot_planning(ElectricVehicleDynamicsModel* vehicle,std::vector<std::vector<double>> planning_data,std::string filename)
+    void WorldMap::plot_planning(ElectricVehicleDynamicsModel* vehicle,
+        std::vector<std::vector<double>> planning_data,
+        std::string filename,
+        std::vector<std::vector<std::vector<double>>> DWA_p_t)
     {
         int steps = static_cast<int>(planning_data[0].size());
         std::vector<double> traj_x, traj_y;
         int k=3;
-        for (int i = 0; i < steps; i++) {
-            std::tuple<double,double,double> new_state = 
-                {planning_data[1][i], planning_data[2][i], planning_data[3][i]};
-            vehicle->reset_for_planning_only(new_state);
-            if (i % k == 0) {
-                // 重新可视化（非阻塞模式）
-                visualize(true,true,false);
+        if(DWA_p_t.size()!=0)
+        {
+            for (int i = 0; i < steps; i++) {
+                std::tuple<double,double,double> new_state = 
+                    {planning_data[1][i], planning_data[2][i], planning_data[3][i]};
+                vehicle->reset_for_planning_only(new_state,DWA_p_t[i]);
+                if (i % k == 0) {
+                    // 重新可视化（非阻塞模式）
+                    visualize(true,true,false);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < steps; i++) {
+                std::tuple<double,double,double> new_state = 
+                    {planning_data[1][i], planning_data[2][i], planning_data[3][i]};
+                vehicle->reset_for_planning_only(new_state);
+                if (i % k == 0) {
+                    // 重新可视化（非阻塞模式）
+                    visualize(true,true,false);
+                }
             }
         }
         save_to_PNG(filename);

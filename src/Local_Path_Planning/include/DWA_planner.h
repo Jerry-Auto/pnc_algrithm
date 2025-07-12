@@ -7,6 +7,9 @@
 #include <limits>
 #include <tuple>
 #include "World_map.h"
+#include "vehicle_model.h"
+
+#define PI 3.14159
 
 class DWAPlanner {
 public:
@@ -29,7 +32,7 @@ public:
         double goal_cost_weight;    // 目标代价权重
         double speed_cost_weight;   // 速度代价权重
         double obstacle_cost_weight;// 障碍物代价权重
-        double path_cost_weight;    // 路径跟踪代价权重
+        double head_cost_weight;    // 航向代价
         
         // 机器人参数
         double robot_radius;       // 机器人半径 (m)
@@ -37,48 +40,50 @@ public:
         // 障碍物阈值
         double obstacle_threshold; // 障碍物安全距离 (m)
 
+        double speed_resolution;//速度采样分辨率
+
+        double yaw_rate_resolution;//航向角采样分辨率
+
         // 构造函数提供默认值
         Config() :
             max_speed(5.0),
             min_speed(-1.0),
-            max_yaw_rate(1.0),
+            max_yaw_rate(3.0),
             max_accel(2.5),
-            max_decel(7.0),
-            max_delta_yaw_rate(0.5),
+            max_decel(1.0),
+            max_delta_yaw_rate(2.0),
             dt(0.1),
-            predict_time(3.0),
-            goal_cost_weight(1.0),
+            predict_time(4.0),
+            goal_cost_weight(10),
             speed_cost_weight(0.1),
             obstacle_cost_weight(1.0),
-            path_cost_weight(0.5),
-            robot_radius(1.5),
-            obstacle_threshold(2.0) {}
+            head_cost_weight(1.0),
+            robot_radius(2.5),
+            speed_resolution(0.1),
+            yaw_rate_resolution(2*PI/180),
+            obstacle_threshold(10.0) {}
     };
 
     // 构造函数
-    //explicit DWAPlanner(const Config& config = Config());  // 声明
+    DWAPlanner(const Config& config = Config());  // 声明
     
-    explicit DWAPlanner(const Config& config = Config()) : config_(config) {}
-    
-    std::tuple<double, double, std::vector<std::vector<double>>> plan(
-        const ElectricVehicleDynamicsModel::VehicleState& current_state,
-        const std::pair<double, double>& goal,
-        const std::vector<WorldMap::Obstacle>& obstacles,
-        ElectricVehicleDynamicsModel& vehicle_model);
+    std::pair<std::vector<std::vector<double>>,
+    std::vector<std::vector<std::vector<double>>>> 
+    planning_series();
+
+    void read_map_data(WorldMap& map,ElectricVehicleDynamicsModel& car);
+
+    void plot_planning(WorldMap* map,ElectricVehicleDynamicsModel* car);
 
 private:
+    std::tuple<double, double, std::vector<std::vector<double>>> get_next_ctl_trj(ElectricVehicleDynamicsModel::VehicleState current_state);
+
     std::tuple<double, double, double, double> calc_dynamic_window(
         const ElectricVehicleDynamicsModel::VehicleState& state) const;
     
-    std::vector<std::vector<double>> predict_trajectory(
-        double v, double yaw_rate, 
-        const ElectricVehicleDynamicsModel::VehicleState& state,
-        ElectricVehicleDynamicsModel& vehicle_model) const;
+    std::vector<std::vector<double>> predict_trajectory(double v, double yaw_rate,
+        ElectricVehicleDynamicsModel::VehicleState state) const;
     
-    double calc_trajectory_cost(
-        const std::vector<std::vector<double>>& trajectory,
-        const std::pair<double, double>& goal,
-        const std::vector<WorldMap::Obstacle>& obstacles) const;
     
     double calc_goal_cost(
         const std::vector<std::vector<double>>& trajectory,
@@ -90,7 +95,7 @@ private:
         const std::vector<std::vector<double>>& trajectory,
         const std::vector<WorldMap::Obstacle>& obstacles) const;
     
-    double calc_path_cost(
+    double calc_head_cost(
         const std::vector<std::vector<double>>& trajectory,
         const std::pair<double, double>& goal) const;
     
@@ -98,10 +103,13 @@ private:
         const std::vector<std::vector<double>>& trajectory,
         const std::vector<WorldMap::Obstacle>& obstacles) const;
 
-    void kinematics_update_State(ElectricVehicleDynamicsModel::VehicleState& state ,double v,double w,double dt);
+    ElectricVehicleDynamicsModel::VehicleState kinematics_update_State
+    (double v,double w,ElectricVehicleDynamicsModel::VehicleState state) const;
     
     Config config_;
-    std::vector<WorldMap::Obstacle> obstacles_;
+    std::vector<WorldMap::Obstacle>  obstacle_;
+    std::pair<double, double> goal_point_;
+    ElectricVehicleDynamicsModel::VehicleState str_state_;
 };
 
 #endif // DWA_PLANNER_H

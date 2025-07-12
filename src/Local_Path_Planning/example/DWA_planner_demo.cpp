@@ -2,62 +2,39 @@
 
 // 主函数
 int main() {
+    //创建地图并设置障碍物
     WorldMap world_map(-10, 50, -10, 50);
     world_map.addObstacle({15, 15, 3, 3, 0, "red"});
     world_map.addObstacle({25, 20, 4, 4, 0, "red"});
     world_map.addObstacle({35, 15, 3, 3, 0, "red"});
-    
+    //     // 添加障碍物（同前）
+    // WorldMap::Obstacle obs1 = {10, 10, 5, 3, 0, "red"};
+    // WorldMap::Obstacle obs2 = {-15, 20, 4, 6, M_PI/4, "green"};
+    // WorldMap::Obstacle obs3 = {0, -10, 8, 2, 0, "purple"};
+    // world_map.addObstacle(obs1);  
+    // world_map.addObstacle(obs2);
+    // world_map.addObstacle(obs3);
+
+    //设置目标点
+    std::pair<double, double> goal = {40, 40};
+    world_map.set_goal(goal);
+    //world_map.visualize(true, true, true);
+    //创建地图里运动的车辆
     ElectricVehicleDynamicsModel vehicle;
     ElectricVehicleDynamicsModel::VehicleState initial_state = {0, 0, 0, 0, 0, 0, 0};
     vehicle.reset(initial_state);
     world_map.addVehicle(&vehicle,"green");
-    DWAPlanner::Config config;
-    DWAPlanner planner(config);
-    
-    std::pair<double, double> goal = {40, 40};
-    world_map.set_goal(goal);
-    world_map.visualize();
-    auto current_state = vehicle.getState();
-    auto [best_v, best_yaw_rate, best_traj] = planner.plan(
-        current_state, goal, world_map.get_Obstacle(), vehicle);
-    
-    // 使用reset_for_planning_only更新状态
-    std::tuple<double, double, double> new_state = {
-        best_traj[1].back(), 
-        best_traj[2].back(), 
-        best_traj[3].back()
-    };
+    //world_map.visualize(true, true, true);
+
+    //DWA求解器创建
+
+    DWAPlanner DWA_solver;
+    DWA_solver.read_map_data(world_map,vehicle);
+
+    // auto plan_data=DWA_solver.planning_series();
+    // world_map.plot_planning(&vehicle,plan_data.first,"DWA.png",plan_data.second);
+
+    DWA_solver.plot_planning(&world_map,&vehicle);
         
-    // for (int i = 0; i < 100; ++i) {
-    //     auto current_state = vehicle.getState();
-    //     std::tuple<double, double, double> state = {
-    //         current_state.x, 
-    //         current_state.y, 
-    //         current_state.yaw
-    //     };
-    //     auto [best_v, best_yaw_rate, best_traj] = planner.plan(
-    //         current_state, goal, world_map.get_Obstacle(), vehicle);
-        
-    //     // 使用reset_for_planning_only更新状态
-    //     std::tuple<double, double, double> pre_state = {
-    //         best_traj[1].back(), 
-    //         best_traj[2].back(), 
-    //         best_traj[3].back()
-    //     };
-    //     vehicle.reset_for_planning_only(new_state,pre_state);
-        
-    //     // 使用plot_planning进行可视化
-    //     world_map.plot_planning(&vehicle, best_traj, "dwa_path.png");
-        
-    //     double dist_to_goal = std::hypot(current_state.x - goal.first, 
-    //                                     current_state.y - goal.second);
-    //     if (dist_to_goal < 1.0) {
-    //         std::cout << "Goal reached!" << std::endl;
-    //         break;
-    //     }
-        
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    // }
-    
     return 0;
 }

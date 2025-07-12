@@ -131,6 +131,6 @@ target_include_directories(${DWA_LIB_NAME}
 target_link_libraries(${DWA_LIB_NAME} ${WORLD_MAP_LIB_NAME} Python3::Python) 
 set(DWA_DEMO_NAME DWA_demo)
 add_executable(${DWA_DEMO_NAME} example/DWA_planner_demo.cpp)  
-target_link_libraries(${DWA_DEMO_NAME} ${DWA_LIB_NAME} Python3::Python Python3::NumPy)
+target_link_libraries(${DWA_DEMO_NAME} ${DWA_LIB_NAME} ${WORLD_MAP_LIB_NAME} Python3::Python Python3::NumPy)
 
 
