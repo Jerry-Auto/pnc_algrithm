@@ -91,7 +91,7 @@ void WorldMap::visualize(bool show_grid, bool equal_aspect, bool blocking) {
         auto vehicle = vehicle_pair.first;
         auto color = vehicle_pair.second;
         vehicle->plot_vehicle(color);
-        plt::plot(vehicle->traj_x, vehicle->traj_y, {{"color", "blue"}, {"linestyle", "-"}, {"linewidth", "1"}});
+
     }
 
     plt::title("World Map with Vehicles and Obstacles");

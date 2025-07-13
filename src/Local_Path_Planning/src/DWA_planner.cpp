@@ -75,7 +75,6 @@ DWAPlanner::get_next_ctl_trj(ElectricVehicleDynamicsModel::VehicleState current_
         for(double yaw_rate = min_yaw_rate; yaw_rate <= max_yaw_rate; 
             yaw_rate += config_.yaw_rate_resolution) {
             auto trajectory = predict_trajectory(v, yaw_rate, state);
-            state=kinematics_update_State(v, yaw_rate, state);
             sum_goal_cost += calc_goal_cost(trajectory, goal_point_);
             sum_speed_cost += calc_speed_cost(v);
             sum_obs_cost += calc_obstacle_cost(trajectory, obstacle_);
@@ -89,15 +88,13 @@ DWAPlanner::get_next_ctl_trj(ElectricVehicleDynamicsModel::VehicleState current_
         return {0, 0, {}};
     }
     double max_cost=0;
-    state = current_state;
+    //state = current_state;
     //sum_goal_cost = 1, sum_speed_cost = 1, sum_obs_cost = 1, sum_path_cost = 1;
     // 第二次遍历：寻找最优轨迹
     for(double v = min_v; v <= max_v; v += config_.speed_resolution) {
         for(double yaw_rate = min_yaw_rate; yaw_rate <= max_yaw_rate; 
             yaw_rate += config_.yaw_rate_resolution) {
             auto trajectory = predict_trajectory(v, yaw_rate, state);
-
-            state=kinematics_update_State(v, yaw_rate, state);
 
             double goal_cost = calc_goal_cost(trajectory, goal_point_) / sum_goal_cost;
             double speed_cost = calc_speed_cost(v) / sum_speed_cost;
@@ -219,7 +216,7 @@ double DWAPlanner::calc_obstacle_cost(
             const double effective_dist = dist_to_center - obs_radius-config_.robot_radius;
 
             if(effective_dist < config_.obstacle_threshold)
-            {cost+=10.0/(effective_dist+1e-6);}
+            {cost+=1.0/std::pow((effective_dist+1e-6),1);}
              
             // 碰撞检测（考虑机器人半径）
             if(check_collision(trajectory,obstacles)) {
@@ -287,12 +284,11 @@ void DWAPlanner::plot_planning(WorldMap* map,ElectricVehicleDynamicsModel* car) 
     double goal_threshold = std::pow(config_.robot_radius * 1.5, 2); // 目标点阈值  
     auto current_state = car->getState();
     while(true) {
-        // 获取最佳控制指令和轨迹
+        // 获取下一步最佳控制指令和轨迹
         auto [best_v, best_yaw_rate, best_trajectory] = get_next_ctl_trj(current_state);
-        // 刷新当前状态
-        
+        std::cout<<"当前最优控制:V:"<<best_v<<" W:"<<best_yaw_rate<<std::endl;       
+        // 绘制当前状态
         std::tuple<double,double,double> state={current_state.x,current_state.y,current_state.yaw};
-        std::cout<<"当前最优控制:V:"<<best_v<<" W:"<<best_yaw_rate<<std::endl;
         car->reset_for_planning_only(state,best_trajectory);
         if (i % k == 0) {
             // 重新可视化（非阻塞模式）
@@ -304,7 +300,14 @@ void DWAPlanner::plot_planning(WorldMap* map,ElectricVehicleDynamicsModel* car) 
         // 检查是否到达目标
         double dist_to_goal = std::pow(current_state.x - goal_point_.first, 2) + 
                              std::pow(current_state.y - goal_point_.second, 2);
-        if(dist_to_goal < goal_threshold) {
+        if(dist_to_goal < 0.1*goal_threshold) {
+            //到达了把到达的这一步绘制出来
+            std::tuple<double,double,double> state={current_state.x,current_state.y,current_state.yaw};
+            car->reset_for_planning_only(state);
+            if (i % k == 0) {
+                // 重新可视化（非阻塞模式）
+                map->visualize(true,true,false);
+            }
             std::cout << "Goal reached!" << std::endl;
             break;
         }

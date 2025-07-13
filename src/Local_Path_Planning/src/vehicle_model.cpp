@@ -103,6 +103,14 @@ void ElectricVehicleDynamicsModel::reset(const VehicleState& new_state) {
 
 
 void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
+    //绘制车辆历史轨迹
+    plt::plot(traj_x,traj_y, {{"color", "blue"}, {"linestyle", "-"}, {"linewidth", "1"}});
+    //绘制DWA预测轨迹
+    if(state_.DWA_pre_traj.size()!=0)
+    {
+        plt::plot(state_.DWA_pre_traj[0],state_.DWA_pre_traj[1], {{"color", "cyan"}, {"linestyle", "-"},{"linewidth", "1"}});            
+    }
+   
     // 车辆轮廓点 (局部坐标系)
     std::vector<double> vehicle_x = {-params_.lr, params_.lf, params_.lf, -params_.lr, -params_.lr};
     std::vector<double> vehicle_y = {-1.0, -1.0, 1.0, 1.0, -1.0};
@@ -128,7 +136,7 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
     double half_track = params_.track_width / 2.0;
     double wheel_len = params_.wheel_radius*2;  // 前轮稍长表示驱动轮
     double wheel_width = params_.wheel_width;
-    
+
     auto draw_wheel = [&](double x, double y, double steer, bool is_front) {
         std::vector<double> wx = {-wheel_len/2, wheel_len/2, wheel_len/2, -wheel_len/2, -wheel_len/2};
         std::vector<double> wy = {-wheel_width/2, -wheel_width/2, wheel_width/2, wheel_width/2, -wheel_width/2};    
@@ -158,13 +166,10 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
             plt::plot(gx, gy, {{"color", "black"}, {"linewidth", "1.5"}});
         }
     };
-    //绘制DWA预测轨迹
-    if(state_.DWA_pre_traj.size()!=0)
-    {
-        plt::plot(state_.DWA_pre_traj[0],state_.DWA_pre_traj[1], {{"color", "blue"}, {"linestyle", "-"}, {"linewidth", "1"}});            
-    }
-    // 绘制四个车轮（前轮用红色强调）
     
+ 
+
+    // 绘制四个车轮（前轮用红色强调）
     draw_wheel(params_.lf, half_track, this->steering_angle, true);   // 左前（驱动轮）
     draw_wheel(params_.lf, -half_track, this->steering_angle, true);  // 右前（驱动轮）
     draw_wheel(-params_.lr, half_track, 0, false);           // 左后
@@ -186,7 +191,7 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
                0.15);     // 头部宽度 (数值)
 
     // 可选：在车辆中心添加一个小圆点
-    plt::plot({state_.x}, {state_.y}, "bo");  // 蓝色圆点
+    plt::plot({state_.x}, {state_.y}, "go");  // 蓝色圆点
 }
  
 void ElectricVehicleDynamicsModel::reset_for_planning_only(std::tuple<double,double,double>& new_state,
