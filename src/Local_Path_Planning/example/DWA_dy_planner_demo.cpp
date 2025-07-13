@@ -1,4 +1,4 @@
-#include"DWA_planner.h"
+#include"DWA_dy_planner.h"
 
 // 主函数
 int main() {
@@ -26,13 +26,13 @@ int main() {
 
     //DWA求解器创建
 
-    DWAPlanner DWA_solver;
-    DWA_solver.read_map_data(world_map,vehicle);
+    DWADyPlanner DWA_dy_solver;
+    DWA_dy_solver.read_map_data(world_map,vehicle);
 
     // auto plan_data=DWA_solver.planning_series();
     // world_map.plot_planning(&vehicle,plan_data.first,"DWA.png",plan_data.second);
 
-    DWA_solver.plot_planning(&world_map,&vehicle);
+    DWA_dy_solver.plot_planning(&world_map,&vehicle);
         
     return 0;
 }

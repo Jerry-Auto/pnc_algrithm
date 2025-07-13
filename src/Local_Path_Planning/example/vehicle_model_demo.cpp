@@ -22,28 +22,42 @@ int main() {
     // 存储轨迹
     std::vector<double> traj_x, traj_y;
     // 模拟循环
+    double min_x=std::numeric_limits<double>::max();    
+    double max_y=0;
+    double min_y=min_x,max_x=max_y;
+    double max,min;
+
     for (int i = 0; i < steps; ++i) {
         // 切换输入（每4秒切换一次）
         int input_idx = (i / 400) % inputs.size();
         double steer = std::get<0>(inputs[input_idx]);
         double accel = std::get<1>(inputs[input_idx]);
         // 更新状态
-        vehicle.update(steer, accel, dt);
+        vehicle.update(steer, accel, dt,1);
         auto state = vehicle.getState();
         // 存储轨迹
         traj_x.push_back(state.x);
         traj_y.push_back(state.y);
+
         // 绘图
-        if (i % 50 == 0) {
-            plt::cla();
-            plt::plot(traj_x, traj_y, {{"color", "blue"}, {"linestyle", "-"}, {"linewidth", "1"}});
-            vehicle.plot_vehicle();
-            plt::xlim(state.x-10, state.x+10);
-            plt::ylim(state.y-10, state.y+10);
-            plt::pause(0.6);
-        }
+        // if (i % 100 == 0) {
+        //     if(state.x<min_x){min_x=state.x-5;}
+        //     if(state.y<min_y){min_y=state.y-5;}
+        //     if(state.x>max_x){max_x=state.x+5;}
+        //     if(state.y>max_y){max_y=state.y+5;}
+        //     if(max_x>max_y){max=max_x+5;}else{max=max_y+5;}
+        //     if(min_x<min_y){min=min_x-5;}else{min=min_y-5;}
+        //     plt::cla();
+        //     plt::plot(traj_x, traj_y, {{"color", "blue"}, {"linestyle", "-"}, {"linewidth", "1"}});
+        //     vehicle.plot_vehicle();
+        //     plt::xlim(min, max);
+        //     plt::ylim(min, max);
+        //     plt::pause(0.6);
+        // }
     }
-    
+    plt::cla();
+    plt::plot(traj_x, traj_y, {{"color", "blue"}, {"linestyle", "-"}, {"linewidth", "1"}});
+    vehicle.plot_vehicle();
     plt::show();
     return 0;
 }

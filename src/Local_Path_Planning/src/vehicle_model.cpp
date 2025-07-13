@@ -2,97 +2,140 @@
 #include <chrono>    
     
     // 构造函数 - 调整参数更适合前驱车
-ElectricVehicleDynamicsModel::ElectricVehicleDynamicsModel() {
-    params_.mass = 1200.0;       // 前驱车通常较轻
-    params_.lf = 1.1;            // 前轴到质心距离（稍短）
-    params_.lr = 1.4;            // 后轴到质心距离
-    params_.iz = 2000.0;         // 减小转动惯量
-    params_.cf = 70000.0;        // 前轮侧偏刚度
-    params_.cr = 65000.0;        // 后轮侧偏刚度（通常小于前轮）
-    params_.drag_coeff = 0.32;
-    params_.rr_coeff = 0.016;
-    params_.max_steer = M_PI / 4;
-    params_.max_motor_torque = 250.0; // 前驱电机扭矩
-    params_.max_brake_torque = 800.0;
-    params_.wheel_radius = 0.3;
-    params_.gear_ratio = 9.0;
-    params_.motor_efficiency = 0.92;
-    params_.wheel_width = 0.2;
-    params_.track_width = 1.5;
-    params_.max_accel = 2.5;
-    params_.max_decel = 7.0;
-    params_.Cd = 0.3;        // 空气阻力系数
-    params_.damping = 0.95;  // 横摆角速度阻尼
-    state_ = {0, 0, 0, 0, 0, 0, 0};
+ElectricVehicleDynamicsModel::ElectricVehicleDynamicsModel(): params_(), state_() {
+
 }
- 
-void ElectricVehicleDynamicsModel::update(double steering_angle, double desired_accel, double dt) {
+/// @brief 更新车辆状态
+/// @param deta_steering_angle 方向盘转角变化率
+/// @param desired_accel 期望的加速度
+/// @param dt 
+/// @param model 默认用动力学模型，false用运动学模型
+void ElectricVehicleDynamicsModel::update(double steering_angle, double desired_accel, double dt,bool model) {
     // 更新车辆状态
-
-        // 1. 计算轮胎侧偏角（小角度近似）
-        //steering_angle=-steering_angle;
-        this->steering_angle=steering_angle;
-        this->desired_accel=desired_accel;
-        double alpha_f = steering_angle - (state_.vy + params_.lf * state_.yaw_rate) / (state_.vx + 1e-6);
-        double alpha_r = -(state_.vy - params_.lr * state_.yaw_rate) / (state_.vx + 1e-6);
-
-        // 2. 限制侧偏角范围（非线性保护）
-        alpha_f = std::max(-0.5, std::min(0.5, alpha_f));
-        alpha_r = std::max(-0.5, std::min(0.5, alpha_r));
-
-        // 3. 计算轮胎力（线性模型）
-        double Fyf = 2 * params_.cf * alpha_f;
-        double Fyr = 2 * params_.cr * alpha_r;
-
-        // 4. 计算纵向力（简化模型）
-        double Fx = desired_accel * params_.mass;
-        // 5. 更新横向速度（博客公式14）
-        double ay = (-(params_.cf + params_.cr) * state_.vy 
-                    - (params_.lf * params_.cf - params_.lr * params_.cr) * state_.yaw_rate 
-                    + params_.cf * steering_angle * state_.vx) / params_.mass;
-        state_.vy += ay * dt;
-
-        // 6. 更新横摆角速度（博客公式17+阻尼）
-        double yaw_accel = (params_.lf * Fyf - params_.lr * Fyr) / params_.iz;
-        state_.yaw_rate = params_.damping * state_.yaw_rate + yaw_accel * dt;
-
-        // 7. 更新纵向速度（考虑空气阻力）
-        double air_drag = 0.5 * 1.225 * params_.Cd * 2.0 * (state_.vx > 0 ? state_.vx * state_.vx : 0); // 假设迎风面积2m²
-        state_.vx += (Fx - air_drag) / params_.mass * dt;
-
-        // 8. 更新航向角
-        state_.yaw += state_.yaw_rate * dt;
-
-        // 规范化yaw角度到[-π, π]
-        state_.yaw = std::atan2(std::sin(state_.yaw), std::cos(state_.yaw));
-        state_.beta = std::atan2(state_.vy,state_.vx);
-
-        // 9. 更新全局位置
-        state_.x += (state_.vx * cos(state_.yaw) - state_.vy * sin(state_.yaw)) * dt;
-        state_.y += (state_.vx * sin(state_.yaw) + state_.vy * cos(state_.yaw)) * dt;
- 
-    // 防止低速不稳定
-    if (state_.vx < 0.1 && desired_accel <= 0) {
-        state_.vx = 0;
-        state_.wheel_speed = 0;
+    if(model)
+    {
+        state_=dynamic(steering_angle,desired_accel,dt,state_);
     }
-    
+    else
+    {
+        state_=kinematics(steering_angle,desired_accel,dt,state_);
+    }
 }
 
 
 // 车辆运动学模型函数,采样时间（秒）
-void ElectricVehicleDynamicsModel::kinematics_update_State(double v,double w,double dt) {
+ElectricVehicleDynamicsModel::VehicleState ElectricVehicleDynamicsModel::kinematics(double steering_angle,double desired_accel,double dt,VehicleState current_state){
     // 更新速度
-    state_.vx=v;
-    state_.yaw_rate=w;
-    // 更新航向角
-    state_.yaw +=w*dt;
-    // 更新位置（全局坐标）
-    state_.x += state_.vx * cos(state_.yaw) * dt;
-    state_.y += state_.vx * sin(state_.yaw) * dt;
+    ElectricVehicleDynamicsModel::VehicleParams params;
+    ElectricVehicleDynamicsModel::VehicleState next_state;
+    next_state.steering_angle=steering_angle;
+    next_state.vx=current_state.vx+desired_accel*dt;
+    next_state.yaw_rate=tan(next_state.steering_angle)*next_state.vx/(params.lf+params.lr);
+    next_state.yaw=current_state.yaw+next_state.yaw_rate*dt;
+    next_state.x=current_state.x+next_state.vx*cos(next_state.yaw)*dt;
+    next_state.y=current_state.y+next_state.vx*sin(next_state.yaw)*dt;
+    return next_state;
+}
+
+//动力学模型
+ElectricVehicleDynamicsModel::VehicleState 
+ElectricVehicleDynamicsModel::dynamic(double steering_angle, double desired_accel, double dt, 
+                                     VehicleState current_state)
+{
+    ElectricVehicleDynamicsModel::VehicleParams params;
+    VehicleState next_state = current_state;
+    // 处理静止状态
+if (std::abs(current_state.vx) < 0.01 && std::abs(desired_accel) < 0.01) {
+    next_state.vx = 0;
+    next_state.vy = 0;
+    next_state.yaw_rate = 0;
+    next_state.wheel_speed = 0;
+    // 可选：重置侧滑角和轮胎力
+    next_state.beta = 0;
+}
+    // 1. 限制转向角在物理范围内
+    next_state.steering_angle = std::clamp(steering_angle, -params.max_steer, params.max_steer);
+    
+    // 2. 计算轮胎侧偏角（小角度近似）
+    const double epsilon = 1e-6;
+    double vx_eff = current_state.vx + epsilon;
+    
+    // 前轮和后轮侧偏角（公式6和7）
+    double alpha_f = 0;
+    double alpha_r = 0;
+    if (!(std::abs(current_state.vx) < 0.01 && std::abs(desired_accel) < 0.01)) {
+        alpha_f = next_state.steering_angle - (current_state.vy + params.lf * current_state.yaw_rate) / vx_eff;
+        alpha_r = -(current_state.vy - params.lr * current_state.yaw_rate) / vx_eff;
+    }
+    // 3. 平滑限制侧偏角范围（使用tanh函数平滑过渡）
+    auto smooth_clamp = [](double x, double limit) {
+        return limit * std::tanh(x / limit);
+    };
+    alpha_f = smooth_clamp(alpha_f, 0.5);  // 限制在±0.5rad(≈±28.6°)内
+    alpha_r = smooth_clamp(alpha_r, 0.5);
+    
+    // 4. 计算轮胎侧向力（线性模型，公式8和9）
+    double Fyf = 2*params.cf * alpha_f;
+    double Fyr = 2*params.cr * alpha_r;
+    
+    // 5. 计算纵向力
+    double Fx = desired_accel * params.mass;
+    
+    // 6. 计算横向加速度
+    if (std::abs(current_state.vx) < 0.1 && std::abs(desired_accel) < 0.01) {
+        next_state.vy = 0;}
+        else{
+    double ay = (-(params.cf+params.cr)*current_state.vy
+                -(params.lf*params.cr-params.lr*params.cf)*current_state.yaw_rate
+                +params.cf*next_state.steering_angle*current_state.vx) / params.mass;
+    next_state.vy += ay * dt;
+    }
+    // 7. 计算横摆角加速度（公式17）
+    if (std::abs(current_state.vx) < 0.1 && std::abs(desired_accel) < 0.01) {
+            std::cout<<"静止"<<std::endl;
+        next_state.yaw_rate = 0;}
+    else{
+        double yaw_accel = (params.lf * Fyf * std::cos(next_state.steering_angle) - params.lr * Fyr) / params.iz;
+        next_state.yaw_rate = params.damping * current_state.yaw_rate + yaw_accel * dt;
+    }
+    // 8. 计算纵向加速度（考虑空气阻力和滚动阻力）
+
+    if (std::abs(current_state.vx) < 0.1 && std::abs(desired_accel) < 0.01) {
+        next_state.vx = 0;}
+    else{
+        double air_drag = 0.5 * 1.225 * params.Cd * 2.0 * current_state.vx * std::abs(current_state.vx);
+        double rolling_resistance = params.rr_coeff * params.mass * 9.81 * (current_state.vx > 0 ? 1 : -1);
+        next_state.vx += (Fx - air_drag - rolling_resistance) / params.mass * dt;
+    }
+    // 9. 更新航向角（规范化到[-π, π]）
+    next_state.yaw = current_state.yaw+current_state.yaw_rate * dt;
+    next_state.yaw = std::atan2(std::sin(next_state.yaw),std::cos(next_state.yaw));
+    //打印输出状态
+    //std::cout<<next_state.yaw_rate<<"  "<<next_state.yaw<<"  "<<next_state.vx<<std::endl;
+    // 10. 计算侧滑角（公式5）
+    next_state.beta = (std::abs(vx_eff) > 0.1) ? std::atan2(next_state.vy, next_state.vx) : 0.0;
+    
+    // 11. 更新全局位置（公式1和2）
+    double cos_yaw = std::cos(next_state.yaw);
+    double sin_yaw = std::sin(next_state.yaw);
+    next_state.x += (next_state.vx * cos_yaw - next_state.vy * sin_yaw) * dt;
+    next_state.y += (next_state.vx * sin_yaw + next_state.vy * cos_yaw) * dt;
+    
+    // 12. 计算综合速度
+    next_state.vp = std::hypot(next_state.vx, next_state.vy);
+    
+    // 13. 更新车轮速度
+    next_state.wheel_speed = next_state.vx / params.wheel_radius;
+    
+    // 14. 处理静止状态
+    if (std::abs(next_state.vx) < 0.1 && std::abs(desired_accel) < 0.01) {
+        next_state.wheel_speed = 0;
+    }
+
+    
+    return next_state;
 }
  
-//
 ElectricVehicleDynamicsModel::VehicleState ElectricVehicleDynamicsModel::getState() const {
     return state_;
 }
@@ -103,8 +146,10 @@ void ElectricVehicleDynamicsModel::reset(const VehicleState& new_state) {
 
 
 void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
+
     //绘制车辆历史轨迹
     plt::plot(traj_x,traj_y, {{"color", "blue"}, {"linestyle", "-"}, {"linewidth", "1"}});
+
     //绘制DWA预测轨迹
     if(state_.DWA_pre_traj.size()!=0)
     {
@@ -167,11 +212,10 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
         }
     };
     
- 
 
     // 绘制四个车轮（前轮用红色强调）
-    draw_wheel(params_.lf, half_track, this->steering_angle, true);   // 左前（驱动轮）
-    draw_wheel(params_.lf, -half_track, this->steering_angle, true);  // 右前（驱动轮）
+    draw_wheel(params_.lf, half_track, this->state_.steering_angle, true);   // 左前（驱动轮）
+    draw_wheel(params_.lf, -half_track, this->state_.steering_angle, true);  // 右前（驱动轮）
     draw_wheel(-params_.lr, half_track, 0, false);           // 左后
     draw_wheel(-params_.lr, -half_track, 0, false);          // 右后
 

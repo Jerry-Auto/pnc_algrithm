@@ -18,7 +18,11 @@ int main() {
     ElectricVehicleDynamicsModel vehicle2;
     
     // 设置车辆初始状态
-    ElectricVehicleDynamicsModel::VehicleState state2 = {30, -15, -M_PI/6, 3, 0, -0.05, 0};
+    ElectricVehicleDynamicsModel::VehicleState state2;
+    state2.x=30.0;
+    state2.y=-15.0;
+    state2.yaw=-M_PI/6;
+
     //vehicle1->reset(state1);
     vehicle2.reset(state2);
     
