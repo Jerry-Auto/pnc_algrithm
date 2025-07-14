@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <vector>
+#include <tuple>
 #include <memory>
 #include <thread>
 #include <chrono>

@@ -21,7 +21,7 @@ DWAPlanner::planning_series() {
     std::vector<std::vector<std::vector<double>>> pre_trj;
     
     auto current_state = str_state_;
-    
+    double dist_to_goal =std::numeric_limits<double>::max();
     while(true) {
         // 记录当前状态
         t_data.push_back(t);
@@ -32,28 +32,26 @@ DWAPlanner::planning_series() {
         // 获取最佳控制指令和轨迹
         auto [best_v, best_yaw_rate, best_trajectory] = get_next_ctl_trj(current_state);
         pre_trj.push_back(best_trajectory);
-        
+        if(dist_to_goal < 0.1*goal_threshold) {
+            std::cout << "Goal reached!" << std::endl;
+            break;
+        }
         // 更新状态
         current_state = kinematics_update_State(best_v, best_yaw_rate, current_state);
         
         // 检查是否到达目标
-        double dist_to_goal = std::pow(current_state.x - goal.first, 2) + 
+        dist_to_goal = std::pow(current_state.x - goal.first, 2) + 
                              std::pow(current_state.y - goal.second, 2);
         t += config_.dt;
-        
-        if(dist_to_goal < goal_threshold) {
-            std::cout << "Goal reached!" << std::endl;
-            break;
-        }
-        
+        std::cout<<"到目标的距离:"<<dist_to_goal<<std::endl;  
         // 防止无限循环
-        if(t > 10000.0) { // 100秒超时
+        if(t > 1000.0) { // 100秒超时
             std::cout << "Planning timeout!" << std::endl;
             break;
         }
     }
     
-    std::vector<std::vector<double>> planning_data = {x_data, y_data, theta_data};
+    std::vector<std::vector<double>> planning_data = {t_data,x_data, y_data, theta_data};
     return {planning_data, pre_trj};
 }
 
@@ -286,7 +284,7 @@ void DWAPlanner::plot_planning(WorldMap* map,ElectricVehicleDynamicsModel* car) 
     while(true) {
         // 获取下一步最佳控制指令和轨迹
         auto [best_v, best_yaw_rate, best_trajectory] = get_next_ctl_trj(current_state);
-        std::cout<<"当前最优控制:V:"<<best_v<<" W:"<<best_yaw_rate<<std::endl;       
+        std::cout<<"当前最优控制:V:"<<best_v<<" W:"<<best_yaw_rate;       
         // 绘制当前状态
         std::tuple<double,double,double> state={current_state.x,current_state.y,current_state.yaw};
         car->reset_for_planning_only(state,best_trajectory);
@@ -300,6 +298,7 @@ void DWAPlanner::plot_planning(WorldMap* map,ElectricVehicleDynamicsModel* car) 
         // 检查是否到达目标
         double dist_to_goal = std::pow(current_state.x - goal_point_.first, 2) + 
                              std::pow(current_state.y - goal_point_.second, 2);
+        std::cout<<" 到目标的距离:"<<dist_to_goal<<std::endl; 
         if(dist_to_goal < 0.1*goal_threshold) {
             //到达了把到达的这一步绘制出来
             std::tuple<double,double,double> state={current_state.x,current_state.y,current_state.yaw};

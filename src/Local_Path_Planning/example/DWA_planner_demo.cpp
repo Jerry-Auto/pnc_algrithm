@@ -4,13 +4,13 @@
 int main() {
     //创建地图并设置障碍物
     WorldMap world_map(-10, 50, -10, 50);
-    world_map.addObstacle({15, 15, 3, 3, 0, "red"});
+    world_map.addObstacle({15, 10, 3, 3, 0, "red"});
     world_map.addObstacle({25, 20, 4, 4, 0, "red"});
-    world_map.addObstacle({35, 15, 3, 3, 0, "red"});
+    world_map.addObstacle({40, 15, 3, 3, 0, "red"});
         // 添加障碍物（同前）
-    WorldMap::Obstacle obs1 = {10, 10, 5, 3, 0, "red"};
-    WorldMap::Obstacle obs2 = {-15, 20, 4, 6, M_PI/4, "green"};
-    WorldMap::Obstacle obs3 = {0, -10, 8, 2, 0, "purple"};
+    WorldMap::Obstacle obs1 = {5, 10, 5, 3, 0, "red"};
+    WorldMap::Obstacle obs2 = {40, 30, 4, 6, M_PI/4, "green"};
+    WorldMap::Obstacle obs3 = {35, 5, 2, 8, 0, "purple"};
     world_map.addObstacle(obs1);  
     world_map.addObstacle(obs2);
     world_map.addObstacle(obs3);
@@ -29,10 +29,10 @@ int main() {
     DWAPlanner DWA_solver;
     DWA_solver.read_map_data(world_map,vehicle);
 
-    // auto plan_data=DWA_solver.planning_series();
-    // world_map.plot_planning(&vehicle,plan_data.first,"DWA.png",plan_data.second);
+    auto plan_data=DWA_solver.planning_series();
+    world_map.plot_planning(&vehicle,plan_data.first,"DWA.png",plan_data.second);
 
-    DWA_solver.plot_planning(&world_map,&vehicle);
+    //DWA_solver.plot_planning(&world_map,&vehicle);
         
     return 0;
 }

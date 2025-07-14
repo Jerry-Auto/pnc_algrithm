@@ -46,21 +46,21 @@ public:
 
         // 构造函数提供默认值
         Config() :
-            max_speed(5.0),
-            min_speed(-2.0),
+            max_speed(2.5),
+            min_speed(-1.0),
             max_yaw_rate(40*PI/180.0),
             max_accel(0.2),
             max_decel(0.1),
-            max_delta_yaw_rate(40*PI/180.0),
+            max_delta_yaw_rate(30*PI/180.0),
             dt(0.1),
             predict_time(3.0),
-            goal_cost_weight(1.0),
-            speed_cost_weight(1.0),
-            obstacle_cost_weight(50.0),
+            goal_cost_weight(10.0),
+            speed_cost_weight(5.0),
+            obstacle_cost_weight(500.0),
             head_cost_weight(1.0),
             robot_radius(2.5),
             speed_resolution(0.01),
-            yaw_rate_resolution(0.1*PI/180),
+            yaw_rate_resolution(0.5*PI/180),
             obstacle_threshold(2.0) {}
     };
 

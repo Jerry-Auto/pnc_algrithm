@@ -146,4 +146,17 @@ set(DWA_DY_DEMO_NAME DWA_dy_demo)
 add_executable(${DWA_DY_DEMO_NAME} example/DWA_dy_planner_demo.cpp)  
 target_link_libraries(${DWA_DY_DEMO_NAME} ${DWA_DY_LIB_NAME} ${WORLD_MAP_LIB_NAME} Python3::Python Python3::NumPy)
 
+# 人工势场法类的编译
+set(APF_LIB_NAME APF)
+add_library(${APF_LIB_NAME} SHARED src/Artificial_potential_field.cpp)  
+target_include_directories(${APF_LIB_NAME}  
+    PUBLIC include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+target_link_libraries(${APF_LIB_NAME} ${WORLD_MAP_LIB_NAME} Python3::Python) 
+set(APF_DEMO_NAME APF_demo)
+add_executable(${APF_DEMO_NAME} example/Artificial_potential_field_demo.cpp)  
+target_link_libraries(${APF_DEMO_NAME} ${APF_LIB_NAME} Python3::Python Python3::NumPy)
+
 

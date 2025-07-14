@@ -1,5 +1,4 @@
 #ifndef POLYNOMIALALGORITHM_H
-
 #define POLYNOMIALALGORITHM_H
 #include <iostream>
 #include<Eigen/Dense>

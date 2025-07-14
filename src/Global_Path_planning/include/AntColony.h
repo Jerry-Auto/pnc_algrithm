@@ -21,7 +21,6 @@ public:
         Node(int x, int y);
     };
 
-
 private:
 
     // 蚁群算法参数
