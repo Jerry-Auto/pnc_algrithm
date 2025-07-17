@@ -323,8 +323,3 @@ void RRT::draw(Node *node) {
               vector<double>{play_area[2], play_area[2], play_area[3], play_area[3], play_area[2]}, "k-");
     plt::pause(0.01);
 }
-
-void RRT::Iterative_plot()
-{
-
-}

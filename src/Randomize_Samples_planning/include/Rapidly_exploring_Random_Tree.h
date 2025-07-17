@@ -38,7 +38,7 @@ public:
 
     void setAnEnd(Node *anEnd);
 
-private:
+//private:
 
     WorldMap* map_=nullptr;
     vector<vector<double>>obstacle_list;//障碍物位置列表 [[x,y,size],...]
@@ -74,8 +74,6 @@ private:
 
     void draw(Node*node= nullptr);
 
-    
-    void Iterative_plot();
 };
 
 
