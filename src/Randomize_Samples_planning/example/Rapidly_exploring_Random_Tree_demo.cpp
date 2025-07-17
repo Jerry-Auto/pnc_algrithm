@@ -1,7 +1,7 @@
-#include "Probability_Road_map.h"
 
+#include "Rapidly_exploring_Random_Tree.h"
 
-int main() {
+int main(){
         //创建地图并设置障碍物
     WorldMap world_map(-10, 50, -10, 50);
     world_map.addObstacle({20, 0, 3, 3, 0, "red"});
@@ -19,27 +19,18 @@ int main() {
     world_map.set_goal(goal);
     world_map.set_start(start);
 
-    //world_map.visualize();
-    // 参数设置
-    int N_SAMPLE = 500;
-    int N_KNN = 10;
-    double MAX_EDGE_LEN = 5.0;
-    double robot_r=1.6;
 
 
-    // 规划
-    PRMPlanner planner(N_SAMPLE, N_KNN, MAX_EDGE_LEN,robot_r, true);
+    double radius = 0.8;
+    double expand_dis=3;//扩展的步长
+    double goal_sample_rate=5;//采样目标点的概率，百分制.default: 5，即表示5%的概率直接采样目标点
+    int max_iter=500;
 
-    planner.init_solver(&world_map);
+    RRT rrt(radius,expand_dis,goal_sample_rate, max_iter);
+    rrt.init_solver(&world_map);
+    pair<vector<double>, vector<double>>traj = rrt.planning(true);
 
-    auto planning_data = planner.plan();
-    if(planning_data.first.size()!=0)
-    {
-        std::cout<<"找到了路径"<<std::endl;
-        world_map.plot_Sampling_path(planning_data,"PRM.png");
-    }
-    else{
-        std::cout<<"没有找到路径"<<std::endl;
-    }
+    //world_map.plot_Sampling_path(traj,"RRT.png");
+
     return 0;
 }

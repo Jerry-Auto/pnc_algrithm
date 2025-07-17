@@ -292,3 +292,8 @@ void ElectricVehicleDynamicsModel::plot_planning(std::vector<std::vector<double>
 
     plt::show();
 }
+
+double ElectricVehicleDynamicsModel::get_vehicle_radias()
+{
+    return sqrt(pow((params_.lf+params_.lr)/2,2)+1);
+}

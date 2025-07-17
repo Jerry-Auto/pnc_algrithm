@@ -36,55 +36,24 @@ std::pair<double, double> WorldMap::get_goal()
 {
     return this->goal_point;
 }
+void WorldMap::set_start(std::pair<double, double> start)
+{
+    this->start_point=start;
+}
+std::pair<double, double> WorldMap::get_start()
+{
+    return this->start_point;
+}
 
 void WorldMap::visualize(bool show_grid, bool equal_aspect, bool blocking) {
+    
     if (!is_interactive_) {
         plt::figure_size(1200, 800);
         is_interactive_ = !blocking;
     } else {
         plt::clf();  // 清除当前图形（交互模式下）
     }
-
-    // 设置坐标轴
-    plt::xlim(x_min_, x_max_);
-    plt::ylim(y_min_, y_max_);
-    
-    if (equal_aspect) plt::axis("equal");
-    if (show_grid) plt::grid(true);
-
-    //绘制控制点
-    for(size_t i=0;i<control_point_.size();i++)
-    {
-        plt::plot(control_point_[i].first, control_point_[i].second, {{"color", "green"}}); 
-    }
-    //绘制目标点
-    if (!std::isnan(goal_point.first))  // 正确写法
-    {
-        std::map<std::string, std::string> goal_point_kwargs = {
-            {"c", "red"},       
-            {"marker", "p"}  // 标记为五角星
-        };
-        std::vector<double> goal_x={goal_point.first};
-        std::vector<double> goal_y={goal_point.second};
-        plt::scatter(goal_x,goal_y,300.0,goal_point_kwargs);       
-    }
-    
-    // 绘制障碍物（提取为独立方法更佳）
-    for (const auto& obstacle : obstacles_) {
-        std::vector<double> local_x = {-obstacle.width/2, obstacle.width/2, 
-                                     obstacle.width/2, -obstacle.width/2, -obstacle.width/2};
-        std::vector<double> local_y = {-obstacle.height/2, -obstacle.height/2, 
-                                     obstacle.height/2, obstacle.height/2, -obstacle.height/2};
-        
-        std::vector<double> global_x, global_y;
-        for (size_t i = 0; i < local_x.size(); ++i) {
-            double x_rot = local_x[i] * cos(obstacle.rotation) - local_y[i] * sin(obstacle.rotation);
-            double y_rot = local_x[i] * sin(obstacle.rotation) + local_y[i] * cos(obstacle.rotation);
-            global_x.push_back(obstacle.x + x_rot);
-            global_y.push_back(obstacle.y + y_rot);
-        }
-        plt::plot(global_x, global_y, {{"color", obstacle.color}, {"linewidth", "2"}});
-    }
+    plot_environment();
 
     // 绘制所有车辆
     for (const auto& vehicle_pair : vehicles_) {
@@ -94,9 +63,8 @@ void WorldMap::visualize(bool show_grid, bool equal_aspect, bool blocking) {
 
     }
 
-    plt::title("World Map with Vehicles and Obstacles");
-    plt::xlabel("X coordinate (m)");
-    plt::ylabel("Y coordinate (m)");
+    if (equal_aspect) plt::axis("equal");
+    if (show_grid) plt::grid(true);
 
     if (blocking) {
         plt::show();
@@ -150,15 +118,80 @@ void WorldMap::updateAndVisualize(bool show_grid, bool equal_aspect) {
         plt::show();
     }
 
+void WorldMap::plot_Sampling_path(std::pair<std::vector<double>, std::vector<double>> planning_data,std::string filename)
+{
+    plt::figure_size(1200, 800);
+    plot_environment();
+    plt::axis("equal");
+    plt::grid(true);
+    plt::plot(planning_data.first,planning_data.second, {{"color", "green"}});
+    save_to_PNG(filename);
+    plt::show();
+}
+void WorldMap::plot_environment()
+{
+    // 设置坐标轴
+    plt::xlim(x_min_, x_max_);
+    plt::ylim(y_min_, y_max_);
+    //绘制控制点
+    for(size_t i=0;i<control_point_.size();i++)
+    {
+        plt::plot(control_point_[i].first, control_point_[i].second, {{"color", "green"}}); 
+    }
+    //绘制目标点
+    if (!std::isnan(goal_point.first))  // 正确写法
+    {
+        std::map<std::string, std::string> goal_point_kwargs = {
+            {"c", "red"},       
+            {"marker", "p"}  // 标记为五角星
+        };
+        std::vector<double> goal_x={goal_point.first};
+        std::vector<double> goal_y={goal_point.second};
+        plt::scatter(goal_x,goal_y,300.0,goal_point_kwargs);       
+    }
 
-
-
+    //绘制起点
+    if (!std::isnan(start_point.first))  // 正确写法
+    {
+        std::map<std::string, std::string> start_point_kwargs = {
+            {"c", "blue"},       
+            {"marker", "D"}  // 标记为五角星
+        };
+        std::vector<double> start_x={start_point.first};
+        std::vector<double> start_y={start_point.second};
+        plt::scatter(start_x,start_y,100.0,start_point_kwargs);       
+    }
+    
+    // 绘制障碍物（提取为独立方法更佳）
+    for (const auto& obstacle : obstacles_) {
+        std::vector<double> local_x = {-obstacle.width/2, obstacle.width/2, 
+                                     obstacle.width/2, -obstacle.width/2, -obstacle.width/2};
+        std::vector<double> local_y = {-obstacle.height/2, -obstacle.height/2, 
+                                     obstacle.height/2, obstacle.height/2, -obstacle.height/2};
+        
+        std::vector<double> global_x, global_y;
+        for (size_t i = 0; i < local_x.size(); ++i) {
+            double x_rot = local_x[i] * cos(obstacle.rotation) - local_y[i] * sin(obstacle.rotation);
+            double y_rot = local_x[i] * sin(obstacle.rotation) + local_y[i] * cos(obstacle.rotation);
+            global_x.push_back(obstacle.x + x_rot);
+            global_y.push_back(obstacle.y + y_rot);
+        }
+        plt::plot(global_x, global_y, {{"color", obstacle.color}, {"linewidth", "2"}});
+    }
+    plt::title("World Map with Vehicles and Obstacles");
+    plt::xlabel("X coordinate (m)");
+    plt::ylabel("Y coordinate (m)");
+}
 // 设置边界
 void WorldMap::setBounds(double x_min, double x_max, double y_min, double y_max) {
     x_min_ = x_min;
     x_max_ = x_max;
     y_min_ = y_min;
     y_max_ = y_max;
+}
+std::vector<double> WorldMap::getBounds()
+{
+    return {x_min_,x_max_ ,y_min_,y_max_};
 }
 
 // 清除所有对象

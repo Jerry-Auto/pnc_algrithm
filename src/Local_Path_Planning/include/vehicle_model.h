@@ -109,6 +109,8 @@ public:
 
     std::vector<double> traj_x, traj_y;
 
+    double get_vehicle_radias();
+
 private:
     VehicleState state_;
     VehicleParams params_;

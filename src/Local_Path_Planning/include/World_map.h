@@ -10,10 +10,9 @@
 #include <thread>
 #include <chrono>
 #include <optional>
-#include "matplotlibcpp.h"
 #include "vehicle_model.h"
+#include "common_plotting.h"
 
-namespace plt = matplotlibcpp;
 
 class WorldMap {
 public:
@@ -54,6 +53,8 @@ public:
 
     // 设置边界
     void setBounds(double x_min, double x_max, double y_min, double y_max);
+
+    std::vector<double> getBounds();
     
     //保存结果图
     void save_to_PNG(std::string filename);
@@ -64,8 +65,15 @@ public:
     //设置目标点
     void set_goal(std::pair<double, double> goal);
 
+    void set_start(std::pair<double, double> start);
+
     std::pair<double, double> get_goal();
 
+    std::pair<double, double> get_start();
+
+    void plot_Sampling_path(std::pair<std::vector<double>, std::vector<double>> planning_data,std::string filename="out.png");
+
+    void plot_environment();
 
     // 清除所有对象
     void clear();
@@ -74,7 +82,8 @@ private:
     bool is_interactive_ = false;  // 标记是否处于交互模式
     double x_min_, x_max_;
     double y_min_, y_max_;
-    std::pair<double, double> goal_point={NAN, NAN};;
+    std::pair<double, double> goal_point={NAN, NAN};
+    std::pair<double, double> start_point={NAN, NAN};
     std::vector<Obstacle> obstacles_;
     std::vector<std::pair<ElectricVehicleDynamicsModel*, std::string>> vehicles_;
     std::vector<std::pair<std::vector<double>,std::vector<double>>> control_point_;

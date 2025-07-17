@@ -57,3 +57,5 @@ target_link_libraries(main PRIVATE auto_driving_algorithm)
 #add_subdirectory(src/Global_Path_planning)
 
 add_subdirectory(src/Local_Path_Planning)
+
+add_subdirectory(src/Randomize_Samples_planning)

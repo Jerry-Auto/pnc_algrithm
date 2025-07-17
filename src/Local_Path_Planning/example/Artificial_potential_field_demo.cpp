@@ -24,9 +24,9 @@ int main(){
 
     APF apf_solver(world_map);
 
-    // auto planning_data=apf_solver.plan_series();
-    // world_map.plot_planning(&vehicle,planning_data,"apf.png");
+    auto planning_data=apf_solver.plan_series();
+    world_map.plot_planning(&vehicle,planning_data,"apf.png");
 
-    apf_solver.plot_planning(&world_map,&vehicle);
+    //apf_solver.plot_planning(&world_map,&vehicle);
     return 0;
 }

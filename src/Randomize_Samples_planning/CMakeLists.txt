@@ -33,6 +33,7 @@ message(STATUS "Python3 libraries: ${Python3_LIBRARIES}")
 # 包含目录
 include_directories(
     ${CMAKE_SOURCE_DIR}/src/libs/common/include
+    ${CMAKE_SOURCE_DIR}/src/Local_Path_Planning/include
     ${Python3_INCLUDE_DIRS}
     /usr/include/python3.10
     /usr/local/lib/python3.10/dist-packages/numpy/core/include
@@ -46,24 +47,44 @@ include_directories(
     ${EIGEN3_INCLUDE_DIR}
 )
 
+# 使用 link_directories() 指定库搜索路径
+link_directories(${CMAKE_SOURCE_DIR}/src/libs/Local_Path_Planning)
+
+
 #set(CMAKE_AUTOMOC ON)
 
+#PRM类的编译
+set(PRM_LIB_NAME PRM)
+add_library(${PRM_LIB_NAME} SHARED)  
+target_sources(${PRM_LIB_NAME}  
+    PRIVATE 
+    src/Probability_Road_map.cpp 
+)
+target_include_directories(${PRM_LIB_NAME}  
+    PUBLIC include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+target_link_libraries(${PRM_LIB_NAME} World_map Python3::Python Python3::NumPy) 
+set(PRM_DEMO_NAME PRM_demo)
+add_executable(${PRM_DEMO_NAME} example/Probability_Road_map_demo.cpp)  
+target_link_libraries(${PRM_DEMO_NAME} ${PRM_LIB_NAME} Python3::Python Python3::NumPy)  
 
-# Vehicle_model类的编译
-# set(VEHICLE_LIB_NAME vehicle_model)
-# add_library(${VEHICLE_LIB_NAME} SHARED)  
-# target_sources(${VEHICLE_LIB_NAME}  
-#     PRIVATE 
-#     src/vehicle_model.cpp 
-# )
-# target_include_directories(${VEHICLE_LIB_NAME}  
-#     PUBLIC include 
-#     PRIVATE 
-#     auto_driving_algorithm 
-# )
-# set(VEHICLE_DEMO_NAME vehicle_model_demo)
-# add_executable(${VEHICLE_DEMO_NAME} example/vehicle_model_demo.cpp)  
-# target_link_libraries(${VEHICLE_DEMO_NAME} ${VEHICLE_LIB_NAME} Python3::Python Python3::NumPy)  
-
+#RRT类的编译
+set(RRT_LIB_NAME RRT)
+add_library(${RRT_LIB_NAME} SHARED)  
+target_sources(${RRT_LIB_NAME}  
+    PRIVATE 
+    src/Rapidly_exploring_Random_Tree.cpp 
+)
+target_include_directories(${RRT_LIB_NAME}  
+    PUBLIC include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+target_link_libraries(${RRT_LIB_NAME} World_map Python3::Python Python3::NumPy) 
+set(RRT_DEMO_NAME RRT_demo)
+add_executable(${RRT_DEMO_NAME} example/Rapidly_exploring_Random_Tree_demo.cpp)  
+target_link_libraries(${RRT_DEMO_NAME} ${RRT_LIB_NAME} Python3::Python Python3::NumPy) 
 
 
