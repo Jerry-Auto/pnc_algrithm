@@ -5,6 +5,7 @@
 
 #include "Rapidly_exploring_Random_Tree.h"
 
+
 class RRT_Star: public RRT{
 public:
 

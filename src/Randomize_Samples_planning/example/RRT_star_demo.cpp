@@ -33,9 +33,10 @@ int main(){
 
     rrt.init_solver(&world_map);
 
-    pair<vector<double>, vector<double>>traj = rrt.planning(false);
+    pair<vector<double>, vector<double>>traj = rrt.planning(true);
 
-    world_map.plot_Sampling_path(traj,"RRT_star.png");
+    std::string filename="RRT_star.png";
+    world_map.plot_Sampling_path(traj,filename);
 
     return 0;
 }

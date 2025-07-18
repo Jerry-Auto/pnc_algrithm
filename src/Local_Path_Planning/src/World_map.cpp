@@ -203,6 +203,6 @@ void WorldMap::clear() {
 void WorldMap::save_to_PNG(std::string filename)
 {
     std::string folderPath = "./image";
-    std::cout << "结果截图保存至：" << filename << std::endl;
+    std::cout << "结果截图保存至：" << folderPath+"/"+filename << std::endl;
     plt::save(folderPath+"/"+filename);
 }

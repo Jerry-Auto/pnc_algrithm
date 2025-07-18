@@ -57,7 +57,7 @@ public:
     std::vector<double> getBounds();
     
     //保存结果图
-    void save_to_PNG(std::string filename);
+    void save_to_PNG(std::string filename="out.png");
 
     //添加控制点
     void add_control_point(std::pair<std::vector<double>,std::vector<double>> control_point);

@@ -1,5 +1,7 @@
 
 #include "RRT_star.h"
+#include"World_map.h"
+#include "common_plotting.h"
 
 RRT_Star::RRT_Star(double robotRadius, double expandDis, double goalSampleRate,
                    int maxIter, double connectCircleDist, bool searchUntilMaxIter) : RRT(robotRadius,
@@ -36,16 +38,18 @@ pair<vector<double>, vector<double>> RRT_Star::planning(bool plot) {
             }
         }
 
-        if(plot){draw(rnd_node);}
+        
 
         if ((!search_until_max_iter) && new_node) {// reaches goal
             int last_index = findBestGoalInd();
             if (last_index != -1) {
                 cout << "reaches the goal!" << endl;
-                if(plot){draw(rnd_node);plt::show();}
+                 if(plot){draw(rnd_node);
+                     }
                 return generateFinalCourse(last_index);
             }
         }
+        if(plot){draw(rnd_node);}
     }
     cout << "达到最大回合数" << endl;
     int last_index = findBestGoalInd();
