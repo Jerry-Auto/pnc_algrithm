@@ -1,0 +1,72 @@
+cmake_minimum_required(VERSION 3.10)
+project(auto_driving_algorithm)
+
+
+set(PACKAGE_NAME auto_driving_algorithm)
+
+set(CMAKE_CXX_STANDARD 17)
+
+# 设置编译选项
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
+# 设置编译模式Debug Realease
+set(CMAKE_BUILD_TYPE Debug)
+
+# 创建输出目录
+set(LIB_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/src/libs/Path_Heading_planning)
+set(BIN_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/bin/Path_Heading_planning/example)
+
+file(MAKE_DIRECTORY 
+    ${LIB_OUTPUT_DIR}
+    ${BIN_OUTPUT_DIR}
+    ${CMAKE_SOURCE_DIR}/bin/Path_Heading_planning/example/image
+)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR})
+
+#包含公共头文件目录
+# 查找 Python 3
+find_package(Python3 REQUIRED COMPONENTS Development)
+message(STATUS "Python3 include dirs: ${Python3_INCLUDE_DIRS}")
+message(STATUS "Python3 libraries: ${Python3_LIBRARIES}")
+
+# 包含目录
+include_directories(
+    ${CMAKE_SOURCE_DIR}/src/libs/common/include
+    ${CMAKE_SOURCE_DIR}/src/Local_Path_Planning/include
+    ${Python3_INCLUDE_DIRS}
+    /usr/include/python3.10
+    /usr/local/lib/python3.10/dist-packages/numpy/core/include
+)
+
+find_package(OsqpEigen REQUIRED)
+find_package(Eigen3 REQUIRED)
+
+include_directories(
+    ${OSQPEIGEN_INCLUDE_DIR}
+    ${EIGEN3_INCLUDE_DIR}
+)
+
+# 使用 link_directories() 指定库搜索路径
+link_directories(${CMAKE_SOURCE_DIR}/src/libs/Local_Path_Planning)
+
+
+#set(CMAKE_AUTOMOC ON)
+
+#Dubins_Curve类的编译
+set(Dubins_Curve_LIB_NAME Dubins_Curve)
+add_library(${Dubins_Curve_LIB_NAME} SHARED)  
+target_sources(${Dubins_Curve_LIB_NAME}  
+    PRIVATE 
+    src/Dubins_Curve.cpp 
+)
+target_include_directories(${Dubins_Curve_LIB_NAME}  
+    PUBLIC include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+target_link_libraries(${Dubins_Curve_LIB_NAME} World_map Python3::Python Python3::NumPy) 
+set(Dubins_Curve_DEMO_NAME Dubins_Curve_demo)
+add_executable(${Dubins_Curve_DEMO_NAME} example/Dubins_Curve_demo.cpp)  
+target_link_libraries(${Dubins_Curve_DEMO_NAME} ${Dubins_Curve_LIB_NAME} Python3::Python Python3::NumPy)  
+

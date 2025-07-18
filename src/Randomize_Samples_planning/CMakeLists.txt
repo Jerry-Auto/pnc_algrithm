@@ -105,3 +105,19 @@ add_executable(${RRT_star_DEMO_NAME} example/RRT_star_demo.cpp)
 target_link_libraries(${RRT_star_DEMO_NAME} ${RRT_star_LIB_NAME} Python3::Python Python3::NumPy) 
 
 
+#RRT_connect类的编译
+set(RRT_connect_LIB_NAME RRT_connect)
+add_library(${RRT_connect_LIB_NAME} SHARED)  
+target_sources(${RRT_connect_LIB_NAME}  
+    PRIVATE 
+    src/RRT_connect.cpp 
+)
+target_include_directories(${RRT_connect_LIB_NAME}  
+    PUBLIC include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+target_link_libraries(${RRT_connect_LIB_NAME}  World_map Python3::Python Python3::NumPy) 
+set(RRT_connect_DEMO_NAME RRT_connect_demo)
+add_executable(${RRT_connect_DEMO_NAME} example/RRT_connect_demo.cpp)  
+target_link_libraries(${RRT_connect_DEMO_NAME} ${RRT_connect_LIB_NAME} Python3::Python Python3::NumPy) 

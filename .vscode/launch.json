@@ -8,7 +8,7 @@
             "name": "(gdb) 启动",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/Randomize_Samples_planning/example/RRT_star_demo",
+            "program": "${workspaceFolder}/bin/Randomize_Samples_planning/example/RRT_connect_demo",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
