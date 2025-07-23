@@ -34,6 +34,7 @@ message(STATUS "Python3 libraries: ${Python3_LIBRARIES}")
 include_directories(
     ${CMAKE_SOURCE_DIR}/src/libs/common/include
     ${CMAKE_SOURCE_DIR}/src/Local_Path_Planning/include
+    ${CMAKE_SOURCE_DIR}/src/Global_Path_planning/include
     ${Python3_INCLUDE_DIRS}
     /usr/include/python3.10
     /usr/local/lib/python3.10/dist-packages/numpy/core/include
@@ -49,6 +50,7 @@ include_directories(
 
 # 使用 link_directories() 指定库搜索路径
 link_directories(${CMAKE_SOURCE_DIR}/src/libs/Local_Path_Planning)
+link_directories(${CMAKE_SOURCE_DIR}/src/libs/Global_Path_planning)
 
 
 #set(CMAKE_AUTOMOC ON)
@@ -69,4 +71,43 @@ target_link_libraries(${Dubins_Curve_LIB_NAME} World_map Python3::Python Python3
 set(Dubins_Curve_DEMO_NAME Dubins_Curve_demo)
 add_executable(${Dubins_Curve_DEMO_NAME} example/Dubins_Curve_demo.cpp)  
 target_link_libraries(${Dubins_Curve_DEMO_NAME} ${Dubins_Curve_LIB_NAME} Python3::Python Python3::NumPy)  
+
+
+#rs曲线类的编译
+set(ReedsShepp_LIB_NAME ReedsShepp)
+add_library(${ReedsShepp_LIB_NAME} SHARED)  
+target_sources(${ReedsShepp_LIB_NAME}  
+    PRIVATE 
+    src/ReedsShepp.cpp 
+)
+target_include_directories(${ReedsShepp_LIB_NAME}  
+    PUBLIC include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+target_link_libraries(${ReedsShepp_LIB_NAME} World_map Python3::Python Python3::NumPy) 
+set(ReedsShepp_DEMO_NAME ReedsShepp_demo)
+add_executable(${ReedsShepp_DEMO_NAME} example/ReedsShepp_demo.cpp)  
+target_link_libraries(${ReedsShepp_DEMO_NAME} ${ReedsShepp_LIB_NAME} Python3::Python Python3::NumPy)  
+
+# #混合A*类的编译
+# set(HY_A_S_LIB_NAME HY_A_S)
+# add_library(${HY_A_S_LIB_NAME} SHARED)  
+# target_sources(${HY_A_S_LIB_NAME}  
+#     PRIVATE 
+#     src/Hybird_A_Star.cpp 
+# )
+# target_include_directories(${HY_A_S_LIB_NAME}  
+#     PUBLIC include 
+#     PRIVATE 
+#     auto_driving_algorithm 
+# )
+# target_link_libraries(${HY_A_S_LIB_NAME} World_map Python3::Python Python3::NumPy) 
+# set(HY_A_S_DEMO_NAME HY_A_S_demo)
+# add_executable(${HY_A_S_DEMO_NAME} example/Hybird_A_Star_demo.cpp)  
+# target_link_libraries(${HY_A_S_DEMO_NAME} ${HY_A_S_LIB_NAME} Python3::Python Python3::NumPy)  
+
+add_executable(test_map example/test.cpp)
+target_link_libraries(test_map ObstacleGridMap Python3::Python Python3::NumPy)
+
 

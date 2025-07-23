@@ -1,13 +1,5 @@
 #include "ObstacleGridMap.h"
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <algorithm>
-#include <cmath>
-#include <iomanip>
-#include "matplotlibcpp.h"
 
-namespace plt = matplotlibcpp;
 
 ObstacleGridMap::ObstacleGridMap(double world_width, double world_height, double resolution)
     :resolution_(resolution),strpoint(-1, -1), goalpoint(-1, -1){
@@ -19,6 +11,29 @@ ObstacleGridMap::ObstacleGridMap(double world_width, double world_height, double
     this->world_width_=this->grid_width_*resolution;
     this->world_height_=this->grid_height_*resolution;
     initializeGrid();
+}
+
+ObstacleGridMap::ObstacleGridMap(WorldMap & map, double resolution,double robot_radius)
+:resolution_(resolution),strpoint(-1, -1), goalpoint(-1, -1)
+{
+    std::vector<double> bounds=map.getBounds();
+    this->world_height_=bounds[3]-bounds[2];
+    this->world_width_=bounds[1]-bounds[0];
+    this->grid_width_ = static_cast<int>(std::ceil(this->world_width_ / resolution));
+    this->grid_height_ = static_cast<int>(std::ceil(this->world_height_ / resolution));
+    this->world_width_=this->grid_width_*resolution;
+    this->world_height_=this->grid_height_*resolution;
+    initializeGrid();
+    std::vector<WorldMap::Obstacle> obs=map.get_Obstacle();
+    for(auto obstacle:obs)
+    {
+        setRotatedRectangleObstacle(obstacle.x,obstacle.y,obstacle.width,obstacle.height,obstacle.rotation);
+    }
+
+    this->setstr(map.get_start().first,map.get_start().second);
+    this->setgoal(map.get_goal().first,map.get_goal().second);
+    set_robot_radius(robot_radius);
+    
 }
 
 ObstacleGridMap::ObstacleGridMap(const std::string& filename) {
@@ -592,4 +607,136 @@ std::vector<double> ObstacleGridMap::readCSVToVector(const std::string& filename
  
     inFile.close();
     return data;
+}
+
+
+// 在 ObstacleGridMap.cpp 中添加实现
+
+// 辅助函数：判断点是否在矩形内（射线法）
+bool isPointInRotatedRectangle(const std::vector<std::pair<double, double>>& vertices, double px, double py) {
+    int n = vertices.size();
+    bool inside = false;
+    for (int i = 0, j = n - 1; i < n; j = i++) {
+        const auto& p1 = vertices[i];
+        const auto& p2 = vertices[j];
+        if (((p1.second > py) != (p2.second > py)) &&
+            (px < (p2.first - p1.first) * (py - p1.second) / (p2.second - p1.second) + p1.first)) {
+            inside = !inside;
+        }
+    }
+    return inside;
+}
+
+// 辅助函数：判断两条线段是否相交
+bool doLinesIntersect(double a1x, double a1y, double a2x, double a2y,
+                     double b1x, double b1y, double b2x, double b2y) {
+    auto ccw = [](double ax, double ay, double bx, double by, double cx, double cy) {
+        return (cy - ay) * (bx - ax) > (by - ay) * (cx - ax);
+    };
+    return ccw(a1x, a1y, a2x, a2y, b1x, b1y) != ccw(a1x, a1y, a2x, a2y, b2x, b2y) &&
+           ccw(b1x, b1y, b2x, b2y, a1x, a1y) != ccw(b1x, b1y, b2x, b2y, a2x, a2y);
+}
+
+// 辅助函数：判断矩形边是否与栅格边相交
+bool doesRectangleIntersectGridCell(const std::vector<std::pair<double, double>>& rect_vertices,
+                                  double grid_min_x, double grid_min_y,
+                                  double grid_max_x, double grid_max_y) {
+    // 栅格的4条边 - 正确定义：每条边由两个点(pair)表示
+    std::pair<std::pair<double, double>, std::pair<double, double>> grid_edges[4] = {
+        {{grid_min_x, grid_min_y}, {grid_max_x, grid_min_y}}, // 下边
+        {{grid_max_x, grid_min_y}, {grid_max_x, grid_max_y}}, // 右边
+        {{grid_max_x, grid_max_y}, {grid_min_x, grid_max_y}}, // 上边
+        {{grid_min_x, grid_max_y}, {grid_min_x, grid_min_y}}  // 左边
+    };
+
+    // 检查矩形的每条边是否与栅格的任意一条边相交
+    for (int i = 0; i < 4; ++i) {
+        const auto& rect_p1 = rect_vertices[i];
+        const auto& rect_p2 = rect_vertices[(i + 1) % 4];
+        for (int j = 0; j < 4; ++j) {
+            // 获取栅格边的两个端点
+            const auto& grid_p1 = grid_edges[j].first;  // 第一个端点
+            const auto& grid_p2 = grid_edges[j].second; // 第二个端点
+            
+            if (doLinesIntersect(
+                rect_p1.first, rect_p1.second,  // 矩形边的起点和终点
+                rect_p2.first, rect_p2.second,
+                grid_p1.first, grid_p1.second,  // 栅格边的起点和终点
+                grid_p2.first, grid_p2.second)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void ObstacleGridMap::setRotatedRectangleObstacle(double cx, double cy, double width, double height, double theta, float probability) {
+    // 1. 计算矩形的4个顶点（世界坐标系）
+    double half_width = width / 2.0;
+    double half_height = height / 2.0;
+
+    std::vector<std::pair<double, double>> local_vertices = {
+        {-half_width, -half_height},  // 左下
+        { half_width, -half_height},  // 右下
+        { half_width,  half_height},  // 右上
+        {-half_width,  half_height}   // 左上
+    };
+
+    std::vector<std::pair<double, double>> world_vertices;
+    for (const auto& vertex : local_vertices) {
+        double x = vertex.first;
+        double y = vertex.second;
+        double wx = cx + x * cos(theta) - y * sin(theta);
+        double wy = cy + x * sin(theta) + y * cos(theta);
+        world_vertices.emplace_back(wx, wy);
+    }
+
+    // 2. 计算矩形的AABB（减少栅格遍历范围）
+    double x_min = world_vertices[0].first, x_max = world_vertices[0].first;
+    double y_min = world_vertices[0].second, y_max = world_vertices[0].second;
+    for (const auto& vertex : world_vertices) {
+        x_min = std::min(x_min, vertex.first);
+        x_max = std::max(x_max, vertex.first);
+        y_min = std::min(y_min, vertex.second);
+        y_max = std::max(y_max, vertex.second);
+    }
+
+    // 3. 遍历AABB范围内的栅格
+    int gx_min, gx_max, gy_min, gy_max;
+    worldToGrid(x_min, y_min, gx_min, gy_min);
+    worldToGrid(x_max, y_max, gx_max, gy_max);
+
+    for (int gy = gy_min; gy <= gy_max; ++gy) {
+        for (int gx = gx_min; gx <= gx_max; ++gx) {
+            if (gx < 0 || gx >= grid_width_ || gy < 0 || gy >= grid_height_) {
+                continue;
+            }
+
+            // 计算当前栅格的边界（世界坐标）
+            double grid_min_x = gx * resolution_;
+            double grid_min_y = gy * resolution_;
+            double grid_max_x = (gx + 1) * resolution_;
+            double grid_max_y = (gy + 1) * resolution_;
+
+            // 情况1：栅格的中心点在矩形内
+            double center_x = (grid_min_x + grid_max_x) / 2.0;
+            double center_y = (grid_min_y + grid_max_y) / 2.0;
+            if (isPointInRotatedRectangle(world_vertices, center_x, center_y)) {
+                setCellProbability(gx, gy, probability);
+                obstacle_grid.first.push_back(gx);
+                obstacle_grid.second.push_back(gy);
+                continue;
+            }
+
+            // 情况2：矩形的边与栅格的边相交
+            if (doesRectangleIntersectGridCell(world_vertices, grid_min_x, grid_min_y, grid_max_x, grid_max_y)) {
+                setCellProbability(gx, gy, probability);
+                obstacle_grid.first.push_back(gx);
+                obstacle_grid.second.push_back(gy);
+            }
+        }
+    }
+
+    update_grid_(); // 更新机器人半径影响的栅格
 }

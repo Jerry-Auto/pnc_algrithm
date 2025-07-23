@@ -33,6 +33,7 @@ message(STATUS "Python3 libraries: ${Python3_LIBRARIES}")
 # 包含目录
 include_directories(
     ${CMAKE_SOURCE_DIR}/src/libs/common/include
+    ${CMAKE_SOURCE_DIR}/src/Local_Path_Planning/include
     ${Python3_INCLUDE_DIRS}
     /usr/include/python3.10
     /usr/local/lib/python3.10/dist-packages/numpy/core/include
@@ -45,6 +46,7 @@ include_directories(
     ${EIGEN3_INCLUDE_DIR}
 )
 
+link_directories(${CMAKE_SOURCE_DIR}/src/libs/Local_Path_Planning)
 
 # graph邻接矩阵类的编译
 set(GRAPH_LIB_NAME graph)
@@ -81,6 +83,7 @@ target_link_libraries(${GRAPH_DEMO_NAME} ${GRAPH_LIB_NAME})
 
 
 
+
 # 障碍物栅格地图类的编译
 set(OBSTACLE_GRID_MAP_LIB_NAME ObstacleGridMap)
 add_library(${OBSTACLE_GRID_MAP_LIB_NAME} SHARED)  
@@ -93,11 +96,12 @@ target_sources(${OBSTACLE_GRID_MAP_LIB_NAME}
 target_include_directories(${OBSTACLE_GRID_MAP_LIB_NAME}  
     PUBLIC
         include 
+        ${CMAKE_SOURCE_DIR}/src/Local_Path_Planning/include 
     PRIVATE 
     auto_driving_algorithm 
 )
 
-target_link_libraries(${OBSTACLE_GRID_MAP_LIB_NAME} PRIVATE Python3::Python)
+target_link_libraries(${OBSTACLE_GRID_MAP_LIB_NAME} PUBLIC World_map PRIVATE Python3::Python)
 
 # 设置库输出目录
 # set_target_properties(${OBSTACLE_GRID_MAP_LIB_NAME} PROPERTIES

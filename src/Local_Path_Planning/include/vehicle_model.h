@@ -52,6 +52,7 @@ public:
         double drag_coeff;
         double rr_coeff;
         double max_steer;
+        double max_steer_rate;
         double max_motor_torque;
         double max_brake_torque;
         double wheel_radius;
@@ -64,15 +65,16 @@ public:
         double Cd;      // 空气阻力系数
         double damping; // 横摆角速度阻尼
         VehicleParams() :
-            mass(1200.0),
+            mass(1600.0),
             lf(1.1),
-            lr(1.4),
+            lr(3.9),
             iz(2000.0),
             cf(70000.0),
             cr(65000.0),
             drag_coeff(0.32),
             rr_coeff(0.016),
             max_steer(M_PI / 4),
+            max_steer_rate(M_PI),
             max_motor_torque(250.0),
             max_brake_torque(800.0),
             wheel_radius(0.3),

@@ -60,7 +60,7 @@ std::pair<std::vector<double>, std::vector<double>> PRMPlanner::samplePoints(
         double out_dist_sqr;
         nanoflann::KNNResultSet<double> resultSet(1);
         resultSet.init(&ret_index, &out_dist_sqr);
-        kd_tree.index_->findNeighbors(resultSet, query_pt, nanoflann::SearchParameters(10));
+        kd_tree.index->findNeighbors(resultSet, query_pt, nanoflann::SearchParams(10));
 
         if (std::sqrt(out_dist_sqr) >= rr) {
             sample_x.push_back(tx);
@@ -95,7 +95,7 @@ bool PRMPlanner::isCollision(const Eigen::Vector2d& p1, const Eigen::Vector2d& p
         double out_dist_sqr;
         nanoflann::KNNResultSet<double> resultSet(1);
         resultSet.init(&ret_index, &out_dist_sqr);
-        kd_tree.index_->findNeighbors(resultSet, query_pt, nanoflann::SearchParameters(10));
+        kd_tree.index->findNeighbors(resultSet, query_pt, nanoflann::SearchParams(10));
 
         if (std::sqrt(out_dist_sqr) < rr) {
             return true; // 碰撞
@@ -131,7 +131,7 @@ std::vector<std::vector<int>> PRMPlanner::generateRoadMap(
         double out_dists_sqr[N_KNN + 1];
         nanoflann::KNNResultSet<double> resultSet(N_KNN + 1);
         resultSet.init(ret_indexes, out_dists_sqr);
-        kd_tree.index_->findNeighbors(resultSet, p.data(), nanoflann::SearchParameters(10));
+        kd_tree.index->findNeighbors(resultSet, p.data(), nanoflann::SearchParams(10));
 
         for (int k = 1; k <= N_KNN; ++k) { // 从 1 开始跳过自身
             size_t j = ret_indexes[k];

@@ -8,11 +8,15 @@
 #include <memory>
 #include <functional>
 #include <map>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <algorithm>
+#include <iomanip>
+#include "common_plotting.h"
+#include "World_map.h"
 
-// 前置声明绘图函数所需的类
-namespace matplotlibcpp {
-    class Plot;
-}
+
 
 class ObstacleGridMap {
 public:
@@ -29,7 +33,9 @@ public:
      * @param resolution 栅格分辨率（米/栅格）
      */
     ObstacleGridMap(double world_width, double world_height, double resolution);
-    
+
+    ObstacleGridMap(WorldMap & map, double resolution,double robot_radius);
+
     // 从文件加载地图的构造函数
     ObstacleGridMap(const std::string& filename);
     
@@ -79,6 +85,8 @@ public:
     void setRectangleObstacle(double world_x, double world_y, 
                              double width, double height, 
                              float probability = 0.9f);
+    // 设置矩形障碍物
+    void setRotatedRectangleObstacle(double cx, double cy, double width, double height, double theta, float probability = 0.9f);
     
     // 在世界坐标设置圆形障碍物
     void setCircleObstacle(double center_x, double center_y, 
