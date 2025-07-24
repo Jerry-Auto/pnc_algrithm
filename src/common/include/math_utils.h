@@ -15,6 +15,8 @@ namespace math {
 struct Vec2d {
   double x = 0.0;
   double y = 0.0;
+  Vec2d() = default;
+  Vec2d(double x_, double y_) : x(x_), y(y_) {}
 };
 
 /// @brief 定义了一个位姿
@@ -22,6 +24,9 @@ struct Pos3d {
   double x;
   double y;
   double phi;
+  Pos3d() = default; 
+  Pos3d(double x_,double y_,double phi_):x(x_),y(y_),phi(phi_){}
+  
 };
 
 /// @brief 定义了一条线段
@@ -31,6 +36,7 @@ struct LineSegment2d {
   Vec2d unit_direction;
   double heading = 0.0;
   double length = 0.0;
+
 };
 
 /// @brief 定义了一条曲线，起点位姿，曲率半径和弧长
@@ -82,6 +88,14 @@ std::vector<Pos3d> GetTrajFromCurvePathsConnect(const Pos3d &start_pos,
                                                 const Pos3d &end_pos,
                                                 double r_min,
                                                 double resolution);
+
+Vec2d rotatePoint(const Vec2d& point, double rotation);
+
+    std::vector<LineSegment2d> computeRectangleEdges(
+    double center_x, double center_y,  // 矩形中心坐标
+    double length, double width,       // 矩形的长和宽
+    double rotation                    // 旋转角度（弧度）
+);
 
 }  // namespace math
 

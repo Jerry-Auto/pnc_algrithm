@@ -52,6 +52,8 @@ private:
     void cal_fina_path(Node* node,std::map<int,Node*> closed_set);
 
     double Best_grid_length;
+    //把最后的最短距离表记录下来
+    std::map<int,Node*> C_set;
 
 public:
     Dijkstra(ObstacleGridMap* grid_map,bool plotfinalpath=true,bool plotpoint=true,bool plotgridpath=true);
@@ -61,6 +63,8 @@ public:
     std::pair<std::vector<int>,std::vector<int>> GetGridPath();
 
     std::pair<std::vector<double>,std::vector<double>> GetWorldPath();
+
+    double cost_to_point(double x,double y);
 
 };
 

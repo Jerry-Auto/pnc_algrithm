@@ -158,7 +158,7 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
    
     // 车辆轮廓点 (局部坐标系)
     std::vector<double> vehicle_x = {-params_.lr, params_.lf, params_.lf, -params_.lr, -params_.lr};
-    std::vector<double> vehicle_y = {-1.0, -1.0, 1.0, 1.0, -1.0};
+    std::vector<double> vehicle_y = {-params_.width/2, -params_.width/2, params_.width/2, params_.width/2, -params_.width/2};
     
     // 旋转和平移到全局坐标系
     std::vector<double> global_x, global_y;

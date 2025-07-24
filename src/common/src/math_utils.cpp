@@ -448,4 +448,69 @@ std::vector<Pos3d> GetTrajFromCurvePathsConnect(const Pos3d &start_pos,
   return traj_points;
 }
 
+
+
+
+// 计算旋转后的点
+Vec2d rotatePoint(const Vec2d& point, double rotation) {
+    double s = std::sin(rotation);
+    double c = std::cos(rotation);
+    Vec2d V;
+    V.x=point.x * c - point.y * s;
+    V.y=point.x * s + point.y * c;
+    return V;
+}
+
+// 计算矩形的四条边（输入：中心坐标、长、宽、旋转角度）
+std::vector<LineSegment2d> computeRectangleEdges(
+    double center_x, double center_y,  // 矩形中心坐标
+    double length, double width,       // 矩形的长和宽
+    double rotation                    // 旋转角度（弧度）
+) {
+    std::vector<LineSegment2d> edges;
+
+    // 计算半长和半宽（假设 length 是 x 方向，width 是 y 方向）
+    double half_length = length / 2.0;
+    double half_width = width / 2.0;
+
+    // 未旋转时的四个角点（相对于中心点）
+    // 注意：这里假设 length 是矩形的“长”（x 方向），width 是“宽”（y 方向）
+    std::vector<Vec2d> local_corners = {
+        Vec2d(-half_length, half_width),   // 左上
+        Vec2d(half_length, half_width),    // 右上
+        Vec2d(half_length, -half_width),   // 右下
+        Vec2d(-half_length, -half_width)   // 左下
+    };
+
+    // 旋转角点并转换为世界坐标
+    std::vector<Vec2d> world_corners;
+    for (const auto& corner : local_corners) {
+        Vec2d rotated = rotatePoint(corner, rotation);
+        world_corners.push_back(Vec2d(center_x + rotated.x, center_y + rotated.y));
+    }
+
+    // 生成四条边
+    for (size_t i = 0; i < world_corners.size(); ++i) {
+        size_t next_i = (i + 1) % world_corners.size();
+        LineSegment2d edge;
+        edge.start = world_corners[i];
+        edge.end = world_corners[next_i];
+
+        // 计算单位方向、heading 和 length
+        Vec2d direction(edge.end.x - edge.start.x, edge.end.y - edge.start.y);
+        edge.length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+        if (edge.length > 0.0) {
+            edge.unit_direction = Vec2d(direction.x / edge.length, direction.y / edge.length);
+            edge.heading = std::atan2(direction.y, direction.x);
+        } else {
+            edge.unit_direction = Vec2d(0.0, 0.0);
+            edge.heading = 0.0;
+        }
+
+        edges.push_back(edge);
+    }
+
+    return edges;
+}
+
 }  // namespace math

@@ -253,7 +253,10 @@ void ObstacleGridMap::loadFromFile(const std::string& filename) {
     }
 }
 
-
+/// @brief 栅格坐标变换成一维索引
+/// @param gx 
+/// @param gy 
+/// @return 
 int ObstacleGridMap::coordToIndex(int gx, int gy) const {
     return gy * grid_width_ + gx;
 }
@@ -448,11 +451,12 @@ void ObstacleGridMap::setgoal(double x_goal, double y_goal) {
     std::pair<int, int> grid_coord;
     worldToGrid(x_goal, y_goal, grid_coord.first, grid_coord.second);        
         
-    if (isInWorldBounds(x_goal, y_goal) && (getCellProbability(grid_coord.first, grid_coord.second) < 0.8)) {
-        this->goalpoint = grid_coord;
-    } else {
-        throw std::invalid_argument("不在地图内或该处有障碍物，无效");
-    }
+    this->goalpoint = grid_coord;
+    // if (isInWorldBounds(x_goal, y_goal) && (getCellProbability(grid_coord.first, grid_coord.second) < 0.8)) {
+    //     this->goalpoint = grid_coord;
+    // } else {
+    //     throw std::invalid_argument("不在地图内或该处有障碍物，无效");
+    // }
 }
  
 // 设置起点

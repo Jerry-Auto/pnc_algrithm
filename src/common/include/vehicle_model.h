@@ -9,8 +9,7 @@
 #include <map>
 #include <string>
 #include <optional>
-#include "matplotlibcpp.h"
-namespace plt = matplotlibcpp;
+#include "common_plotting.h"
 
 // 自定义clamp函数
 
@@ -64,10 +63,11 @@ public:
         double max_decel;
         double Cd;      // 空气阻力系数
         double damping; // 横摆角速度阻尼
+        double width;
         VehicleParams() :
             mass(1600.0),
-            lf(1.1),
-            lr(3.9),
+            lf(3.9),
+            lr(1.1),
             iz(2000.0),
             cf(70000.0),
             cr(65000.0),
@@ -85,7 +85,8 @@ public:
             max_accel(2.5),
             max_decel(7.0),
             Cd(0.3),
-            damping(0.95) {}
+            damping(0.95),
+            width(2.0) {}
     };
 
     // 构造函数

@@ -26,7 +26,7 @@ bool Dijkstra::Is_quit_map(Dijkstra::Node* node)
 void Dijkstra::planning(std::string PNGpath){
     Dijkstra::Node* str_node=new Dijkstra::Node(this->grid_map_->getstr().first,this->grid_map_->getstr().second,0,-1);
     Dijkstra::Node* goal_node=new Dijkstra::Node(this->grid_map_->getgoal().first,this->grid_map_->getgoal().second,0,-1);
-    std::map<int,Node*> O_set,C_set;
+    std::map<int,Node*> O_set;
 
     O_set[this->grid_map_->coordToIndex(str_node->x,str_node->y)]=str_node;
     Node* current=nullptr;
@@ -34,7 +34,7 @@ void Dijkstra::planning(std::string PNGpath){
     {
         float temp_cost=std::numeric_limits<float>::max();
         int c_id=std::numeric_limits<int>::max();
-
+        bool has_node=false;
         for(auto it=O_set.begin();it!=O_set.end();it++)
         {
             if(it->second->cost<temp_cost)
@@ -42,20 +42,35 @@ void Dijkstra::planning(std::string PNGpath){
                 temp_cost=it->second->cost;
                 c_id=it->first;
             }
+            has_node=true;
         }
+        if(has_node==false)
+        {
+            std::cout<<"Dijkstra获得全图栅格节点最短路径！"<<std::endl;
+            break;
+        }       
+        
         current=O_set[c_id];
-
+        
+        if(current==nullptr)        
+        {
+            std::cout<<"遍历全图未找到到达终点的路径！"<<std::endl;
+            break;
+        }
         auto iter = O_set.find(c_id);
         O_set.erase(iter);
         C_set[c_id]=current;
-        
+
+
+
         if(err>std::abs(current->x-goal_node->x)&&err>std::abs(current->y-goal_node->y))
         {
             goal_node->parent_index=current->parent_index;
             goal_node->cost=current->cost;
             break;
         }
-        std::cout<<"当前节点最小代价："<<current->cost<<std::endl;
+
+        //std::cout<<"当前节点最小代价："<<current->cost<<std::endl;
         if(plotpoint)
         {
             this->grid_map_->plotpoint(current->x,current->y,"+b"); 
@@ -79,17 +94,21 @@ void Dijkstra::planning(std::string PNGpath){
             else{O_set[n_id]=node;}
         }       
     }
-    cal_fina_path(goal_node,C_set);
-    std::cout<<"最短距离"<<this->Best_grid_length<<std::endl;
-    if(this->plotfinalpath)
+
+    if(goal_node->parent_index!=-1)
     {
-        if(PNGpath==" ")
-        {   
-        this->grid_map_->plotpath(this->GetGridPath()); 
+        cal_fina_path(goal_node,C_set);
+        std::cout<<"最短距离"<<this->Best_grid_length<<std::endl;
+        if(this->plotfinalpath)
+        {
+            if(PNGpath==" ")
+            {   
+            this->grid_map_->plotpath(this->GetGridPath()); 
+            }
+            else{
+                this->grid_map_->plotpath(this->GetGridPath(),PNGpath);
+            }           
         }
-        else{
-            this->grid_map_->plotpath(this->GetGridPath(),PNGpath);
-        }           
     }
 
 }
@@ -126,4 +145,17 @@ std::pair<std::vector<int>,std::vector<int>> Dijkstra::GetGridPath()
         world_path.second.push_back(wy);
     }
     return world_path;
+}
+
+
+/// @brief 获得任意点到起点的最小代价(实际距离)
+/// @param x 
+/// @param y 
+/// @return 
+double Dijkstra::cost_to_point(double x,double y)
+{
+    std::pair<int, int> grid_coord;
+    this->grid_map_->worldToGrid(x, y, grid_coord.first, grid_coord.second); 
+    Node* node=C_set[this->grid_map_->coordToIndex(grid_coord.first,grid_coord.second)];
+    return node->cost*this->grid_map_->getResolution();
 }

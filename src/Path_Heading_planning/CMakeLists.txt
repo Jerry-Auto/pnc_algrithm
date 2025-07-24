@@ -88,22 +88,26 @@ set(ReedsShepp_DEMO_NAME ReedsShepp_demo)
 add_executable(${ReedsShepp_DEMO_NAME} example/ReedsShepp_demo.cpp)  
 target_link_libraries(${ReedsShepp_DEMO_NAME} ${ReedsShepp_LIB_NAME} Python3::Python Python3::NumPy)  
 
-# #混合A*类的编译
-# set(HY_A_S_LIB_NAME HY_A_S)
-# add_library(${HY_A_S_LIB_NAME} SHARED)  
-# target_sources(${HY_A_S_LIB_NAME}  
-#     PRIVATE 
-#     src/Hybird_A_Star.cpp 
-# )
-# target_include_directories(${HY_A_S_LIB_NAME}  
-#     PUBLIC include 
-#     PRIVATE 
-#     auto_driving_algorithm 
-# )
-# target_link_libraries(${HY_A_S_LIB_NAME} World_map Python3::Python Python3::NumPy) 
-# set(HY_A_S_DEMO_NAME HY_A_S_demo)
-# add_executable(${HY_A_S_DEMO_NAME} example/Hybird_A_Star_demo.cpp)  
-# target_link_libraries(${HY_A_S_DEMO_NAME} ${HY_A_S_LIB_NAME} Python3::Python Python3::NumPy)  
+#混合A*类的编译
+# 使用 link_directories() 指定库搜索路径
+link_directories(${CMAKE_SOURCE_DIR}/src/libs/Global_Path_planning)
+
+set(HY_A_S_LIB_NAME HY_A_S)
+add_library(${HY_A_S_LIB_NAME} SHARED)  
+target_sources(${HY_A_S_LIB_NAME}  
+    PRIVATE 
+    src/H_A_S.cpp 
+)
+target_include_directories(${HY_A_S_LIB_NAME}  
+    PUBLIC include 
+    ${CMAKE_SOURCE_DIR}/src/Global_Path_planning/include
+    PRIVATE 
+    auto_driving_algorithm 
+)
+target_link_libraries(${HY_A_S_LIB_NAME} ObstacleGridMap ReedsShepp Dijkstra node3d Python3::Python Python3::NumPy) 
+set(HY_A_S_DEMO_NAME HY_A_S_demo)
+add_executable(${HY_A_S_DEMO_NAME} example/H_A_Star_demo.cpp)  
+target_link_libraries(${HY_A_S_DEMO_NAME} ${HY_A_S_LIB_NAME} Python3::Python Python3::NumPy)  
 
 add_executable(test_map example/test.cpp)
 target_link_libraries(test_map ObstacleGridMap Python3::Python Python3::NumPy)

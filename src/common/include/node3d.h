@@ -5,8 +5,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-#include "basic_type.h"
+#include "vehicle_model.h"
 #include "math_utils.h"
 class Node3d {
  public:
@@ -18,7 +17,7 @@ class Node3d {
          const std::vector<double> &traversed_phi,
          const std::vector<double> &XYbounds, const double xy_grid_resolution);
   virtual ~Node3d() = default;
-  static Box2d GetBoundingBox(const VehicleParam &vehicle_param_,
+  static math::Box2d GetBoundingBox(const ElectricVehicleDynamicsModel::VehicleParams &vehicle_param_,
                               const double x, const double y, const double phi);
   double GetCost() const { return traj_cost_ + heuristic_cost_; }
   double GetTrajCost() const { return traj_cost_; }
@@ -26,7 +25,7 @@ class Node3d {
   int GetGridX() const { return x_grid_; }
   int GetGridY() const { return y_grid_; }
   int GetGridPhi() const { return phi_grid_; }
-  Pos3d GetPose() const { return Pos3d{x_, y_, phi_}; }
+  math::Pos3d GetPose() const { return math::Pos3d{x_, y_, phi_}; }
   double GetX() const { return x_; }
   double GetY() const { return y_; }
   double GetPhi() const { return phi_; }

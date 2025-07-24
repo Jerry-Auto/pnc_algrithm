@@ -1,7 +1,7 @@
 #include <cmath>
 
 #include "node3d.h"
-
+using namespace math;
 Node3d::Node3d(double x, double y, double phi) {
   x_ = x;
   y_ = y;
@@ -47,15 +47,20 @@ Node3d::Node3d(const std::vector<double> &traversed_x,
   index_ = ComputeStringIndex(x_grid_, y_grid_, phi_grid_);
   step_size_ = traversed_x.size();
 }
-
-Box2d Node3d::GetBoundingBox(const VehicleParam &vehicle_param_, const double x,
+/// @brief 计算车辆的外包围矩形
+/// @param vehicle_param_ 
+/// @param x 
+/// @param y 
+/// @param phi 
+/// @return 
+math::Box2d Node3d::GetBoundingBox(const ElectricVehicleDynamicsModel::VehicleParams &vehicle_param_, const double x,
                              const double y, const double phi) {
-  double ego_length = vehicle_param_.length;
+  double ego_length = vehicle_param_.lf+vehicle_param_.lr;
   double ego_width = vehicle_param_.width;
-  double shift_distance = ego_length / 2.0 - vehicle_param_.back_edge_to_center;
+  double shift_distance = ego_length / 2.0 - vehicle_param_.lr;
   double cos_heading = std::cos(phi);
   double sin_heading = std::sin(phi);
-  Box2d ego_box{
+  math::Box2d ego_box{
       Vec2d{x + shift_distance * cos_heading, y + shift_distance * sin_heading},
       ego_length,
       ego_width,

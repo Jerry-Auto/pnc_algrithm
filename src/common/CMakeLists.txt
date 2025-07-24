@@ -168,3 +168,17 @@ target_link_libraries(${MATPLOT_DEMO_NAME}
 # set_target_properties(${MATPLOT_DEMO_NAME} PROPERTIES
 #     RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT_DIR}  
 # )
+
+# node3d类的编译
+set(NODE3D_LIB_NAME node3d)
+add_library(${NODE3D_LIB_NAME} SHARED)  
+target_sources(${NODE3D_LIB_NAME}  
+    PRIVATE 
+    src/node3d.cpp 
+)
+target_include_directories(${NODE3D_LIB_NAME}  
+    PUBLIC include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+target_link_libraries(${NODE3D_LIB_NAME} vehicle_model math_utils)
