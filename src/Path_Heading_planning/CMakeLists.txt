@@ -49,9 +49,7 @@ include_directories(
 )
 
 # 使用 link_directories() 指定库搜索路径
-link_directories(${CMAKE_SOURCE_DIR}/src/libs/Local_Path_Planning)
-link_directories(${CMAKE_SOURCE_DIR}/src/libs/Global_Path_planning)
-
+link_directories(${CMAKE_SOURCE_DIR}/src/libs/common)
 
 #set(CMAKE_AUTOMOC ON)
 

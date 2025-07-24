@@ -40,7 +40,7 @@ install(
 #包含公共头文件目录
 include_directories(/usr/include/python3.10)
 include_directories(/usr/local/lib/python3.10/dist-packages/numpy/core/include)
-include_directories(${CMAKE_SOURCE_DIR}/src/libs/common/include)
+include_directories(${CMAKE_SOURCE_DIR}/src/common/include)
 
 find_package(OsqpEigen REQUIRED)
 include_directories(${OSQPEIGEN_INCLUDE_DIR})
@@ -61,3 +61,5 @@ add_subdirectory(src/Local_Path_Planning)
 add_subdirectory(src/Randomize_Samples_planning)
 
 add_subdirectory(src/Path_Heading_planning)
+
+add_subdirectory(src/common)

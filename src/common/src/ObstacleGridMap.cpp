@@ -12,7 +12,10 @@ ObstacleGridMap::ObstacleGridMap(double world_width, double world_height, double
     this->world_height_=this->grid_height_*resolution;
     initializeGrid();
 }
-
+/// @brief 
+/// @param map 
+/// @param resolution 
+/// @param robot_radius 
 ObstacleGridMap::ObstacleGridMap(WorldMap & map, double resolution,double robot_radius)
 :resolution_(resolution),strpoint(-1, -1), goalpoint(-1, -1)
 {

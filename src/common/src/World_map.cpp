@@ -32,19 +32,41 @@ void WorldMap::set_goal(std::pair<double, double> goal)
 {
     this->goal_point=goal;
 }
+
+void WorldMap::set_goal_pos(math::Pos3d goal)
+{
+    this->goal_pos_=goal;
+    set_goal({goal.x,goal.y});
+}
+
 std::pair<double, double> WorldMap::get_goal()
 {
     return this->goal_point;
 }
+math::Pos3d WorldMap::get_goal_pos()
+{
+    return this->goal_pos_;
+}
+
 void WorldMap::set_start(std::pair<double, double> start)
 {
     this->start_point=start;
 }
+
+void WorldMap::set_start_pos(math::Pos3d start)
+{
+    this->start_pos_=start;
+    set_start({start.x,start.y});
+}
+
 std::pair<double, double> WorldMap::get_start()
 {
     return this->start_point;
 }
-
+math::Pos3d WorldMap::get_start_pos()
+{
+    return this->start_pos_;
+}
 void WorldMap::visualize(bool show_grid, bool equal_aspect, bool blocking) {
     
     if (!is_interactive_) {

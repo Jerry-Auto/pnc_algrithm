@@ -13,6 +13,7 @@ int main()
     world_map.addObstacle({25, 35, 3, 3, 0, "purple"});
     world_map.addObstacle({25, 25, 5, 5, 0, "purple"});
     //设置目标点
+    //math::
     world_map.set_goal({88, 76});
     world_map.set_start({12,8});
     world_map.visualize();

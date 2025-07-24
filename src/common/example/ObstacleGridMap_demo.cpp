@@ -1,6 +1,5 @@
 #include <iostream>
-#include "ObstacleGridMap.h"  // 假设 ObstacleGridMap 类的头文件是 ObstacleGridMap.h
-
+#include "ObstacleGridMap.h"  
 int main() {
     // 使用正确的构造函数初始化 ObstacleGridMap 对象
     double world_width = 135.78;

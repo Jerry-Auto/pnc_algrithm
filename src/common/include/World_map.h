@@ -12,7 +12,7 @@
 #include <optional>
 #include "vehicle_model.h"
 #include "common_plotting.h"
-
+#include "math_utils.h"
 
 class WorldMap {
 public:
@@ -67,9 +67,17 @@ public:
 
     void set_start(std::pair<double, double> start);
 
+    void set_goal_pos(math::Pos3d goal);
+
+    void set_start_pos(math::Pos3d start);
+
     std::pair<double, double> get_goal();
 
+    math::Pos3d get_goal_pos();
+
     std::pair<double, double> get_start();
+
+    math::Pos3d get_start_pos();
 
     void plot_Sampling_path(std::pair<std::vector<double>, std::vector<double>> planning_data,std::string filename="out.png");
 
@@ -84,6 +92,9 @@ private:
     double y_min_, y_max_;
     std::pair<double, double> goal_point={NAN, NAN};
     std::pair<double, double> start_point={NAN, NAN};
+    math::Pos3d goal_pos_;
+    math::Pos3d start_pos_;
+
     std::vector<Obstacle> obstacles_;
     std::vector<std::pair<ElectricVehicleDynamicsModel*, std::string>> vehicles_;
     std::vector<std::pair<std::vector<double>,std::vector<double>>> control_point_;

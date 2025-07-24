@@ -4,17 +4,28 @@
 #include "math_utils.h"
 
 namespace math {
-
+/// @brief 返回一个数的正负符号
+/// @param x 
+/// @return +1，-1
 double sign(double x) { return x >= 0 ? 1 : -1; }
 
-double PtSegDistance(double query_x, double query_y, double start_x,
-                     double start_y, double end_x, double end_y,
-                     double length) {
+/// @brief 计算点query到以start为起点，end为终点的向量的最短距离
+/// @param query_x 
+/// @param query_y 
+/// @param start_x 
+/// @param start_y 
+/// @param end_x 
+/// @param end_y 
+/// @return 
+double P_t_l_Distance(double query_x, double query_y, double start_x,
+                     double start_y, double end_x, double end_y) {
   const double x0 = query_x - start_x;
   const double y0 = query_y - start_y;
   const double dx = end_x - start_x;
   const double dy = end_y - start_y;
+  const double length=hypot(dx,dy);
   const double proj = x0 * dx + y0 * dy;
+
   if (proj <= 0.0) {
     return hypot(x0, y0);
   }
@@ -23,27 +34,43 @@ double PtSegDistance(double query_x, double query_y, double start_x,
   }
   return std::abs(x0 * dy - y0 * dx) / length;
 }
-
+/// @brief 以pos的点为向量起点，计算终点在point的向量在pos射线上的投影长度，有正负
+/// @param pos pos表示一个有起点的射线
+/// @param point 
+/// @return 
 double CalProjectInX(const Pos3d &pos, const Vec2d &point) {
   return (point.x - pos.x) * std::cos(pos.phi) +
          (point.y - pos.y) * std::sin(pos.phi);
 }
-
+/// @brief 以pos1的点为向量起点，计算终点在pos2的点的向量在pos1射线上的投影长度，有正负
+/// @param pos1 
+/// @param pos2 
+/// @return 
 double CalProjectInX(const Pos3d &pos1, const Pos3d &pos2) {
   return (pos2.x - pos1.x) * std::cos(pos1.phi) +
          (pos2.y - pos1.y) * std::sin(pos1.phi);
 }
-
+/// @brief 以pos的点为向量起点，计算终点在point的向量到pos射线的最短距离（垂直距离），有正负，pos-pot向量到pos射线，逆时针角度为正
+/// @param pos 
+/// @param point 
+/// @return 
 double CalProjectInY(const Pos3d &pos, const Vec2d &point) {
   return (point.y - pos.y) * std::cos(pos.phi) -
          (point.x - pos.x) * std::sin(pos.phi);
 }
-
+/// @brief 以pos1的点为向量起点，计算终点在pos2的向量到pos1射线的最短距离（垂直距离），有正负，pos1-pos2向量到pos1射线，逆时针角度为正
+/// @param pos1 
+/// @param pos2 
+/// @return 
 double CalProjectInY(const Pos3d &pos1, const Pos3d &pos2) {
   return (pos2.y - pos1.y) * std::cos(pos1.phi) -
          (pos2.x - pos1.x) * std::sin(pos1.phi);
 }
-
+/// @brief 计算两个有共同起点的向量之间的叉积，v1叉乘v2
+/// @param start_point 两向量的共同起点
+/// @param end_point_1 终点1，角度计算的起点
+/// @param end_point_2 终点2
+/// @return 
 double CrossProd(const Vec2d &start_point, const Vec2d &end_point_1,
                  const Vec2d &end_point_2) {
   Vec2d v1{end_point_1.x - start_point.x, end_point_1.y - start_point.y};
@@ -51,7 +78,9 @@ double CrossProd(const Vec2d &start_point, const Vec2d &end_point_1,
 
   return v1.x * v2.y - v1.y * v2.x;
 }
-
+/// @brief 把角度规范到-pi,+pi
+/// @param angle 
+/// @return 
 double NormalizeAngle(const double angle) {
   double a = std::fmod(angle + M_PI, 2.0 * M_PI);
   if (a < 0.0) {
@@ -59,13 +88,19 @@ double NormalizeAngle(const double angle) {
   }
   return a - M_PI;
 }
-
+/// @brief 笛卡尔坐标转换为极坐标
+/// @param x 
+/// @param y 
+/// @return （r,theta）
 std::pair<double, double> Cartesian2Polar(double x, double y) {
   double r = std::sqrt(x * x + y * y);
   double theta = std::atan2(y, x);
   return std::make_pair(r, theta);
 }
-
+/// @brief 计算点到线段之间的距离
+/// @param line_segment2d 
+/// @param point 
+/// @return 
 double DistanceTo(const LineSegment2d &line_segment2d, const Vec2d &point) {
   if (line_segment2d.length <= 1e-10) {
     return std::hypot(
@@ -86,9 +121,15 @@ double DistanceTo(const LineSegment2d &line_segment2d, const Vec2d &point) {
   return std::abs(x0 * line_segment2d.unit_direction.y -
                   y0 * line_segment2d.unit_direction.x);
 }
-
+/// @brief 计算向量的角度
+/// @param v 
+/// @return 
 double GetVecAngle(Vec2d v) { return std::atan2(v.y, v.x); }
 
+/// @brief 计算点到一个有任意朝向的矩形盒子之间的最短距离，返回0，说明在盒子内部或边界上
+/// @param bounding_box 
+/// @param point 
+/// @return 
 double DistanceTo(const Box2d &bounding_box, const Vec2d &point) {
   const double x0 = point.x - bounding_box.center.x;
   const double y0 = point.y - bounding_box.center.y;
@@ -107,6 +148,10 @@ double DistanceTo(const Box2d &bounding_box, const Vec2d &point) {
   return hypot(dx, dy);
 }
 
+/// @brief 计算线段到矩形盒子之间的最短距离
+/// @param bounding_box 
+/// @param line_segment 
+/// @return 
 double DistanceTo(const Box2d &bounding_box,
                   const LineSegment2d &line_segment) {
   if (line_segment.length <= kMathEpsilon) {
@@ -158,44 +203,36 @@ double DistanceTo(const Box2d &bounding_box,
   if (gx1 == 1 && gy1 == 1) {
     switch (gx2 * 3 + gy2) {
       case 4:
-        return PtSegDistance(box_x, box_y, x1, y1, x2, y2, line_segment.length);
+        return P_t_l_Distance(box_x, box_y, x1, y1, x2, y2);
       case 3:
         return (x1 > x2) ? (x2 - box_x)
-                         : PtSegDistance(box_x, box_y, x1, y1, x2, y2,
-                                         line_segment.length);
+                         : P_t_l_Distance(box_x, box_y, x1, y1, x2, y2);
       case 2:
-        return (x1 > x2) ? PtSegDistance(box_x, -box_y, x1, y1, x2, y2,
-                                         line_segment.length)
-                         : PtSegDistance(box_x, box_y, x1, y1, x2, y2,
-                                         line_segment.length);
+        return (x1 > x2) ? P_t_l_Distance(box_x, -box_y, x1, y1, x2, y2)
+                         : P_t_l_Distance(box_x, box_y, x1, y1, x2, y2);
       case -1:
         return CrossProd({x1, y1}, {x2, y2}, {box_x, -box_y}) >= 0.0
                    ? 0.0
-                   : PtSegDistance(box_x, -box_y, x1, y1, x2, y2,
-                                   line_segment.length);
+                   : P_t_l_Distance(box_x, -box_y, x1, y1, x2, y2);
       case -4:
         return CrossProd({x1, y1}, {x2, y2}, {box_x, -box_y}) <= 0.0
-                   ? PtSegDistance(box_x, -box_y, x1, y1, x2, y2,
-                                   line_segment.length)
+                   ? P_t_l_Distance(box_x, -box_y, x1, y1, x2, y2)
                    : (CrossProd({x1, y1}, {x2, y2}, {-box_x, box_y}) <= 0.0
                           ? 0.0
-                          : PtSegDistance(-box_x, box_y, x1, y1, x2, y2,
-                                          line_segment.length));
+                          : P_t_l_Distance(-box_x, box_y, x1, y1, x2, y2));
     }
   } else {
     switch (gx2 * 3 + gy2) {
       case 4:
         return (x1 < x2) ? (x1 - box_x)
-                         : PtSegDistance(box_x, box_y, x1, y1, x2, y2,
-                                         line_segment.length);
+                         : P_t_l_Distance(box_x, box_y, x1, y1, x2, y2);
       case 3:
         return std::min(x1, x2) - box_x;
       case 1:
       case -2:
         return CrossProd({x1, y1}, {x2, y2}, {box_x, box_y}) <= 0.0
                    ? 0.0
-                   : PtSegDistance(box_x, box_y, x1, y1, x2, y2,
-                                   line_segment.length);
+                   : P_t_l_Distance(box_x, box_y, x1, y1, x2, y2);
       case -3:
         return 0.0;
     }
@@ -203,6 +240,11 @@ double DistanceTo(const Box2d &bounding_box,
   return 0.0;
 }
 
+
+/// @brief 判断一个点是否在一个矩形盒子里
+/// @param bounding_box 
+/// @param point 
+/// @return 
 bool IsPointIn(const Box2d &bounding_box, const Vec2d &point) {
   const double x0 = point.x - bounding_box.center.x;
   const double y0 = point.y - bounding_box.center.y;
@@ -214,6 +256,11 @@ bool IsPointIn(const Box2d &bounding_box, const Vec2d &point) {
          dy <= bounding_box.half_width + 1e-10;
 }
 
+
+/// @brief 判断一条线段与矩形盒子是否有重叠
+/// @param bounding_box 
+/// @param line_segment 
+/// @return 
 bool HasOverlap(const Box2d &bounding_box, const LineSegment2d &line_segment) {
   if (line_segment.length <= 1e-10) {
     return IsPointIn(bounding_box, line_segment.start);
@@ -254,6 +301,11 @@ bool HasOverlap(const Box2d &bounding_box, const LineSegment2d &line_segment) {
   return DistanceTo(bounding_box, line_segment) <= 1e-10;
 }
 
+/// @brief 给定起点位置航向，移动的弧长，曲率半径，计算终点的位姿
+/// @param start_pos 移动起点位姿
+/// @param dist 移动距离，弧长
+/// @param radius 曲率半径，右转<0,左转>0
+/// @return 
 Pos3d CalEndPosWithACurvePath(const Pos3d &start_pos, double dist,
                               double radius) {
   Pos3d end_pos;
@@ -263,42 +315,50 @@ Pos3d CalEndPosWithACurvePath(const Pos3d &start_pos, double dist,
     end_pos.y = start_pos.y + std::sin(start_pos.phi) * dist;
     end_pos.phi = start_pos.phi;
   } else {
-    double theta = start_pos.phi - sign(radius) * M_PI / 2.0;
-    end_pos.x = start_pos.x +
-                std::cos(dist / radius + theta) * std::abs(radius) -
-                std::cos(theta) * std::abs(radius);
-    end_pos.y = start_pos.y +
-                std::sin(dist / radius + theta) * std::abs(radius) -
-                std::sin(theta) * std::abs(radius);
-    end_pos.phi = start_pos.phi + dist / radius;
+    double theta = dist/radius;
+    double beta=start_pos.phi - sign(radius) * M_PI / 2.0;
+    end_pos.x = start_pos.x +(std::cos(beta + theta)-std::cos(beta)) * std::abs(radius);
+    end_pos.y = start_pos.y +(std::sin(beta + theta)-std::sin(beta)) * std::abs(radius);
+    end_pos.phi = start_pos.phi + theta;
   }
 
   return end_pos;
+
 }
 
+/// @brief 通过一条弧线计算终点位姿
+/// @param curve_path 定义的一条弧线
+/// @return 
 Pos3d CalEndPosWithACurvePath(CurvePath curve_path) {
   return CalEndPosWithACurvePath(
       Pos3d{curve_path.x, curve_path.y, curve_path.phi}, curve_path.dist,
       curve_path.radius);
 }
 
+/// @brief 计算连接两个位姿的中间曲线
+/// @param start_pos 
+/// @param end_pos 
+/// @param r_min 允许的最小转弯半径
+/// @return 
 std::vector<CurvePath> CalCurvePathConnectTwoPose(const Pos3d &start_pos,
                                                   const Pos3d &end_pos,
                                                   double r_min) {
   const double k_min_value = 1e-4;
-  double rx_start_pos_end_pos = CalProjectInX(start_pos, end_pos);
-  double ry_start_pos_end_pos = CalProjectInY(start_pos, end_pos);
-  double ry_end_pos_start_pos = CalProjectInY(end_pos, start_pos);
+  double rx_start_pos_end_pos = CalProjectInX(start_pos, end_pos);//prjs
+  double ry_start_pos_end_pos = CalProjectInY(start_pos, end_pos);//ds
+  double ry_end_pos_start_pos = CalProjectInY(end_pos, start_pos);//de
   double theta = NormalizeAngle(end_pos.phi - start_pos.phi);
 
   std::vector<CurvePath> curve_paths;
+  //prjs=0,无法规划
   if (std::abs(rx_start_pos_end_pos) < k_min_value) {
     return curve_paths;
   }
 
-  // a line path
+  // a line path，起点终点位姿共线
   if (std::abs(ry_start_pos_end_pos) < k_min_value &&
       std::abs(theta) < k_min_value) {
+        
     CurvePath line_path{start_pos.x, start_pos.y, start_pos.phi,
                         rx_start_pos_end_pos, 0};
     curve_paths.push_back(line_path);
@@ -358,6 +418,12 @@ std::vector<CurvePath> CalCurvePathConnectTwoPose(const Pos3d &start_pos,
   return curve_paths;
 }
 
+/// @brief 计算连接两个位姿的中间轨迹
+/// @param start_pos 
+/// @param end_pos 
+/// @param r_min 
+/// @param resolution 
+/// @return 位姿序列
 std::vector<Pos3d> GetTrajFromCurvePathsConnect(const Pos3d &start_pos,
                                                 const Pos3d &end_pos,
                                                 double r_min,

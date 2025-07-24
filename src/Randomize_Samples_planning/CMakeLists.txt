@@ -33,7 +33,6 @@ message(STATUS "Python3 libraries: ${Python3_LIBRARIES}")
 # 包含目录
 include_directories(
     ${CMAKE_SOURCE_DIR}/src/libs/common/include
-    ${CMAKE_SOURCE_DIR}/src/Local_Path_Planning/include
     ${Python3_INCLUDE_DIRS}
     /usr/include/python3.10
     /usr/local/lib/python3.10/dist-packages/numpy/core/include
@@ -48,8 +47,7 @@ include_directories(
 )
 
 # 使用 link_directories() 指定库搜索路径
-link_directories(${CMAKE_SOURCE_DIR}/src/libs/Local_Path_Planning)
-
+link_directories(${CMAKE_SOURCE_DIR}/src/libs/common)
 
 #set(CMAKE_AUTOMOC ON)
 

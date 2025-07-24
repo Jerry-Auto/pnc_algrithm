@@ -48,11 +48,11 @@ void AStar::planning(std::string PNGpath){
             }
         }
         current=O_set[c_id];
-
+        //把当前节点从开集移动到闭集
         auto iter = O_set.find(c_id);
         O_set.erase(iter);
         C_set[c_id]=current;
-        
+        //如果到达终点
         if(err>std::abs(current->x-goal_node->x)&&err>std::abs(current->y-goal_node->y))
         {
             goal_node->parent_index=current->parent_index;
@@ -60,21 +60,24 @@ void AStar::planning(std::string PNGpath){
             break;
         }
         std::cout<<"当前节点最小代价："<<current->cost+cal_h_x(current)<<std::endl;
+        //可视化
         if(plotpoint)
         {
             this->grid_map_->plotpoint(current->x,current->y,"+b"); 
         }
+        //开辟八个移动方向作为新的节点加入开集
         for(std::vector<double>move:this->motion)
         {
             //cost即f(x),现在要加上h(x)，注意node里面的cost仍然是从起点到node的最短距离，h(x)不做累加
             Node*node=new Node(current->x+move[0],current->y+move[1],current->cost+move[2],c_id);
 
+
             int n_id=this->grid_map_->coordToIndex(node->x,node->y);
-
+            //如果在闭集里找到了该节点，不保存，跳过，闭集里的代价都是最小的
             if(C_set.find(n_id)!=C_set.end()){continue;}
-
+            //超出地图或者碰到障碍物，跳过
             if(Is_quit_map(node)){continue;}
-
+            //如果在开集里找到了该节点，比较代价大小，留下小的
             if(O_set.find(n_id)!=O_set.end())
             {
                 //比较f(x)的大小，更新开集重复节点，取代价最小的
@@ -83,11 +86,12 @@ void AStar::planning(std::string PNGpath){
                     O_set[n_id]=node;
                 }
             }
+            //完全新的可行点直接放到开集
             else{O_set[n_id]=node;}
         }       
     }
 
-
+    //通过闭集和终点反推路径
     cal_fina_path(goal_node,C_set);
     std::cout<<"最短距离"<<this->Best_grid_length<<std::endl;
     if(this->plotfinalpath)
