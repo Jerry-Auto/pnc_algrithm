@@ -305,9 +305,9 @@ vector<Path> ReedsShepp::generatePath(vector<double> q0, vector<double> q1, doub
     double y = (-s*dx+c*dy)*max_curvature;
 
     vector<Path>paths;
-    paths= straightCurveStraight(x,y,dth,paths,step_size);
-    paths= curveStraightCurve(x,y,dth,paths,step_size);
-    paths= curveCurveCurve(x,y,dth,paths,step_size);
+    paths= straightCurveStraight(x,y,dth,paths,step_size);//SCS
+    paths= curveStraightCurve(x,y,dth,paths,step_size);//CSC
+    paths= curveCurveCurve(x,y,dth,paths,step_size);//CCC
     return paths;
 }
 
@@ -420,6 +420,12 @@ vector<Path> ReedsShepp::calPath(vector<double> start, vector<double> goal, doub
     return ps;
 }
 
+/// @brief RS曲线规划
+/// @param start 
+/// @param goal 
+/// @param maxc 允许的最大曲率1/R
+/// @param step_size 
+/// @return 
 Path ReedsShepp::reedsSheppPathPlanning(vector<double> start, vector<double> goal, double maxc, double step_size=0.2) {
     vector<Path>paths = calPath(start,goal,maxc,step_size);
     if(paths.empty()){

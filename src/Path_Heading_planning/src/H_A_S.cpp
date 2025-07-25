@@ -13,8 +13,24 @@
 
   }
 
-  void H_A_Star::init_plan(WorldMap& map)
+  bool H_A_Star::init_plan(WorldMap& map)
   {
+    open_set_.clear();
+    close_set_.clear();
+    open_pq_ = decltype(open_pq_)();
+    final_node_ = nullptr;
+
+    //对起点与终点进行碰撞检测
+    if (!ValidityCheck(start_node_)) {
+      std::cout << "start_node in collision with obstacles";
+      return false;
+    }
+    if (!ValidityCheck(end_node_)) {
+      std::cout << "end_node in collision with obstacles";
+      return false;
+    }
+    
+
     //RS曲线生成器
     reedsShepp_=std::shared_ptr<ReedsShepp>(new ReedsShepp());
     //dijkstra求解器
@@ -22,8 +38,7 @@
     //初始化搜索位姿
     Pos3d start_pose=map.get_start_pos(),end_pose=map.get_goal_pos();
     //初始化栅格地图
-    double robot_radius=vehicle_params_->width/2;
-    ObstacleGridMap* grid_map=new ObstacleGridMap(map,params_->dijkstra_grid_resolution,robot_radius);
+    ObstacleGridMap* grid_map=new ObstacleGridMap(map,params_->dijkstra_grid_resolution,params_->robot_radius);
     //设置混合A*的终点当dijkstra的搜索起点，dijkstra的终点设置在地图外（保证得到终点到任意点的最短距离）
     grid_map->setstr(end_pose.x,end_pose.y);
     grid_map->setgoal(-1,-1);
@@ -44,6 +59,8 @@
                               XYbounds_,
                               params_->dijkstra_grid_resolution));
 
+    init_check_=false;
+    return true;
   }
 
   void H_A_Star::obstacle_import(WorldMap& map)
@@ -63,18 +80,13 @@
   {
     //初始化搜索位姿
     Pos3d start_pose_=map.get_start_pos(),end_pose_=map.get_goal_pos();
-        //对起点与终点进行碰撞检测
-    if (!ValidityCheck(start_node_)) {
-      std::cout << "start_node in collision with obstacles";
-      return {};
-    }
-    if (!ValidityCheck(end_node_)) {
-      std::cout << "end_node in collision with obstacles";
-      return {};
-    }
+
 
     //初始化规划器
-    init_plan(map);
+    if(!init_plan(map))
+    {
+      return {};
+    }
     //std::cout<<"初始化完成"<<std::endl;
 
     //一个放节点，一个放代价，节点索引一致
@@ -89,7 +101,7 @@
       open_pq_.pop();
       //取出节点
       std::shared_ptr<Node3d> current_node = open_set_[current_id];
-      ++num_;
+      num_++;
       //检查是否可以用RS曲线直接从当前点到终点，如果可以，则无需探索，一次性完成
       if (AnalyticExpansion(current_node)) {
         break;
@@ -118,11 +130,56 @@
         }
 
       }
-      std::cout<<num_;
+    }
+    std::cout<<"共搜索了"<<num_<<"个节点"<<std::endl;
+    return Path_Backtracking();
   }
 
+  std::vector<std::vector<double>> H_A_Star::Path_Backtracking()
+  {
+    std::shared_ptr<Node3d> current_node = final_node_;
+    std::vector<double> hybrid_a_x;
+    std::vector<double> hybrid_a_y;
+    std::vector<double> hybrid_a_phi;
+    while (current_node->GetPreNode() != nullptr) {
+      std::vector<double> x = current_node->GetXs();
+      std::vector<double> y = current_node->GetYs();
+      std::vector<double> phi = current_node->GetPhis();
+      if (x.empty() || y.empty() || phi.empty()) {
+        std::cout << "result size check failed";
+        return {};
+      }
+      if (x.size() != y.size() || x.size() != phi.size()) {
+        std::cout << "states sizes are not equal";
+        return {};
+      }
+      std::reverse(x.begin(), x.end());
+      std::reverse(y.begin(), y.end());
+      std::reverse(phi.begin(), phi.end());
+      x.pop_back();
+      y.pop_back();
+      phi.pop_back();
+      hybrid_a_x.insert(hybrid_a_x.end(), x.begin(), x.end());
+      hybrid_a_y.insert(hybrid_a_y.end(), y.begin(), y.end());
+      hybrid_a_phi.insert(hybrid_a_phi.end(), phi.begin(), phi.end());
+      current_node = current_node->GetPreNode();
+    }
+    hybrid_a_x.push_back(current_node->GetX());
+    hybrid_a_y.push_back(current_node->GetY());
+    hybrid_a_phi.push_back(current_node->GetPhi());
 
+    std::reverse(hybrid_a_x.begin(), hybrid_a_x.end());
+    std::reverse(hybrid_a_y.begin(), hybrid_a_y.end());
+    std::reverse(hybrid_a_phi.begin(), hybrid_a_phi.end());
+
+    std::vector<double> time;
+    for(size_t i=0;i<hybrid_a_x.size();++i)
+    {
+      time.emplace_back((double)i*params_->dt);
+    }
+    return {time,hybrid_a_x,hybrid_a_y,hybrid_a_phi};
   }
+
 
 
   bool H_A_Star::ValidityCheck(std::shared_ptr<Node3d> node) {
@@ -164,7 +221,7 @@
       for (const LineSegment2d& linesegment : obstacle_linesegments) {
         
         if (math::HasOverlap(bounding_box, linesegment)) {
-          plot_collision(bounding_box,linesegment);
+          if(init_check_){plot_collision(bounding_box,linesegment);}
           return false;
         }
       }
@@ -256,15 +313,31 @@ std::shared_ptr<Node3d> H_A_Star::Next_node_generator(
 
 bool H_A_Star::AnalyticExpansion(std::shared_ptr<Node3d> current_node) {
 
-  // std::vector<Pos3d> curve_path = math::GetTrajFromCurvePathsConnect(
-  //     current_node->GetPose(), end_node_->GetPose(), params_->min_radius,
-  //     xy_grid_resolution_);
-  // if (!IsPathVaild(curve_path)) {
-  //   return false;
-  // }
+  //std::vector<Pos3d> curve_path=RS_generate_path(current_node->GetPose());
 
-  //final_node_ = GenerateFinalNode(curve_path, current_node);
+  std::vector<Pos3d> curve_path = math::GetTrajFromCurvePathsConnect(
+    current_node->GetPose(), end_node_->GetPose(), params_->min_radius,params_->grid_resolution);
+
+
+  if (!IsPathVaild(curve_path)) {
+    return false;
+  }
+
+  final_node_ = GenerateFinalNode(curve_path, current_node);
   return true;
+}
+
+std::vector<Pos3d> H_A_Star::RS_generate_path(Pos3d current_pos)
+{
+  vector<Pos3d> pos3d_vector;
+  Pos3d end_pos=end_node_->GetPose();
+  vector<double>start{current_pos.x,current_pos.y,current_pos.phi};
+  vector<double>goal{end_pos.x,end_pos.y,end_pos.phi};
+  Path path =reedsShepp_->reedsSheppPathPlanning(start,goal,params_->max_kappa,params_->step_size);
+  for (size_t i = 0; i < path.x.size(); ++i) {
+     pos3d_vector.emplace_back(path.x[i], path.y[i], path.yaw[i]);
+  }
+  return pos3d_vector;
 }
 
 bool H_A_Star::IsPathVaild(const std::vector<Pos3d>& curve_path) {
@@ -331,6 +404,12 @@ double H_A_Star::Heuristic_cost(std::shared_ptr<Node3d> next_node) {
   double holo_heuristic=Dijk_solver_->cost_to_point(next_node->GetX(),next_node->GetY());
   //非完整性约束，RS曲线长度
   double non_holo_heuristic=0;
+  // Pos3d current_pos=next_node->GetPose();
+  // Pos3d end_pos=end_node_->GetPose();
+  // vector<double>start{current_pos.x,current_pos.y,current_pos.phi};
+  // vector<double>goal{end_pos.x,end_pos.y,end_pos.phi};
+  // Path path =reedsShepp_->reedsSheppPathPlanning(start,goal,params_->max_kappa,params_->step_size);
+  // non_holo_heuristic=path.L;
   double heuristic_cost=std::max(holo_heuristic,non_holo_heuristic);
   return heuristic_cost;
 }

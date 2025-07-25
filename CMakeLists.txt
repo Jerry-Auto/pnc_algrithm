@@ -58,7 +58,7 @@ add_subdirectory(src/Global_Path_planning)
 
 add_subdirectory(src/Local_Path_Planning)
 
-add_subdirectory(src/Randomize_Samples_planning)
+#add_subdirectory(src/Randomize_Samples_planning)
 
 add_subdirectory(src/Path_Heading_planning)
 

@@ -24,8 +24,14 @@ int main()
     // ObstacleGridMap grid_map(world_map,2,1.0);
     // grid_map.plotWorldMap();
     H_A_Star HAS_solver;
+    auto planning_data=HAS_solver.planning(world_map);
+    if(planning_data.size()!=0)
+    {
+        ElectricVehicleDynamicsModel vehicle;
+        world_map.addVehicle(&vehicle,"green");
+        world_map.plot_planning(&vehicle,planning_data,"hy_a_s.png");
+    }
 
-    HAS_solver.planning(world_map);
 
     return 0;
 }

@@ -33,15 +33,15 @@ struct Cost_weight {
 
     Cost_weight()
         : traj_forward_penalty(0.0),
-          traj_back_penalty(0.5),
+          traj_back_penalty(10),
           traj_gear_switch_penalty(10),
           traj_steer_penalty(100),
           traj_steer_change_penalty(10),
 
           heu_rs_forward_penalty(0.0),
-          heu_rs_back_penalty(0.0),
-          heu_rs_gear_switch_penalty(0.0),
-          heu_rs_steer_penalty(0.0),
+          heu_rs_back_penalty(0.5),
+          heu_rs_gear_switch_penalty(10.0),
+          heu_rs_steer_penalty(100.0),
           heu_rs_steer_change_penalty(0.0) {}
 };
 
@@ -54,15 +54,17 @@ struct Params {
     double min_radius;
     double robot_radius;
     double dijkstra_grid_resolution;
+    double dt;
 
     Params()
-        : step_size(0.5),
-          grid_resolution(0.5),
-          next_node_num(8),
+        : step_size(0.1),
+          grid_resolution(2),
+          next_node_num(10),
           max_kappa(0.2),
           min_radius(5),
-          robot_radius(1),
-          dijkstra_grid_resolution(1) {}
+          robot_radius(0),
+          dijkstra_grid_resolution(2),
+          dt(0.1){}
 };
 
     
@@ -100,8 +102,9 @@ private:
     std::shared_ptr<Node3d> final_node_;
       // 地图边界 xmin, xmax, ymin, ymax
     std::vector<double> XYbounds_;
+    //标志是否已进行初始化
+    bool init_check_=true;
     
-
 
 public:
     H_A_Star(std::shared_ptr<ElectricVehicleDynamicsModel::VehicleParams> vehicle_param = nullptr,
@@ -113,7 +116,7 @@ public:
 
 //私有函数
 private:
-    void init_plan(WorldMap& map);
+    bool init_plan(WorldMap& map);
 
     void obstacle_import(WorldMap& map);
 
@@ -134,6 +137,10 @@ private:
     std::shared_ptr<Node3d>  GenerateFinalNode( const std::vector<Pos3d>& curve_path,std::shared_ptr<Node3d> current_node);
 
     void plot_collision(Box2d bounding_box,LineSegment2d linesegment);
+
+    std::vector<Pos3d> RS_generate_path(Pos3d current_pos);
+
+    std::vector<std::vector<double>> Path_Backtracking();
 
 };
 

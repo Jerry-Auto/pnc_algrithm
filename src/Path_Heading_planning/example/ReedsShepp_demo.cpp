@@ -2,10 +2,10 @@
 
 
 int main(){
-    vector<double>start{1.0,-4.0,(double)20/180*PI};
-    vector<double>goal{5.0,5.0,(double)100/180*PI};
-    double curvature = 0.1;
-    double step_size = 0.05;
+    vector<double>start{33.829,23.6706,-1.8357};
+    vector<double>goal{53,95,-1.570796};
+    double curvature = 0.2;//1/R
+    double step_size = 0.5;
     ReedsShepp reedsShepp;
 
     Path path = reedsShepp.reedsSheppPathPlanning(start,goal,curvature,step_size);

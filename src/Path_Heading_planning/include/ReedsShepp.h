@@ -42,24 +42,26 @@ private:
     double PI2PI(double angle);
 
 public:
-
-    pair<bool,vector<double>>straightLeftStraight(double x, double y,double phi);
-
     vector<Path>setPath(vector<Path>paths,vector<double> lengths,string modes, double step_size);
 
-    vector<Path>straightCurveStraight(double x, double y,double phi,vector<Path>paths,double step_size);
+    //SLS
+    pair<bool,vector<double>>straightLeftStraight(double x, double y,double phi);
 
+    //SCS
+    vector<Path>straightCurveStraight(double x, double y,double phi,vector<Path>paths,double step_size);
+    //LSL
     pair<bool,vector<double>>leftStraightLeft(double x, double y,double phi);
 
-
+    //LRL
     pair<bool,vector<double>>leftRightLeft(double x, double y,double phi);
-
+    //CCC
     vector<Path>curveCurveCurve(double x, double y,double phi,vector<Path>paths,double step_size);
-
+    //CSC
     vector<Path>curveStraightCurve(double x, double y,double phi,vector<Path>paths,double step_size);
 
-
+    //LSR
     pair<bool,vector<double>>leftStraightRight(double x, double y,double phi);
+    
 
     vector<Path>generatePath(vector<double>q0,vector<double>q1,double max_curvature, double step_size);
 
