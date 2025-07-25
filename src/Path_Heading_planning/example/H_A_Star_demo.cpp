@@ -32,6 +32,6 @@ int main()
         world_map.plot_planning(&vehicle,planning_data,"hy_a_s.png");
     }
 
-
     return 0;
+    
 }

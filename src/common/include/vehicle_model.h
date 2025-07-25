@@ -86,7 +86,7 @@ public:
             max_decel(7.0),
             Cd(0.3),
             damping(0.95),
-            width(2.0) {}
+            width(2.2) {}
     };
 
     // 构造函数

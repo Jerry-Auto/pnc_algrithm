@@ -178,7 +178,7 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
     plt::plot(global_x, global_y, {{"color", color}, {"linewidth", "2"}});
     
     // 绘制车轮（前驱车强调前轮）
-    double half_track = params_.track_width / 2.0;
+    double half_track = params_.width / 2.0;
     double wheel_len = params_.wheel_radius*2;  // 前轮稍长表示驱动轮
     double wheel_width = params_.wheel_width;
 
@@ -214,10 +214,10 @@ void ElectricVehicleDynamicsModel::plot_vehicle(const std::string& color) {
     
 
     // 绘制四个车轮（前轮用红色强调）
-    draw_wheel(params_.lf, half_track, this->state_.steering_angle, true);   // 左前（驱动轮）
-    draw_wheel(params_.lf, -half_track, this->state_.steering_angle, true);  // 右前（驱动轮）
-    draw_wheel(-params_.lr, half_track, 0, false);           // 左后
-    draw_wheel(-params_.lr, -half_track, 0, false);          // 右后
+    draw_wheel(params_.lf*4/5, half_track, this->state_.steering_angle, true);   // 左前（驱动轮）
+    draw_wheel(params_.lf*4/5, -half_track, this->state_.steering_angle, true);  // 右前（驱动轮）
+    draw_wheel(-params_.lr/5, half_track, 0, false);           // 左后
+    draw_wheel(-params_.lr/5, -half_track, 0, false);          // 右后
 
     // 添加车辆方向指示箭头
     double arrow_length = 1.5 * std::max(params_.lf, params_.lr);  // 箭头长度

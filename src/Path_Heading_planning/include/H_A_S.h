@@ -57,7 +57,7 @@ struct Params {
     double dt;
 
     Params()
-        : step_size(0.1),
+        : step_size(0.3),
           grid_resolution(2),
           next_node_num(10),
           max_kappa(0.2),
