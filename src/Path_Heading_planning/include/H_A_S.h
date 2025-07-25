@@ -9,7 +9,7 @@
 #include <string>
 #include"ObstacleGridMap.h"
 #include"Dijkstra.h"
-#include "ReedsShepp.h"
+#include "rs_curve.h"
 #include "node3d.h"
 #include "math_utils.h"
 
@@ -24,6 +24,7 @@ struct Cost_weight {
     double traj_gear_switch_penalty;
     double traj_steer_penalty;
     double traj_steer_change_penalty;
+    double traj_obs_dist_penalty;
 
     double heu_rs_forward_penalty;
     double heu_rs_back_penalty;
@@ -37,6 +38,7 @@ struct Cost_weight {
           traj_gear_switch_penalty(10),
           traj_steer_penalty(100),
           traj_steer_change_penalty(10),
+          traj_obs_dist_penalty(10),
 
           heu_rs_forward_penalty(0.0),
           heu_rs_back_penalty(0.5),
@@ -47,22 +49,22 @@ struct Cost_weight {
 
 
 struct Params {
-    double step_size;
-    double grid_resolution;
-    int next_node_num;
+    double step_size;//轨迹点之间的距离间隔
+    double grid_resolution;//运动学模型向各个方向探索的距离
+    int next_node_num;//新节点的个数
     double max_kappa;
-    double min_radius;
-    double robot_radius;
-    double dijkstra_grid_resolution;
+    double min_radius;//最小转弯半径
+    double robot_radius;//机器人半径
+    double dijkstra_grid_resolution;//dijkstra的栅格大小
     double dt;
 
     Params()
-        : step_size(0.3),
-          grid_resolution(2),
+        : step_size(0.2),
+          grid_resolution(3),
           next_node_num(10),
           max_kappa(0.2),
           min_radius(5),
-          robot_radius(0),
+          robot_radius(0.0),
           dijkstra_grid_resolution(2),
           dt(0.1){}
 };
@@ -71,7 +73,7 @@ struct Params {
 //私有变量
 private:
     std::shared_ptr<Dijkstra> Dijk_solver_=nullptr;
-    std::shared_ptr<ReedsShepp> reedsShepp_=nullptr;
+    std::shared_ptr<RSCurve> reedsShepp_=nullptr;
     
     std::shared_ptr<ElectricVehicleDynamicsModel::VehicleParams> vehicle_params_=nullptr;
     std::shared_ptr<Cost_weight> cost_weights_=nullptr;
@@ -140,7 +142,13 @@ private:
 
     std::vector<Pos3d> RS_generate_path(Pos3d current_pos);
 
+    double Get_RS_Length(Pos3d current_pos);
+
     std::vector<std::vector<double>> Path_Backtracking();
+
+    double calcu_obstacle_cost(std::shared_ptr<Node3d> next_node);
+
+    double distance_to_obs(Pos3d current_pos);
 
 };
 

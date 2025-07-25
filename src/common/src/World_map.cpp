@@ -109,7 +109,7 @@ void WorldMap::updateAndVisualize(bool show_grid, bool equal_aspect) {
         std::string filename,
         std::vector<std::vector<std::vector<double>>> DWA_p_t)
     {
-        int steps = static_cast<int>(planning_data[0].size());
+        int steps = static_cast<int>(planning_data[1].size());
         std::vector<double> traj_x, traj_y;
         int k=3;
         if(DWA_p_t.size()!=0)

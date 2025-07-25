@@ -13,10 +13,19 @@ int main()
     world_map.addObstacle({42, 30, 80, 10, 0, "red"});
     world_map.addObstacle({58, 60, 80, 10, 0, "red"});
     world_map.addObstacle({50, 95, 2, 6, 0, "red"});
-    world_map.addObstacle({56, 95, 2, 6, 0, "red"});  
+    world_map.addObstacle({56, 95, 2, 6, 0, "red"});
+    world_map.addObstacle({66, 95, 2, 6, 0, "red"});  
+    world_map.addObstacle({90, 96.5, 2, 3, 0, "red"});    
 
     //设置目标点
-    Pos3d str_pos(12,15,M_PI/6),end_pos(53,95,-M_PI/2);
+    Pos3d str_pos(12,15,M_PI/6);
+    //倒车入库
+    //Pos3d end_pos(53,96,-M_PI/2);
+    //侧方位停车
+    //Pos3d end_pos(63,96,-M_PI);
+    //侧方位停车1
+    Pos3d end_pos(96,96,-M_PI);
+
     world_map.set_goal_pos(end_pos);
     world_map.set_start_pos(str_pos);
     // world_map.visualize();

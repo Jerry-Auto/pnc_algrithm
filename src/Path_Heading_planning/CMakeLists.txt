@@ -88,6 +88,25 @@ set(ReedsShepp_DEMO_NAME ReedsShepp_demo)
 add_executable(${ReedsShepp_DEMO_NAME} example/ReedsShepp_demo.cpp)  
 target_link_libraries(${ReedsShepp_DEMO_NAME} ${ReedsShepp_LIB_NAME} Python3::Python Python3::NumPy)  
 
+
+#正确版本的RS曲线类编译
+set(RS_CURVE_LIB_NAME rs_curve)
+add_library(${RS_CURVE_LIB_NAME} SHARED)  
+target_sources(${RS_CURVE_LIB_NAME}  
+    PRIVATE 
+    src/rs_curve.cpp 
+)
+target_include_directories(${RS_CURVE_LIB_NAME}  
+    PUBLIC include 
+    PRIVATE 
+    auto_driving_algorithm 
+)
+target_link_libraries(${RS_CURVE_LIB_NAME} World_map Python3::Python Python3::NumPy) 
+set(RS_CURVE_DEMO_NAME rs_curve_demo)
+add_executable(${RS_CURVE_DEMO_NAME} example/rs_curve_demo.cpp)  
+target_link_libraries(${RS_CURVE_DEMO_NAME} ${RS_CURVE_LIB_NAME} Python3::Python Python3::NumPy)  
+
+
 #混合A*类的编译
 # 使用 link_directories() 指定库搜索路径
 link_directories(${CMAKE_SOURCE_DIR}/src/libs/Global_Path_planning)
@@ -104,7 +123,7 @@ target_include_directories(${HY_A_S_LIB_NAME}
     PRIVATE 
     auto_driving_algorithm 
 )
-target_link_libraries(${HY_A_S_LIB_NAME} ObstacleGridMap ReedsShepp Dijkstra node3d Python3::Python Python3::NumPy) 
+target_link_libraries(${HY_A_S_LIB_NAME} ObstacleGridMap rs_curve Dijkstra node3d Python3::Python Python3::NumPy) 
 set(HY_A_S_DEMO_NAME HY_A_S_demo)
 add_executable(${HY_A_S_DEMO_NAME} example/H_A_Star_demo.cpp)  
 target_link_libraries(${HY_A_S_DEMO_NAME} ${HY_A_S_LIB_NAME} Python3::Python Python3::NumPy)  

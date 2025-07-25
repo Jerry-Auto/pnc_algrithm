@@ -1,8 +1,6 @@
 #include "H_A_S.h"
 
-
-
-
+using namespace std;
   H_A_Star::H_A_Star(std::shared_ptr<ElectricVehicleDynamicsModel::VehicleParams> vehicle_param,
                           std::shared_ptr<Params> solver_param,
                           std::shared_ptr<Cost_weight> cost_param)
@@ -32,7 +30,7 @@
     
 
     //RS曲线生成器
-    reedsShepp_=std::shared_ptr<ReedsShepp>(new ReedsShepp());
+    reedsShepp_=std::shared_ptr<RSCurve>(new RSCurve());
     //dijkstra求解器
 
     //初始化搜索位姿
@@ -173,10 +171,15 @@
     std::reverse(hybrid_a_phi.begin(), hybrid_a_phi.end());
 
     std::vector<double> time;
-    for(size_t i=0;i<hybrid_a_x.size();++i)
+    for(size_t i=0;i<hybrid_a_x.size()+1;++i)
     {
       time.emplace_back((double)i*params_->dt);
     }
+    
+    hybrid_a_x.push_back(end_node_->GetX());
+    hybrid_a_y.push_back(end_node_->GetY());
+    hybrid_a_phi.push_back(end_node_->GetPhi());
+
     return {time,hybrid_a_x,hybrid_a_y,hybrid_a_phi};
   }
 
@@ -312,12 +315,19 @@ std::shared_ptr<Node3d> H_A_Star::Next_node_generator(
 }
 
 bool H_A_Star::AnalyticExpansion(std::shared_ptr<Node3d> current_node) {
+  //使用RS曲线生成
+  std::vector<Pos3d> curve_path=RS_generate_path(current_node->GetPose());
 
-  //std::vector<Pos3d> curve_path=RS_generate_path(current_node->GetPose());
+  //使用一般几何曲线计算
+  // std::vector<Pos3d> curve_path = math::GetTrajFromCurvePathsConnect(
+  //   current_node->GetPose(), end_node_->GetPose(), params_->min_radius,params_->grid_resolution);
 
-  std::vector<Pos3d> curve_path = math::GetTrajFromCurvePathsConnect(
-    current_node->GetPose(), end_node_->GetPose(), params_->min_radius,params_->grid_resolution);
-
+  //判断RS曲线是否正确
+  double dx=abs(curve_path.back().x-end_node_->GetPose().x),
+  dy=abs(curve_path.back().y-end_node_->GetPose().y),
+  dphi=abs(curve_path.back().phi-end_node_->GetPose().phi);
+  if(dx>params_->step_size/2||dy>params_->step_size/2||dphi>0.1)
+  {return false;}
 
   if (!IsPathVaild(curve_path)) {
     return false;
@@ -331,11 +341,15 @@ std::vector<Pos3d> H_A_Star::RS_generate_path(Pos3d current_pos)
 {
   vector<Pos3d> pos3d_vector;
   Pos3d end_pos=end_node_->GetPose();
-  vector<double>start{current_pos.x,current_pos.y,current_pos.phi};
-  vector<double>goal{end_pos.x,end_pos.y,end_pos.phi};
-  Path path =reedsShepp_->reedsSheppPathPlanning(start,goal,params_->max_kappa,params_->step_size);
-  for (size_t i = 0; i < path.x.size(); ++i) {
-     pos3d_vector.emplace_back(path.x[i], path.y[i], path.yaw[i]);
+  point_type start_pose(std::make_pair(current_pos.x,current_pos.y),current_pos.phi); // 起点 (0,0)，朝向 0 弧度
+  point_type end_pose(std::make_pair(end_pos.x,end_pos.y), end_pos.phi); // 终点 (4,2)，朝向 π/2 弧度
+
+  auto curve=reedsShepp_->GetBestRSCurve(params_->min_radius,start_pose,end_pose);
+  auto path= reedsShepp_->GetRSPoint(curve,params_->step_size);
+
+  for (size_t i = 0; i < path.size(); ++i) {
+    Pos3d pos(path[i].first.first, path[i].first.second, path[i].second);
+     pos3d_vector.push_back(pos);
   }
   return pos3d_vector;
 }
@@ -395,8 +409,47 @@ double H_A_Star::TrajCost(std::shared_ptr<Node3d> current_node,
 
   piecewise_cost += cost_weights_->traj_steer_change_penalty*
                     std::abs(next_node->GetSteer() - current_node->GetSteer());
+  //障碍物距离代价
+  piecewise_cost += cost_weights_->traj_obs_dist_penalty*calcu_obstacle_cost(next_node);
 
   return piecewise_cost;
+}
+
+double H_A_Star::calcu_obstacle_cost(std::shared_ptr<Node3d> next_node)
+{
+  double cost=0;
+  vector<double> deta_path_x=next_node->GetXs(),
+  deta_path_y=next_node->GetYs(),
+  deta_path_phi=next_node->GetPhis();
+  double deta_s=params_->step_size;
+
+  for(size_t i=0;i<deta_path_x.size();i++)
+  {
+    Pos3d pos(deta_path_x[i],deta_path_y[i],deta_path_phi[i]);
+    double di=distance_to_obs(pos);
+    if(di>5){continue;}
+    else{
+      cost+=1/(di+0.00001);
+    }
+  }
+  return cost*deta_s;
+}
+
+double H_A_Star::distance_to_obs(Pos3d current_pos)
+{
+      //规划点是车辆后轴重心点，因此需要向前移动到几何中心
+    Box2d bounding_box = Node3d::GetBoundingBox(
+        *vehicle_params_, current_pos.x, current_pos.y, current_pos.phi);
+      double min_dist=std::numeric_limits<double>::max();
+    //用矩形框和障碍物算距离
+    for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
+      for (const LineSegment2d& linesegment : obstacle_linesegments) {
+          double dist=DistanceTo(bounding_box, linesegment);
+          if(dist<min_dist)
+          {min_dist=dist;}
+      }
+    }
+    return min_dist;
 }
 
 double H_A_Star::Heuristic_cost(std::shared_ptr<Node3d> next_node) {
@@ -404,14 +457,21 @@ double H_A_Star::Heuristic_cost(std::shared_ptr<Node3d> next_node) {
   double holo_heuristic=Dijk_solver_->cost_to_point(next_node->GetX(),next_node->GetY());
   //非完整性约束，RS曲线长度
   double non_holo_heuristic=0;
-  // Pos3d current_pos=next_node->GetPose();
-  // Pos3d end_pos=end_node_->GetPose();
-  // vector<double>start{current_pos.x,current_pos.y,current_pos.phi};
-  // vector<double>goal{end_pos.x,end_pos.y,end_pos.phi};
-  // Path path =reedsShepp_->reedsSheppPathPlanning(start,goal,params_->max_kappa,params_->step_size);
-  // non_holo_heuristic=path.L;
+
+  Pos3d current_pos=next_node->GetPose();
+  non_holo_heuristic=Get_RS_Length(current_pos);
+
   double heuristic_cost=std::max(holo_heuristic,non_holo_heuristic);
   return heuristic_cost;
+}
+
+double H_A_Star::Get_RS_Length(Pos3d current_pos)
+{
+  Pos3d end_pos=end_node_->GetPose();
+  point_type start_pos(std::make_pair(current_pos.x,current_pos.y),current_pos.phi); // 起点 (0,0)，朝向 0 弧度
+  point_type end_pose(std::make_pair(end_pos.x,end_pos.y), end_pos.phi); // 终点 (4,2)，朝向 π/2 弧度
+  auto curve=reedsShepp_->GetBestRSCurve(params_->min_radius,start_pos,end_pose);
+  return curve.second.second;
 }
 
 std::shared_ptr<Node3d>  H_A_Star::GenerateFinalNode(const std::vector<Pos3d>& curve_path,std::shared_ptr<Node3d> current_node) 
