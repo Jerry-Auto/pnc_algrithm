@@ -19,6 +19,7 @@ int main(){
     double k = 3.; //增益系数
     vector<vector<double>>refer_path(1000,vector<double>(3));
     vector<double>refer_x,refer_y; //保存参考数据用于画图
+    
     // 生成参考轨迹
     for(int i=0;i<1000;i++){
         refer_path[i][0]=0.1*i;
@@ -58,6 +59,7 @@ int main(){
         plt::pause(0.01);
         if(delta_index[1]>=refer_path.size()-1)break;
     }
+
     // save figure
     const char* filename = "./stanley_demo.png";
     cout << "Saving result to " << filename << std::endl;

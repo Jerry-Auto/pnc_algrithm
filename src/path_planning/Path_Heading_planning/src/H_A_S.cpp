@@ -385,8 +385,7 @@ void H_A_Star::CalculateNodeCost(std::shared_ptr<Node3d> current_node,std::share
 
   next_node->SetTrajCost(current_node->GetTrajCost()+TrajCost(current_node, next_node));
 
-  double optimal_path_cost = 0.0;
-  optimal_path_cost += Heuristic_cost(next_node);
+  double optimal_path_cost = Heuristic_cost(next_node);
   next_node->SetHeuCost(optimal_path_cost);
 }
 

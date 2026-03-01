@@ -61,7 +61,7 @@ target_link_libraries(main PRIVATE ${PACKAGE_NAME})
 
 
 # 添加子目录
-#add_subdirectory(src/path_planning)
+add_subdirectory(src/path_planning)
 
 add_subdirectory(src/path_Tracking)
 

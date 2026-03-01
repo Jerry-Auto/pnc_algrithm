@@ -9,12 +9,13 @@
 using namespace std;
 
 /**
- * 位置式PID实现
+ * 增量式PID实现
  */
 class PID_controller {
 private:
     double kp,  ki, kd, target, upper,  lower;
-    double error=0.0,pre_error=0.0,sum_error=0.0;
+    double error=0.0,pre_error=0.0,prev_error2=0.0,sum_error=0.0;
+    double last_output=0.0;
 public:
     PID_controller(double kp, double ki, double kd, double target, double upper, double lower);
 
@@ -24,6 +25,8 @@ public:
 
     void setBound(double upper,double lower);
 
+    double calIncrementalOutput(double state);
+    
     double calOutput(double state);
 
     void reset();

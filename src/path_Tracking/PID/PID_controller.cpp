@@ -42,8 +42,31 @@ void PID_controller::setBound(double upper, double lower) {
     this->lower=lower;
 }
 
+
+
 /**
- * 计算控制输出
+ * 计算控制输出，增量式PID
+ * @param state 当前状态量
+ * @return
+ */
+double PID_controller::calIncrementalOutput(double state) {
+    this->error = this->target - state;
+    double delta_u = this->kp * (this->error - this->pre_error)
+                     + this->ki * (this->error)
+                     + this->kd * (this->error - 2.0 * this->pre_error + this->prev_error2);
+    double u = this->last_output + delta_u;
+    if (u < this->lower) u = this->lower;
+    else if (u > this->upper) u = this->upper;
+    // update history
+    this->prev_error2 = this->pre_error;
+    this->pre_error = this->error;
+    this->last_output = u;
+    this->sum_error = this->sum_error + this->error;
+    return u;
+}
+
+/**
+ * 计算控制输出，位置式PID
  * @param state 当前状态量
  * @return
  */
@@ -61,7 +84,11 @@ double PID_controller::calOutput(double state) {
  * 重置
  */
 void PID_controller::reset() {
-    error=0.0,pre_error=0.0,sum_error=0.0;
+    error = 0.0;
+    pre_error = 0.0;
+    prev_error2 = 0.0;
+    sum_error = 0.0;
+    last_output = 0.0;
 }
 
 /**

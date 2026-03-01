@@ -47,7 +47,8 @@ int main(int argc, char* argv[]) {
     const std::string filename = "./image/data.csv";
     if(!read)
     {   
-        AntColony ACO(&grid_map,200,1,10,0.3,100);
+        AntColony ACO(&grid_map,4000,1.5,4.0,0.2,80);
+        ACO.set_ant_num(300);
 
         ACO.planning("ant.png",true,false);
 

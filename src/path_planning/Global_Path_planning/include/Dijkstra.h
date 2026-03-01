@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <map>
+#include <unordered_map>
+#include <queue>
 #include <limits>  // 用于 std::numeric_limits
 #include"ObstacleGridMap.h"
 
@@ -36,7 +38,7 @@ private:
     {1, -1, sqrt(2)},
     {1, 1, sqrt(2)}};//移动方向与代价
 
-    bool Is_quit_map(Dijkstra::Node* node);
+    bool Is_quit_map(const Dijkstra::Node& node) const;
 
     ObstacleGridMap* grid_map_=nullptr;
 
@@ -49,11 +51,11 @@ private:
     
     std::pair<std::vector<int>,std::vector<int>> final_path;
 
-    void cal_fina_path(Node* node,std::map<int,Node*> closed_set);
+    void cal_fina_path(const Node& node,const std::unordered_map<int,Node>& closed_set);
 
     double Best_grid_length;
     //把最后的最短距离表记录下来
-    std::map<int,Node*> C_set;
+    std::unordered_map<int,Node> C_set;
 
 public:
     Dijkstra(ObstacleGridMap* grid_map,bool plotfinalpath=true,bool plotpoint=true,bool plotgridpath=true);

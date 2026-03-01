@@ -11,6 +11,7 @@
 #include <map>
 #include <limits>  // 用于 std::numeric_limits
 #include <random>
+#include <utility>
 
 class AntColony
 {
@@ -23,8 +24,16 @@ public:
 
 private:
 
+    struct AntState {
+        int current_idx;
+        int target_idx;
+        int prev_idx;
+        std::vector<int> segment_path;
+        double segment_length;
+    };
+
     // 蚁群算法参数
-    int num_of_iterations ;        // 迭代次数
+    int num_of_iterations ;        // 模拟步数
     int num_of_ant;         // 蚂蚁数量
     double Alpha; // 信息素重要程度
     double Beta;  // 启发式信息重要程度
@@ -60,13 +69,11 @@ private:
 
     double getrandm(double a,double b);//在【a,b）之间生成随机数
 
-    double calcu_dis_to_end(Node* node);//计算节点到终点的距离
+    double calcu_dis_to_target(Node* node,int target_idx);//计算节点到目标点的距离
 
     int rotate_wheel_slt(const std::vector<double>& prob);//轮盘赌确定移动方向
 
-    std::pair<double,std::vector<int>> single_ant_go(Node* start,Node* goal,int size);//单个蚂蚁从起点出发找到去终点的<距离，路径>
-
-    void update_pheromono(std::vector<std::vector<int>> ants_ROUTES_per_round,std::vector<double> ants_PL_per_round);
+    void update_pheromono(const std::vector<std::pair<int,int>>& step_edges,const std::vector<double>& step_lengths);
 public:
 
     AntColony(ObstacleGridMap* grid_map,int num_i=100,double alp=2,double bet=4.0,double rho=0.3,double q=8);
